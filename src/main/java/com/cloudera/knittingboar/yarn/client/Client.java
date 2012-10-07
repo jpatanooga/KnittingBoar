@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn.client;
+package com.cloudera.knittingboar.yarn.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

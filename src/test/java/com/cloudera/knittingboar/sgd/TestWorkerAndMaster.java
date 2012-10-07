@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd;
+package com.cloudera.knittingboar.sgd;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,14 +17,14 @@ import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextInputFormat;
 
-import com.cloudera.wovenwabbit.io.InputRecordsSplit;
-import com.cloudera.wovenwabbit.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.wovenwabbit.messages.GradientUpdateMessage;
-import com.cloudera.wovenwabbit.records.RecordFactory;
-import com.cloudera.wovenwabbit.utils.Utils;
+import com.cloudera.knittingboar.io.InputRecordsSplit;
+import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
+import com.cloudera.knittingboar.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.records.RecordFactory;
+import com.cloudera.knittingboar.utils.Utils;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.mongodb.util.Util;
+
 
 public class TestWorkerAndMaster extends TestCase {
 

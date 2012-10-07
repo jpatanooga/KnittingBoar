@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cloudera.wovenwabbit.yarn.appmaster.ComputableMaster;
+import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 
 public class CompoundAdditionMaster implements ComputableMaster<UpdateableInt> {
   private static final Log LOG = LogFactory.getLog(CompoundAdditionMaster.class);

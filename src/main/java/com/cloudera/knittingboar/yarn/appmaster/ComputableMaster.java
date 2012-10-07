@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn.appmaster;
+package com.cloudera.knittingboar.yarn.appmaster;
 
 import java.util.Collection;
 

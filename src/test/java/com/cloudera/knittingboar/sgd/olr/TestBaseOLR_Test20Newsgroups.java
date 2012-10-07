@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd.olr;
+package com.cloudera.knittingboar.sgd.olr;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,11 +18,11 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import com.cloudera.wovenwabbit.io.InputRecordsSplit;
-import com.cloudera.wovenwabbit.metrics.POLRMetrics;
-import com.cloudera.wovenwabbit.metrics.POLRModelTester;
-import com.cloudera.wovenwabbit.records.RecordFactory;
-import com.cloudera.wovenwabbit.records.TwentyNewsgroupsRecordFactory;
+import com.cloudera.knittingboar.io.InputRecordsSplit;
+import com.cloudera.knittingboar.metrics.POLRMetrics;
+import com.cloudera.knittingboar.metrics.POLRModelTester;
+import com.cloudera.knittingboar.records.RecordFactory;
+import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 
 import junit.framework.TestCase;
 

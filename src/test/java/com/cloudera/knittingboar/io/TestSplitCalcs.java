@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.io;
+package com.cloudera.knittingboar.io;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

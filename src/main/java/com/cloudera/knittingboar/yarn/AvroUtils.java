@@ -1,6 +1,6 @@
-package com.cloudera.wovenwabbit.yarn;
+package com.cloudera.knittingboar.yarn;
 
-import com.cloudera.wovenwabbit.yarn.avro.generated.WorkerId;
+import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
 
 public class AvroUtils {
   public static String getWorkerId(WorkerId workerId) {

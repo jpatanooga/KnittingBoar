@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.records;
+package com.cloudera.knittingboar.records;
 
 import junit.framework.TestCase;
 

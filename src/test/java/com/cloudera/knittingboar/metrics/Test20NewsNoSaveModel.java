@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.metrics;
+package com.cloudera.knittingboar.metrics;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,11 +11,11 @@ import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextInputFormat;
 
-import com.cloudera.wovenwabbit.io.InputRecordsSplit;
-import com.cloudera.wovenwabbit.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.wovenwabbit.messages.GradientUpdateMessage;
-import com.cloudera.wovenwabbit.sgd.POLRMasterDriver;
-import com.cloudera.wovenwabbit.sgd.POLRWorkerDriver;
+import com.cloudera.knittingboar.io.InputRecordsSplit;
+import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
+import com.cloudera.knittingboar.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.sgd.POLRMasterDriver;
+import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
 
 import junit.framework.TestCase;
 

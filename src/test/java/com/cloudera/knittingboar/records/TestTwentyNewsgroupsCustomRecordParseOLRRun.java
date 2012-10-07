@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.records;
+package com.cloudera.knittingboar.records;
 
 import java.io.IOException;
 
@@ -21,8 +21,8 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import com.cloudera.wovenwabbit.io.InputRecordsSplit;
-import com.cloudera.wovenwabbit.utils.Utils;
+import com.cloudera.knittingboar.io.InputRecordsSplit;
+import com.cloudera.knittingboar.utils.Utils;
 
 public class TestTwentyNewsgroupsCustomRecordParseOLRRun extends TestCase {
 

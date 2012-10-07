@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.conf.cmdline;
+package com.cloudera.knittingboar.conf.cmdline;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

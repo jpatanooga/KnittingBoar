@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn.appmaster;
+package com.cloudera.knittingboar.yarn.appmaster;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -17,13 +17,13 @@ import org.apache.avro.ipc.specific.SpecificResponder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cloudera.wovenwabbit.yarn.AvroUtils;
-import com.cloudera.wovenwabbit.yarn.Updateable;
-import com.cloudera.wovenwabbit.yarn.avro.generated.KnittingBoarService;
-import com.cloudera.wovenwabbit.yarn.avro.generated.ProgressReport;
-import com.cloudera.wovenwabbit.yarn.avro.generated.ServiceError;
-import com.cloudera.wovenwabbit.yarn.avro.generated.StartupConfiguration;
-import com.cloudera.wovenwabbit.yarn.avro.generated.WorkerId;
+import com.cloudera.knittingboar.yarn.AvroUtils;
+import com.cloudera.knittingboar.yarn.Updateable;
+import com.cloudera.knittingboar.yarn.avro.generated.KnittingBoarService;
+import com.cloudera.knittingboar.yarn.avro.generated.ProgressReport;
+import com.cloudera.knittingboar.yarn.avro.generated.ServiceError;
+import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
+import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
 
 /**
  * @author Michael

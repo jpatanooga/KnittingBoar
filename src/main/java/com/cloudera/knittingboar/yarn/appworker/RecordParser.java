@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn.appworker;
+package com.cloudera.knittingboar.yarn.appworker;
 
 public interface RecordParser<T> {
   void reset();

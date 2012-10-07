@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn;
+package com.cloudera.knittingboar.yarn;
 
 
 /**

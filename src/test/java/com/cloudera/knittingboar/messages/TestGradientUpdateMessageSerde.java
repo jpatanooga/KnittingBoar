@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.messages;
+package com.cloudera.knittingboar.messages;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.cloudera.wovenwabbit.sgd.GradientBuffer;
+import com.cloudera.knittingboar.sgd.GradientBuffer;
 
 import junit.framework.TestCase;
 

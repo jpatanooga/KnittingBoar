@@ -1,9 +1,9 @@
-package com.cloudera.wovenwabbit.sgd;
+package com.cloudera.knittingboar.sgd;
 
 import org.apache.hadoop.conf.Configuration;
 
-import com.cloudera.wovenwabbit.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.wovenwabbit.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
+import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 
 import junit.framework.TestCase;
 

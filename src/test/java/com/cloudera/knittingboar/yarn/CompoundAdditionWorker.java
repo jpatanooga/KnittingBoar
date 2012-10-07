@@ -1,11 +1,11 @@
-package com.cloudera.wovenwabbit.yarn;
+package com.cloudera.knittingboar.yarn;
 
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cloudera.wovenwabbit.yarn.appworker.ComputableWorker;
+import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
 
 public class CompoundAdditionWorker implements ComputableWorker<UpdateableInt, String> {
   private static final Log LOG = LogFactory.getLog(CompoundAdditionWorker.class);

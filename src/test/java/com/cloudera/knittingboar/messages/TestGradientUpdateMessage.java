@@ -1,6 +1,6 @@
-package com.cloudera.wovenwabbit.messages;
+package com.cloudera.knittingboar.messages;
 
-import com.cloudera.wovenwabbit.sgd.GradientBuffer;
+import com.cloudera.knittingboar.sgd.GradientBuffer;
 
 import junit.framework.TestCase;
 

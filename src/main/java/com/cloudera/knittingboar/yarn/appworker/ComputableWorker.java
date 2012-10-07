@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn.appworker;
+package com.cloudera.knittingboar.yarn.appworker;
 
 import java.util.List;
 

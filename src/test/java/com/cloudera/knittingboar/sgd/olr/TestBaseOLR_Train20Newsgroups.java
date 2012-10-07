@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd.olr;
+package com.cloudera.knittingboar.sgd.olr;
 
 import junit.framework.TestCase;
 
@@ -37,7 +37,7 @@ import org.apache.mahout.vectorizer.encoders.FeatureVectorEncoder;
 import org.apache.mahout.vectorizer.encoders.StaticWordValueEncoder;
 import org.apache.mahout.vectorizer.encoders.Dictionary;
 
-import com.cloudera.wovenwabbit.utils.Utils;
+import com.cloudera.knittingboar.utils.Utils;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ConcurrentHashMultiset;
 import com.google.common.collect.HashMultiset;

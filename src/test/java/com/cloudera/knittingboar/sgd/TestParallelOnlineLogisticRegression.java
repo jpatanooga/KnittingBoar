@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd;
+package com.cloudera.knittingboar.sgd;
 
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ import org.apache.mahout.classifier.sgd.L1;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import com.cloudera.wovenwabbit.utils.Utils;
+import com.cloudera.knittingboar.utils.Utils;
 
 /**
  * Mostly temporary tests used to debug components as we developed the system

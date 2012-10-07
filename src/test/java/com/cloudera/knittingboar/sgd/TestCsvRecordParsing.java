@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd;
+package com.cloudera.knittingboar.sgd;
 
 import java.util.ArrayList;
 

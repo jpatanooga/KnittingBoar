@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.messages;
+package com.cloudera.knittingboar.messages;
 
 import junit.framework.TestCase;
 

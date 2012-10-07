@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd;
+package com.cloudera.knittingboar.sgd;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,8 +17,8 @@ import org.apache.hadoop.mapred.TextInputFormat;
 
 import junit.framework.TestCase;
 
-import com.cloudera.wovenwabbit.io.InputRecordsSplit;
-import com.cloudera.wovenwabbit.records.RecordFactory;
+import com.cloudera.knittingboar.io.InputRecordsSplit;
+import com.cloudera.knittingboar.records.RecordFactory;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;

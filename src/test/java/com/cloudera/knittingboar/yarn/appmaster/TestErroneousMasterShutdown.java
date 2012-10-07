@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.yarn.appmaster;
+package com.cloudera.knittingboar.yarn.appmaster;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -10,12 +10,12 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.cloudera.wovenwabbit.yarn.AvroUtils;
-import com.cloudera.wovenwabbit.yarn.CompoundAdditionMaster;
-import com.cloudera.wovenwabbit.yarn.UpdateableInt;
-import com.cloudera.wovenwabbit.yarn.avro.generated.FileSplit;
-import com.cloudera.wovenwabbit.yarn.avro.generated.StartupConfiguration;
-import com.cloudera.wovenwabbit.yarn.avro.generated.WorkerId;
+import com.cloudera.knittingboar.yarn.AvroUtils;
+import com.cloudera.knittingboar.yarn.CompoundAdditionMaster;
+import com.cloudera.knittingboar.yarn.UpdateableInt;
+import com.cloudera.knittingboar.yarn.avro.generated.FileSplit;
+import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
+import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
 
 
 public class TestErroneousMasterShutdown {

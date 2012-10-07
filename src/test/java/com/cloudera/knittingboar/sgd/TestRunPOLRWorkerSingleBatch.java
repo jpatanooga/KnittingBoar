@@ -1,4 +1,4 @@
-package com.cloudera.wovenwabbit.sgd;
+package com.cloudera.knittingboar.sgd;
 
 import java.io.IOException;
 
@@ -15,8 +15,8 @@ import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.mahout.classifier.sgd.L1;
 import org.apache.mahout.classifier.sgd.OnlineLogisticRegression;
 
-import com.cloudera.wovenwabbit.io.InputRecordsSplit;
-import com.cloudera.wovenwabbit.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.io.InputRecordsSplit;
+import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 
 import junit.framework.TestCase;
 
