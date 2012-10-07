@@ -15,7 +15,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 
-import com.cloudera.wovenwabbit.utils.Utils;
+import com.cloudera.knittingboar.utils.Utils;
 
 import junit.framework.TestCase;
 

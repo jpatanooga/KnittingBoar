@@ -16,13 +16,13 @@ import org.apache.avro.ipc.specific.SpecificRequestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cloudera.wovenwabbit.yarn.AvroUtils;
-import com.cloudera.wovenwabbit.yarn.Updateable;
-import com.cloudera.wovenwabbit.yarn.avro.generated.KnittingBoarService;
-import com.cloudera.wovenwabbit.yarn.avro.generated.ProgressReport;
-import com.cloudera.wovenwabbit.yarn.avro.generated.ServiceError;
-import com.cloudera.wovenwabbit.yarn.avro.generated.StartupConfiguration;
-import com.cloudera.wovenwabbit.yarn.avro.generated.WorkerId;
+import com.cloudera.knittingboar.yarn.AvroUtils;
+import com.cloudera.knittingboar.yarn.Updateable;
+import com.cloudera.knittingboar.yarn.avro.generated.KnittingBoarService;
+import com.cloudera.knittingboar.yarn.avro.generated.ProgressReport;
+import com.cloudera.knittingboar.yarn.avro.generated.ServiceError;
+import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
+import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
 
 public class ApplicationWorkerService<T extends Updateable, R> implements
     Callable<Integer> {

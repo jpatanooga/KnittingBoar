@@ -1,4 +1,4 @@
-@namespace ("com.cloudera.wovenwabbit.yarn.avro.generated")
+@namespace ("com.cloudera.knittingboar.yarn.avro.generated")
 protocol KnittingBoarService {
 
   fixed WorkerId (32);

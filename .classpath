@@ -1,378 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
-  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
-  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
-  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
-  <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/inject/javax.inject/1/javax.inject-1.jar" sourcepath="M2_REPO/javax/inject/javax.inject/1/javax.inject-1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/javax/inject/javax.inject/1/javax.inject-1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/javax/xml/bind/jaxb-api/2.2.2/jaxb-api-2.2.2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1.jar" sourcepath="M2_REPO/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.7/antlr-2.7.7.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/antlr/antlr/3.2/antlr-3.2.jar" sourcepath="M2_REPO/org/antlr/antlr/3.2/antlr-3.2-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/antlr/antlr-runtime/3.2/antlr-runtime-3.2.jar" sourcepath="M2_REPO/org/antlr/antlr-runtime/3.2/antlr-runtime-3.2-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar" sourcepath="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/asm/asm/3.2/asm-3.2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.6.5/aspectjrt-1.6.5.jar" sourcepath="M2_REPO/org/aspectj/aspectjrt/1.6.5/aspectjrt-1.6.5-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/avro/avro/1.7.1/avro-1.7.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/avro/avro-ipc/1.7.1/avro-ipc-1.7.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mongodb/bson/2.5/bson-2.5.jar" sourcepath="M2_REPO/org/mongodb/bson/2.5/bson-2.5-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/mongodb/bson/2.5/bson-2.5-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/cassandra/cassandra-all/0.8.1/cassandra-all-0.8.1.jar" sourcepath="M2_REPO/org/apache/cassandra/cassandra-all/0.8.1/cassandra-all-0.8.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/apache/cassandra/cassandra-all/0.8.1/cassandra-all-0.8.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/cassandra/cassandra-thrift/0.8.1/cassandra-thrift-0.8.1.jar" sourcepath="M2_REPO/org/apache/cassandra/cassandra-thrift/0.8.1/cassandra-thrift-0.8.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/apache/cassandra/cassandra-thrift/0.8.1/cassandra-thrift-0.8.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar" sourcepath="M2_REPO/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/commons/commons-cli/2.0-mahout/commons-cli-2.0-mahout.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-codec/commons-codec/1.4/commons-codec-1.4-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar" sourcepath="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-compress/1.1/commons-compress-1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar" sourcepath="M2_REPO/commons-configuration/commons-configuration/1.6/commons-configuration-1.6-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-daemon/commons-daemon/1.0.3/commons-daemon-1.0.3.jar" sourcepath="M2_REPO/commons-daemon/commons-daemon/1.0.3/commons-daemon-1.0.3-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-daemon/commons-daemon/1.0.3/commons-daemon-1.0.3-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" sourcepath="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-digester/commons-digester/1.8/commons-digester-1.8.jar" sourcepath="M2_REPO/commons-digester/commons-digester/1.8/commons-digester-1.8-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-el/commons-el/1.0/commons-el-1.0.jar" sourcepath="M2_REPO/commons-el/commons-el/1.0/commons-el-1.0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-el/commons-el/1.0/commons-el-1.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar" sourcepath="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.1/commons-io-2.1.jar" sourcepath="M2_REPO/commons-io/commons-io/2.1/commons-io-2.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-io/commons-io/2.1/commons-io-2.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-lang/commons-lang/2.5/commons-lang-2.5-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.1/commons-logging-api-1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-math/2.2/commons-math-2.2.jar" sourcepath="M2_REPO/org/apache/commons/commons-math/2.2/commons-math-2.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/apache/commons/commons-math/2.2/commons-math-2.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-net/commons-net/3.1/commons-net-3.1.jar" sourcepath="M2_REPO/commons-net/commons-net/3.1/commons-net-3.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-net/commons-net/3.1/commons-net-3.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.5.6/commons-pool-1.5.6.jar" sourcepath="M2_REPO/commons-pool/commons-pool/1.5.6/commons-pool-1.5.6-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/commons-pool/commons-pool/1.5.6/commons-pool-1.5.6-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.1/concurrentlinkedhashmap-lru-1.1.jar" sourcepath="M2_REPO/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.1/concurrentlinkedhashmap-lru-1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.1/concurrentlinkedhashmap-lru-1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jdt/core/3.1.1/core-3.1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/gmbal/gmbal-api-only/3.0.0-b023/gmbal-api-only-3.0.0-b023.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1-tests.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-http/2.1.1/grizzly-http-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-http/2.1.1/grizzly-http-2.1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-http/2.1.1/grizzly-http-2.1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-http-server/2.1.1/grizzly-http-server-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-http-server/2.1.1/grizzly-http-server-2.1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-http-server/2.1.1/grizzly-http-server-2.1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-http-servlet/2.1.1/grizzly-http-servlet-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-http-servlet/2.1.1/grizzly-http-servlet-2.1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-http-servlet/2.1.1/grizzly-http-servlet-2.1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-rcm/2.1.1/grizzly-rcm-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-rcm/2.1.1/grizzly-rcm-2.1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-rcm/2.1.1/grizzly-rcm-2.1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/r09/guava-r09.jar" sourcepath="M2_REPO/com/google/guava/guava/r09/guava-r09-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/google/guava/guava/r09/guava-r09-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/google/inject/guice/3.0/guice-3.0.jar" sourcepath="M2_REPO/com/google/inject/guice/3.0/guice-3.0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/google/inject/guice/3.0/guice-3.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0.jar" sourcepath="M2_REPO/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-annotations/2.0.0-cdh4.0.0/hadoop-annotations-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-auth/2.0.0-cdh4.0.1/hadoop-auth-2.0.0-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-common/2.0.0-cdh4.0.1/hadoop-common-2.0.0-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-core/2.0.0-mr1-cdh4.0.1/hadoop-core-2.0.0-mr1-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-hdfs/2.0.0-cdh4.0.1/hadoop-hdfs-2.0.0-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-api/2.0.0-cdh4.0.0/hadoop-yarn-api-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-common/2.0.0-cdh4.0.0/hadoop-yarn-common-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-common/2.0.0-cdh4.0.0/hadoop-yarn-server-common-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-nodemanager/2.0.0-cdh4.0.0/hadoop-yarn-server-nodemanager-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-resourcemanager/2.0.0-cdh4.0.0/hadoop-yarn-server-resourcemanager-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-web-proxy/2.0.0-cdh4.0.0/hadoop-yarn-server-web-proxy-2.0.0-cdh4.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/me/prettyprint/hector-core/0.8.0-2/hector-core-0.8.0-2.jar" sourcepath="M2_REPO/me/prettyprint/hector-core/0.8.0-2/hector-core-0.8.0-2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/me/prettyprint/hector-core/0.8.0-2/hector-core-0.8.0-2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.2/high-scale-lib-1.1.2.jar" sourcepath="M2_REPO/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.2/high-scale-lib-1.1.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.2/high-scale-lib-1.1.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.0.1/httpclient-4.0.1.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpclient/4.0.1/httpclient-4.0.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.8/jackson-core-asl-1.8.8.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.8/jackson-core-asl-1.8.8-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-jaxrs/1.7.1/jackson-jaxrs-1.7.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.8.8/jackson-mapper-asl-1.8.8.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.8.8/jackson-mapper-asl-1.8.8-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-xc/1.7.1/jackson-xc-1.7.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/jakarta-regexp/jakarta-regexp/1.4/jakarta-regexp-1.4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/github/stephenc/jamm/0.2.2/jamm-0.2.2.jar" sourcepath="M2_REPO/com/github/stephenc/jamm/0.2.2/jamm-0.2.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/github/stephenc/jamm/0.2.2/jamm-0.2.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/tomcat/jasper-compiler/5.5.23/jasper-compiler-5.5.23.jar"/>
-  <classpathentry kind="var" path="M2_REPO/tomcat/jasper-runtime/5.5.23/jasper-runtime-5.5.23.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/javax.servlet/3.0/javax.servlet-3.0.jar" sourcepath="M2_REPO/org/glassfish/javax.servlet/3.0/javax.servlet-3.0-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1.jar" sourcepath="M2_REPO/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/jfree/jcommon/1.0.12/jcommon-1.0.12.jar" sourcepath="M2_REPO/jfree/jcommon/1.0.12/jcommon-1.0.12-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/jfree/jcommon/1.0.12/jcommon-1.0.12-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/jdiff/jdiff/1.0.9/jdiff-1.0.9.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-client/1.8/jersey-client-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-client/1.8/jersey-client-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-client/1.8/jersey-client-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.8/jersey-core-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.8/jersey-core-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-core/1.8/jersey-core-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-grizzly2/1.8/jersey-grizzly2-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-grizzly2/1.8/jersey-grizzly2-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-grizzly2/1.8/jersey-grizzly2-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/contribs/jersey-guice/1.8/jersey-guice-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/contribs/jersey-guice/1.8/jersey-guice-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/contribs/jersey-guice/1.8/jersey-guice-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-json/1.8/jersey-json-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-json/1.8/jersey-json-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-json/1.8/jersey-json-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-server/1.8/jersey-server-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-server/1.8/jersey-server-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-server/1.8/jersey-server-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.8/jersey-test-framework-core-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.8/jersey-test-framework-core-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.8/jersey-test-framework-core-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.8/jersey-test-framework-grizzly2-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.8/jersey-test-framework-grizzly2-1.8-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.8/jersey-test-framework-grizzly2-1.8-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1.jar" sourcepath="M2_REPO/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar" sourcepath="M2_REPO/org/codehaus/jettison/jettison/1.1/jettison-1.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar" sourcepath="M2_REPO/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26.jar" sourcepath="M2_REPO/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/jfree/jfreechart/1.0.13/jfreechart-1.0.13.jar"/>
-  <classpathentry kind="var" path="M2_REPO/jline/jline/0.9.94/jline-0.9.94.jar" sourcepath="M2_REPO/jline/jline/0.9.94/jline-0.9.94-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar" sourcepath="M2_REPO/com/jcraft/jsch/0.1.42/jsch-0.1.42-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar" sourcepath="M2_REPO/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/jul-to-slf4j/1.6.1/jul-to-slf4j-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/jul-to-slf4j/1.6.1/jul-to-slf4j-1.6.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/slf4j/jul-to-slf4j/1.6.1/jul-to-slf4j-1.6.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/net/sf/kosmosfs/kfs/0.3/kfs-0.3.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/thrift/libthrift/0.6.1/libthrift-0.6.1.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/apache/thrift/libthrift/0.6.1/libthrift-0.6.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-analyzers/3.4.0/lucene-analyzers-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-benchmark/3.4.0/lucene-benchmark-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-core/3.4.0/lucene-core-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-highlighter/3.4.0/lucene-highlighter-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-memory/3.4.0/lucene-memory-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-queries/3.4.0/lucene-queries-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-xercesImpl/3.4.0/lucene-xercesImpl-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-collections/1.0/mahout-collections-1.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-core/0.6-cdh4.0.1/mahout-core-0.6-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-examples/0.6-cdh4.0.1/mahout-examples-0.6-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-integration/0.6-cdh4.0.1/mahout-integration-0.6-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-math/0.6-cdh4.0.1/mahout-math-0.6-cdh4.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/glassfish/external/management-api/3.0.0-b012/management-api-3.0.0-b012.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mongodb/mongo-java-driver/2.5/mongo-java-driver-2.5.jar" sourcepath="M2_REPO/org/mongodb/mongo-java-driver/2.5/mongo-java-driver-2.5-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/mongodb/mongo-java-driver/2.5/mongo-java-driver-2.5-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/io/netty/netty/3.4.0.Final/netty-3.4.0.Final.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jboss/netty/netty/3.2.3.Final/netty-3.2.3.Final.jar" sourcepath="M2_REPO/org/jboss/netty/netty/3.2.3.Final/netty-3.2.3.Final-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/oro/oro/2.0.8/oro-2.0.8.jar" sourcepath="M2_REPO/oro/oro/2.0.8/oro-2.0.8-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3.jar" sourcepath="M2_REPO/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a.jar" sourcepath="M2_REPO/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211.jar" sourcepath="M2_REPO/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.6/snakeyaml-1.6.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.6/snakeyaml-1.6-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/yaml/snakeyaml/1.6/snakeyaml-1.6-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/xerial/snappy/snappy-java/1.0.4.1/snappy-java-1.0.4.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/solr/solr-commons-csv/3.4.0/solr-commons-csv-3.4.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/ecyrd/speed4j/speed4j/0.9/speed4j-0.9.jar" sourcepath="M2_REPO/com/ecyrd/speed4j/speed4j/0.9/speed4j-0.9-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/ecyrd/speed4j/speed4j/0.9/speed4j-0.9-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/stax/stax-api/1.0.1/stax-api-1.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/antlr/stringtemplate/3.2/stringtemplate-3.2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/uncommons/maths/uncommons-maths/1.2.2/uncommons-maths-1.2.2.jar" sourcepath="M2_REPO/org/uncommons/maths/uncommons-maths/1.2.2/uncommons-maths-1.2.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/uncommons/maths/uncommons-maths/1.2.2/uncommons-maths-1.2.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/github/stephenc/eaio-uuid/uuid/3.2.0/uuid-3.2.0.jar" sourcepath="M2_REPO/com/github/stephenc/eaio-uuid/uuid/3.2.0/uuid-3.2.0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/github/stephenc/eaio-uuid/uuid/3.2.0/uuid-3.2.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/velocity/velocity/1.7/velocity-1.7.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/uncommons/watchmaker/watchmaker-framework/0.6.2/watchmaker-framework-0.6.2.jar" sourcepath="M2_REPO/org/uncommons/watchmaker/watchmaker-framework/0.6.2/watchmaker-framework-0.6.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/uncommons/watchmaker/watchmaker-framework/0.6.2/watchmaker-framework-0.6.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/uncommons/watchmaker/watchmaker-swing/0.6.2/watchmaker-swing-0.6.2.jar" sourcepath="M2_REPO/org/uncommons/watchmaker/watchmaker-swing/0.6.2/watchmaker-swing-0.6.2-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/org/uncommons/watchmaker/watchmaker-swing/0.6.2/watchmaker-swing-0.6.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar" sourcepath="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/xmlenc/xmlenc/0.52/xmlenc-0.52.jar"/>
-  <classpathentry kind="var" path="M2_REPO/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar" sourcepath="M2_REPO/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1.jar" sourcepath="M2_REPO/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/Users/jpatterson/.m2/repository/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/zookeeper/zookeeper/3.4.3-cdh4.0.1/zookeeper-3.4.3-cdh4.0.1.jar"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry excluding="**/*.java" kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
+	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/inject/javax.inject/1/javax.inject-1.jar" sourcepath="M2_REPO/javax/inject/javax.inject/1/javax.inject-1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/javax/inject/javax.inject/1/javax.inject-1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/javax/xml/bind/jaxb-api/2.2.2/jaxb-api-2.2.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1.jar" sourcepath="M2_REPO/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.7/antlr-2.7.7.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/antlr/antlr/3.2/antlr-3.2.jar" sourcepath="M2_REPO/org/antlr/antlr/3.2/antlr-3.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/antlr/antlr-runtime/3.2/antlr-runtime-3.2.jar" sourcepath="M2_REPO/org/antlr/antlr-runtime/3.2/antlr-runtime-3.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar" sourcepath="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/asm/asm/3.2/asm-3.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.6.5/aspectjrt-1.6.5.jar" sourcepath="M2_REPO/org/aspectj/aspectjrt/1.6.5/aspectjrt-1.6.5-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/avro/avro/1.7.1/avro-1.7.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/avro/avro-ipc/1.7.1/avro-ipc-1.7.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mongodb/bson/2.5/bson-2.5.jar" sourcepath="M2_REPO/org/mongodb/bson/2.5/bson-2.5-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/mongodb/bson/2.5/bson-2.5-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/cassandra/cassandra-all/0.8.1/cassandra-all-0.8.1.jar" sourcepath="M2_REPO/org/apache/cassandra/cassandra-all/0.8.1/cassandra-all-0.8.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/apache/cassandra/cassandra-all/0.8.1/cassandra-all-0.8.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/cassandra/cassandra-thrift/0.8.1/cassandra-thrift-0.8.1.jar" sourcepath="M2_REPO/org/apache/cassandra/cassandra-thrift/0.8.1/cassandra-thrift-0.8.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/apache/cassandra/cassandra-thrift/0.8.1/cassandra-thrift-0.8.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar" sourcepath="M2_REPO/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/mahout/commons/commons-cli/2.0-mahout/commons-cli-2.0-mahout.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-codec/commons-codec/1.4/commons-codec-1.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar" sourcepath="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-compress/1.1/commons-compress-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar" sourcepath="M2_REPO/commons-configuration/commons-configuration/1.6/commons-configuration-1.6-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-daemon/commons-daemon/1.0.3/commons-daemon-1.0.3.jar" sourcepath="M2_REPO/commons-daemon/commons-daemon/1.0.3/commons-daemon-1.0.3-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-daemon/commons-daemon/1.0.3/commons-daemon-1.0.3-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" sourcepath="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-digester/commons-digester/1.8/commons-digester-1.8.jar" sourcepath="M2_REPO/commons-digester/commons-digester/1.8/commons-digester-1.8-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-el/commons-el/1.0/commons-el-1.0.jar" sourcepath="M2_REPO/commons-el/commons-el/1.0/commons-el-1.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-el/commons-el/1.0/commons-el-1.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar" sourcepath="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.1/commons-io-2.1.jar" sourcepath="M2_REPO/commons-io/commons-io/2.1/commons-io-2.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-io/commons-io/2.1/commons-io-2.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-lang/commons-lang/2.5/commons-lang-2.5-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.1/commons-logging-api-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-math/2.2/commons-math-2.2.jar" sourcepath="M2_REPO/org/apache/commons/commons-math/2.2/commons-math-2.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/apache/commons/commons-math/2.2/commons-math-2.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-net/commons-net/3.1/commons-net-3.1.jar" sourcepath="M2_REPO/commons-net/commons-net/3.1/commons-net-3.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-net/commons-net/3.1/commons-net-3.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.5.6/commons-pool-1.5.6.jar" sourcepath="M2_REPO/commons-pool/commons-pool/1.5.6/commons-pool-1.5.6-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/commons-pool/commons-pool/1.5.6/commons-pool-1.5.6-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.1/concurrentlinkedhashmap-lru-1.1.jar" sourcepath="M2_REPO/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.1/concurrentlinkedhashmap-lru-1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.1/concurrentlinkedhashmap-lru-1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jdt/core/3.1.1/core-3.1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/gmbal/gmbal-api-only/3.0.0-b023/gmbal-api-only-3.0.0-b023.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-framework/2.1.1/grizzly-framework-2.1.1-tests.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-http/2.1.1/grizzly-http-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-http/2.1.1/grizzly-http-2.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-http/2.1.1/grizzly-http-2.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-http-server/2.1.1/grizzly-http-server-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-http-server/2.1.1/grizzly-http-server-2.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-http-server/2.1.1/grizzly-http-server-2.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-http-servlet/2.1.1/grizzly-http-servlet-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-http-servlet/2.1.1/grizzly-http-servlet-2.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-http-servlet/2.1.1/grizzly-http-servlet-2.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/grizzly/grizzly-rcm/2.1.1/grizzly-rcm-2.1.1.jar" sourcepath="M2_REPO/org/glassfish/grizzly/grizzly-rcm/2.1.1/grizzly-rcm-2.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/glassfish/grizzly/grizzly-rcm/2.1.1/grizzly-rcm-2.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/google/guava/guava/r09/guava-r09.jar" sourcepath="M2_REPO/com/google/guava/guava/r09/guava-r09-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/google/guava/guava/r09/guava-r09-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/google/inject/guice/3.0/guice-3.0.jar" sourcepath="M2_REPO/com/google/inject/guice/3.0/guice-3.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/google/inject/guice/3.0/guice-3.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0.jar" sourcepath="M2_REPO/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-annotations/2.0.0-cdh4.0.0/hadoop-annotations-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-auth/2.0.0-cdh4.0.1/hadoop-auth-2.0.0-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-common/2.0.0-cdh4.0.1/hadoop-common-2.0.0-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-core/2.0.0-mr1-cdh4.0.1/hadoop-core-2.0.0-mr1-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-hdfs/2.0.0-cdh4.0.1/hadoop-hdfs-2.0.0-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-api/2.0.0-cdh4.0.0/hadoop-yarn-api-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-common/2.0.0-cdh4.0.0/hadoop-yarn-common-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-common/2.0.0-cdh4.0.0/hadoop-yarn-server-common-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-nodemanager/2.0.0-cdh4.0.0/hadoop-yarn-server-nodemanager-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-resourcemanager/2.0.0-cdh4.0.0/hadoop-yarn-server-resourcemanager-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/hadoop/hadoop-yarn-server-web-proxy/2.0.0-cdh4.0.0/hadoop-yarn-server-web-proxy-2.0.0-cdh4.0.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/me/prettyprint/hector-core/0.8.0-2/hector-core-0.8.0-2.jar" sourcepath="M2_REPO/me/prettyprint/hector-core/0.8.0-2/hector-core-0.8.0-2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/me/prettyprint/hector-core/0.8.0-2/hector-core-0.8.0-2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.2/high-scale-lib-1.1.2.jar" sourcepath="M2_REPO/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.2/high-scale-lib-1.1.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.2/high-scale-lib-1.1.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.0.1/httpclient-4.0.1.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpclient/4.0.1/httpclient-4.0.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.8/jackson-core-asl-1.8.8.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.8/jackson-core-asl-1.8.8-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-jaxrs/1.7.1/jackson-jaxrs-1.7.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.8.8/jackson-mapper-asl-1.8.8.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.8.8/jackson-mapper-asl-1.8.8-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-xc/1.7.1/jackson-xc-1.7.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jakarta-regexp/jakarta-regexp/1.4/jakarta-regexp-1.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/github/stephenc/jamm/0.2.2/jamm-0.2.2.jar" sourcepath="M2_REPO/com/github/stephenc/jamm/0.2.2/jamm-0.2.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/github/stephenc/jamm/0.2.2/jamm-0.2.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/tomcat/jasper-compiler/5.5.23/jasper-compiler-5.5.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/tomcat/jasper-runtime/5.5.23/jasper-runtime-5.5.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/javax.servlet/3.0/javax.servlet-3.0.jar" sourcepath="M2_REPO/org/glassfish/javax.servlet/3.0/javax.servlet-3.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1.jar" sourcepath="M2_REPO/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jfree/jcommon/1.0.12/jcommon-1.0.12.jar" sourcepath="M2_REPO/jfree/jcommon/1.0.12/jcommon-1.0.12-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/jfree/jcommon/1.0.12/jcommon-1.0.12-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/jdiff/jdiff/1.0.9/jdiff-1.0.9.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-client/1.8/jersey-client-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-client/1.8/jersey-client-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-client/1.8/jersey-client-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.8/jersey-core-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.8/jersey-core-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-core/1.8/jersey-core-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-grizzly2/1.8/jersey-grizzly2-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-grizzly2/1.8/jersey-grizzly2-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-grizzly2/1.8/jersey-grizzly2-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/contribs/jersey-guice/1.8/jersey-guice-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/contribs/jersey-guice/1.8/jersey-guice-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/contribs/jersey-guice/1.8/jersey-guice-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-json/1.8/jersey-json-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-json/1.8/jersey-json-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-json/1.8/jersey-json-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-server/1.8/jersey-server-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-server/1.8/jersey-server-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-server/1.8/jersey-server-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.8/jersey-test-framework-core-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.8/jersey-test-framework-core-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.8/jersey-test-framework-core-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.8/jersey-test-framework-grizzly2-1.8.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.8/jersey-test-framework-grizzly2-1.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.8/jersey-test-framework-grizzly2-1.8-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1.jar" sourcepath="M2_REPO/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar" sourcepath="M2_REPO/org/codehaus/jettison/jettison/1.1/jettison-1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar" sourcepath="M2_REPO/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26.jar" sourcepath="M2_REPO/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/jfree/jfreechart/1.0.13/jfreechart-1.0.13.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jline/jline/0.9.94/jline-0.9.94.jar" sourcepath="M2_REPO/jline/jline/0.9.94/jline-0.9.94-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar" sourcepath="M2_REPO/com/jcraft/jsch/0.1.42/jsch-0.1.42-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar" sourcepath="M2_REPO/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/jul-to-slf4j/1.6.1/jul-to-slf4j-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/jul-to-slf4j/1.6.1/jul-to-slf4j-1.6.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/slf4j/jul-to-slf4j/1.6.1/jul-to-slf4j-1.6.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/sf/kosmosfs/kfs/0.3/kfs-0.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/thrift/libthrift/0.6.1/libthrift-0.6.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/apache/thrift/libthrift/0.6.1/libthrift-0.6.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-analyzers/3.4.0/lucene-analyzers-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-benchmark/3.4.0/lucene-benchmark-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-core/3.4.0/lucene-core-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-highlighter/3.4.0/lucene-highlighter-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-memory/3.4.0/lucene-memory-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-queries/3.4.0/lucene-queries-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-xercesImpl/3.4.0/lucene-xercesImpl-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-collections/1.0/mahout-collections-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-core/0.6-cdh4.0.1/mahout-core-0.6-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-examples/0.6-cdh4.0.1/mahout-examples-0.6-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-integration/0.6-cdh4.0.1/mahout-integration-0.6-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/mahout/mahout-math/0.6-cdh4.0.1/mahout-math-0.6-cdh4.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/external/management-api/3.0.0-b012/management-api-3.0.0-b012.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mongodb/mongo-java-driver/2.5/mongo-java-driver-2.5.jar" sourcepath="M2_REPO/org/mongodb/mongo-java-driver/2.5/mongo-java-driver-2.5-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/mongodb/mongo-java-driver/2.5/mongo-java-driver-2.5-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/io/netty/netty/3.4.0.Final/netty-3.4.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/netty/netty/3.2.3.Final/netty-3.2.3.Final.jar" sourcepath="M2_REPO/org/jboss/netty/netty/3.2.3.Final/netty-3.2.3.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/oro/oro/2.0.8/oro-2.0.8.jar" sourcepath="M2_REPO/oro/oro/2.0.8/oro-2.0.8-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3.jar" sourcepath="M2_REPO/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a.jar" sourcepath="M2_REPO/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211.jar" sourcepath="M2_REPO/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.6/snakeyaml-1.6.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.6/snakeyaml-1.6-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/yaml/snakeyaml/1.6/snakeyaml-1.6-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/xerial/snappy/snappy-java/1.0.4.1/snappy-java-1.0.4.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/solr/solr-commons-csv/3.4.0/solr-commons-csv-3.4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/ecyrd/speed4j/speed4j/0.9/speed4j-0.9.jar" sourcepath="M2_REPO/com/ecyrd/speed4j/speed4j/0.9/speed4j-0.9-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/ecyrd/speed4j/speed4j/0.9/speed4j-0.9-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/stax/stax-api/1.0.1/stax-api-1.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/antlr/stringtemplate/3.2/stringtemplate-3.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/uncommons/maths/uncommons-maths/1.2.2/uncommons-maths-1.2.2.jar" sourcepath="M2_REPO/org/uncommons/maths/uncommons-maths/1.2.2/uncommons-maths-1.2.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/uncommons/maths/uncommons-maths/1.2.2/uncommons-maths-1.2.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/github/stephenc/eaio-uuid/uuid/3.2.0/uuid-3.2.0.jar" sourcepath="M2_REPO/com/github/stephenc/eaio-uuid/uuid/3.2.0/uuid-3.2.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/github/stephenc/eaio-uuid/uuid/3.2.0/uuid-3.2.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/velocity/velocity/1.7/velocity-1.7.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/uncommons/watchmaker/watchmaker-framework/0.6.2/watchmaker-framework-0.6.2.jar" sourcepath="M2_REPO/org/uncommons/watchmaker/watchmaker-framework/0.6.2/watchmaker-framework-0.6.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/uncommons/watchmaker/watchmaker-framework/0.6.2/watchmaker-framework-0.6.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/uncommons/watchmaker/watchmaker-swing/0.6.2/watchmaker-swing-0.6.2.jar" sourcepath="M2_REPO/org/uncommons/watchmaker/watchmaker-swing/0.6.2/watchmaker-swing-0.6.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/org/uncommons/watchmaker/watchmaker-swing/0.6.2/watchmaker-swing-0.6.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar" sourcepath="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/xmlenc/xmlenc/0.52/xmlenc-0.52.jar"/>
+	<classpathentry kind="var" path="M2_REPO/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar" sourcepath="M2_REPO/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1.jar" sourcepath="M2_REPO/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jpatterson/.m2/repository/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/zookeeper/zookeeper/3.4.3-cdh4.0.1/zookeeper-3.4.3-cdh4.0.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

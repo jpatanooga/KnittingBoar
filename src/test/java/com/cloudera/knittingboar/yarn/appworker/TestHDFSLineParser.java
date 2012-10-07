@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cloudera.wovenwabbit.yarn.appworker.HDFSLineParser;
+import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
 
 import junit.framework.TestCase;
 import static junit.framework.Assert.*;
