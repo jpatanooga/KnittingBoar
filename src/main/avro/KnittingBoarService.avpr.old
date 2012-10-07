@@ -1,0 +1,111 @@
+{ "namespace": "com.cloudera.wovenwabbit.yarn.avro.generated",
+  "protocol": "KnittingBoarService",
+  
+  "types": [
+  
+    // Worker specific
+    
+  	{ "name": "WorkerState",
+  	  "type": "enum",
+  	  "symbols": [
+  	  	"READY",
+  	  	"RUNNING",
+  	  	"WAITING",
+  	  	"UPDATE",
+  	  	"TERMINATING",
+  	  	"COMPLETED",
+  	  	"SHUTDOWN"
+  	  ]
+  	},
+  	{ "name": "WorkerId", 
+  	  "type": "fixed",
+  	  "size": 32
+  	},
+  	{ "name": "WorkerPayload",
+  	  "type": "record",
+  	  "fields": [
+  	    { "name": "PayloadType", "type": {
+  	        "name": "WorkerPayloadTypes",
+  	        "type": "enum",
+  	        "symbols": [
+  	          "VECTOR",
+  	          "OTHER"
+  	        ]
+  	      } 
+  	    },
+        { "name": "Payload", "type": "bytes" }
+  	  ]
+  	},
+  	{ "name": "WorkerMessage", 
+  	  "type": "record",
+  	  "fields": [
+  	    { "name": "WorkerId", "type": "WorkerId" },
+  	    { "name": "State", "type": "WorkerState" },
+  	    { "name": "Iteration", "type": [ "null", "int" ] },
+  	    { "name": "Batch", "type": [ "null", "int" ] },
+  	    { "name": "Payload", "type": [ "null", "WorkerPayload" ] } 
+  	  ]
+  	},
+  	
+  	// Master specific
+  	
+  	{ "name": "MasterMessageType",
+  	  "type": "enum",
+  	  "symbols": [
+  	    "START",
+        "CONTINUE",
+  	    "UPDATE",
+  	    "WAIT",
+  	    "TERMINATE",
+  	    "SHUTDOWN"
+  	  ]
+  	},
+  	{ "name": "MasterStartupPayload",
+  	  "type": "record",
+  	  "fields": [
+	    { "name": "FileSplit", "type": "string" },
+	    { "name": "Iterations", "type": "int" },
+	    { "name": "BatchSize", "type": "int" },
+	    { "name": "Other", "type": [ "null", { "type": "map", "values": "string" } ] }
+  	  ]
+  	},
+  	{ "name": "MasterUpdatePayload",
+  	  "type": "record",
+  	  "fields": [
+  	    { "name": "PayloadType", "type": {
+  	        "name": "MasterPayloadTypes",
+  	        "type": "enum",
+  	        "symbols": [
+  	          "VECTOR",
+  	          "OTHER"
+  	        ]
+  	      }
+  	    },
+        { "name": "Payload", "type": "bytes" }
+  	  ]
+  	},
+  	{ "name": "MasterMessage",
+  	  "type": "record",
+  	  "fields": [
+  	    { "name": "WorkerId", "type": "WorkerId" },
+  	    { "name": "MessageType", "type": "MasterMessageType" },
+  	    { "name": "Payload", "type": [ "null", "MasterStartupPayload", "MasterUpdatePayload"] },
+  	    { "name": "Additional", "type": ["null", "string"] }
+  	  ]
+  	}
+  ],
+  
+  // RPC Messages
+  "messages": {
+    "startup": {
+      "request": [{ "name": "workerId", "type": "WorkerId" }],
+      "response": "boolean";
+      "one-way": true
+    },
+    
+    "hearbeat": {
+      "request": [{ "name": "message", "type": "WorkerMessage" }],
+      "response": "MasterMessage"
+    }
+  }
+}

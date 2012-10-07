@@ -1,0 +1,61 @@
+@namespace ("com.cloudera.wovenwabbit.yarn.avro.generated")
+protocol KnittingBoarService {
+
+  fixed WorkerId (32);
+  
+  record FileSplit {
+    string path;
+    long offset;
+    long length;
+  }
+  
+  record StartupConfiguration {
+    FileSplit split;
+    int iterations;
+    int batchSize;
+    union { map<string>, null } other;
+  }
+  
+  record ProgressReport {
+    WorkerId workerId;
+    map<string> report;
+  }
+  
+  error ServiceError {
+    union { null, string } description;
+  }
+  
+  // Worker starts up, sends a startup() call
+  // @returns master sends back a startup configuration record
+  // @throws ServiceError
+  StartupConfiguration startup(WorkerId workerId) throws ServiceError;
+  
+  // Periodically the worker will send a progress update
+  // @returns true
+  boolean progress(WorkerId workerId, union { ProgressReport, null } report);
+  
+  // Send a vector update (right now just a series of bytes)
+  // @return true if update has been received, false on error
+  boolean update(WorkerId workerId, bytes data);
+  
+  // Worker is waiting to get an update from the master. 
+  // @param workerId    the workerId
+  // @param lastUpdate  the last update ID
+  // @param waiting     length of time worker has been waiting in this loop
+  // @return the latest available updateId. If master is in update mode (e.g. it has received an update from at least one worker, it returns -1) 
+  int waiting(WorkerId workerId, int lastUpdate, long waiting);
+  
+  // Worker will fetch a new update vector from master
+  // @param workerId  the workerId
+  // @param updateId  the updateId worker is looking for 
+  // @return byte array of new vector
+  bytes fetch(WorkerId workerId, int updateId);
+  
+  // Worker notifies master that work is complete
+  // @returns void, no return -- informative message only
+  void complete(WorkerId workerId, ProgressReport finalReport) oneway;
+  
+  // Worker informs master that an error occurred
+  // @returns void -- this is an error condition and assumes the worker is no longer active
+  void `error`(WorkerId workerId, string message) oneway;
+}
