@@ -1,5 +1,4 @@
 package com.cloudera.knittingboar.yarn.appworker;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -15,8 +14,9 @@ import org.apache.avro.ipc.NettyTransceiver;
 import org.apache.avro.ipc.specific.SpecificRequestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 
-import com.cloudera.knittingboar.yarn.AvroUtils;
+import com.cloudera.knittingboar.yarn.Utils;
 import com.cloudera.knittingboar.yarn.Updateable;
 import com.cloudera.knittingboar.yarn.avro.generated.KnittingBoarService;
 import com.cloudera.knittingboar.yarn.avro.generated.ProgressReport;
@@ -39,7 +39,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
   private WorkerState currentState;
   private KnittingBoarService masterService;
 
-  private StartupConfiguration conf;
+  private StartupConfiguration workerConf;
 
   private RecordParser<R> recordParser;
   private ComputableWorker<T, R> computable;
@@ -52,6 +52,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
   private long updateSleepTime = 1000L;
   
   private ExecutorService updateExecutor;
+  private Configuration conf;
 
   class PeridoicUpdateThread implements Runnable {
     @Override
@@ -79,27 +80,35 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
 
   public ApplicationWorkerService(String wid, InetSocketAddress masterAddr,
       RecordParser<R> parser, ComputableWorker<T, R> computable,
-      Class<T> updateable) {
+      Class<T> updateable, Configuration conf) {
 
-    this.workerId = AvroUtils.createWorkerId(wid);
+    this.workerId = Utils.createWorkerId(wid);
     this.currentState = WorkerState.NONE;
     this.masterAddr = masterAddr;
     this.recordParser = parser;
     this.computable = computable;
     this.updateable = updateable;
-
     this.progressCounters = new HashMap<String, Integer>();
+    
+    this.conf = conf;
+  }
+  
+  public ApplicationWorkerService(String wid, InetSocketAddress masterAddr,
+      RecordParser<R> parser, ComputableWorker<T, R> computable,
+      Class<T> updateable) {
+
+    this(wid, masterAddr, parser, computable, updateable, new Configuration());
   }
 
   public Integer call() {
     Thread.currentThread().setName(
-        "ApplicationWorkerService Thread - " + AvroUtils.getWorkerId(workerId));
+        "ApplicationWorkerService Thread - " + Utils.getWorkerId(workerId));
     
     if (!initializeService())
       return -1;
 
-    recordParser.setFile(conf.getSplit().getPath().toString(), conf.getSplit()
-        .getOffset(), conf.getSplit().getLength());
+    recordParser.setFile(workerConf.getSplit().getPath().toString(), workerConf.getSplit()
+        .getOffset(), workerConf.getSplit().getLength());
     recordParser.parse();
 
     // Create an updater thread
@@ -114,7 +123,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
     int countCurrent = 0;
     int currentIteration = 0;
 
-    for (currentIteration = 0; currentIteration < conf.getIterations(); currentIteration++) {
+    for (currentIteration = 0; currentIteration < workerConf.getIterations(); currentIteration++) {
       synchronized (currentState) {
         currentState = WorkerState.RUNNING;
       }
@@ -134,7 +143,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
           progressCounters.put("currentIteration", currentIteration);
         }
 
-        if (countCurrent == conf.getBatchSize()
+        if (countCurrent == workerConf.getBatchSize()
             || !recordParser.hasMoreRecords()) {
           LOG.debug("Read "
               + countCurrent
@@ -175,7 +184,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
             lastUpdate = nextUpdate;
 
             LOG.debug("Requested to fetch an update from master"
-                + ", workerId=" + AvroUtils.getWorkerId(workerId)
+                + ", workerId=" + Utils.getWorkerId(workerId)
                 + ", requestedUpdatedId=" + nextUpdate
                 + ", responseLength=" + b.limit());
             
@@ -220,12 +229,12 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
 
   private boolean getConfiguration() {
     try {
-      conf = masterService.startup(workerId);
+      workerConf = masterService.startup(workerId);
 
       LOG.info("Recevied startup configuration from master" + ", fileSplit=["
-          + conf.getSplit().getPath() + ", " + conf.getSplit().getOffset()
-          + ", " + conf.getSplit().getLength() + "]" + ", batchSize="
-          + conf.getBatchSize() + ", iterations=" + conf.getIterations());
+          + workerConf.getSplit().getPath() + ", " + workerConf.getSplit().getOffset()
+          + ", " + workerConf.getSplit().getLength() + "]" + ", batchSize="
+          + workerConf.getBatchSize() + ", iterations=" + workerConf.getIterations());
 
     } catch (AvroRemoteException ex) {
       if (ex instanceof ServiceError) {
@@ -238,6 +247,10 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
 
       return false;
     }
+    
+    // Merge configs and fire a startup call to compute
+    Utils.mergeConfigs(workerConf, conf);
+    computable.setup(conf);
 
     return true;
   }
@@ -285,7 +298,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
       StringBuffer sb = new StringBuffer();
       sb.append("Created a progress report");
       sb.append(", workerId=").append(
-          AvroUtils.getWorkerId(progressReport.getWorkerId()));
+          Utils.getWorkerId(progressReport.getWorkerId()));
 
       for (Map.Entry<CharSequence, CharSequence> entry : progressReport
           .getReport().entrySet()) {

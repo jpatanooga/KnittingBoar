@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -16,16 +17,15 @@ import org.apache.avro.ipc.Server;
 import org.apache.avro.ipc.specific.SpecificResponder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 
-import com.cloudera.knittingboar.yarn.AvroUtils;
+import com.cloudera.knittingboar.yarn.Utils;
 import com.cloudera.knittingboar.yarn.Updateable;
 import com.cloudera.knittingboar.yarn.avro.generated.KnittingBoarService;
 import com.cloudera.knittingboar.yarn.avro.generated.ProgressReport;
 import com.cloudera.knittingboar.yarn.avro.generated.ServiceError;
 import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
-
-
 
 /**
  * @author Michael
@@ -65,10 +65,14 @@ public class ApplicationMasterService<T extends Updateable> implements
 
   private boolean isRunning;
   private Thread ourThread;
+  
+  private Configuration conf;
+  private Map<String, String> appConf;
 
   public ApplicationMasterService(InetSocketAddress masterAddr,
       HashMap<WorkerId, StartupConfiguration> workers,
-      ComputableMaster<T> computable, Class<T> updatable) {
+      ComputableMaster<T> computable, Class<T> updatable,
+      Map<String, String> appConf, Configuration conf) {
 
     if (masterAddr == null || computable == null || updatable == null)
       throw new IllegalStateException(
@@ -84,7 +88,29 @@ public class ApplicationMasterService<T extends Updateable> implements
     this.masterAddr = masterAddr;
     this.computable = computable;
     this.updateable = updatable;
+    
+    this.appConf = appConf;
+    this.conf = conf;
+    Utils.mergeConfigs(this.appConf, this.conf);
+    
+    this.computable.setup(this.conf);
   }
+  
+  public ApplicationMasterService(InetSocketAddress masterAddr,
+      HashMap<WorkerId, StartupConfiguration> workers,
+      ComputableMaster<T> computable, Class<T> updatable,
+      Map<String, String> appConf) {
+
+    this(masterAddr, workers, computable, updatable, appConf,
+        new Configuration());
+  }
+  
+  public ApplicationMasterService(InetSocketAddress masterAddr,
+      HashMap<WorkerId, StartupConfiguration> workers,
+      ComputableMaster<T> computable, Class<T> updatable) {
+
+    this(masterAddr, workers, computable, updatable, null);
+  }  
 
   public Integer call() {
     Thread.currentThread().setName("ApplicationMasterService Thread");
@@ -161,20 +187,21 @@ public class ApplicationMasterService<T extends Updateable> implements
         throw ServiceError
             .newBuilder()
             .setDescription(
-                "Worker " + AvroUtils.getWorkerId(workerId)
+                "Worker " + Utils.getWorkerId(workerId)
                     + "already registered.").build();
 
-      StartupConfiguration conf = workers.get(workerId);
+      StartupConfiguration workerConf = workers.get(workerId);
+      Utils.mergeConfigs(appConf, workerConf);
 
       LOG.debug("Got a startup call, workerId="
-          + AvroUtils.getWorkerId(workerId) + ", responded with"
-          + ", batchSize=" + conf.getBatchSize() + ", iterations="
-          + conf.getIterations() + ", fileSplit=[" + conf.getSplit().getPath()
-          + ", " + conf.getSplit().getOffset() + "]");
+          + Utils.getWorkerId(workerId) + ", responded with"
+          + ", batchSize=" + workerConf.getBatchSize() + ", iterations="
+          + workerConf.getIterations() + ", fileSplit=[" + workerConf.getSplit().getPath()
+          + ", " + workerConf.getSplit().getOffset() + "]");
 
       workersState.put(workerId, WorkerState.STARTED);
 
-      return conf;
+      return workerConf;
     }
   }
 
@@ -192,7 +219,7 @@ public class ApplicationMasterService<T extends Updateable> implements
       workersState.put(workerId, WorkerState.RUNNING);
   
       LOG.debug("Got a progress report" + ", workerId="
-          + AvroUtils.getWorkerId(workerId) + ", workerState="
+          + Utils.getWorkerId(workerId) + ", workerState="
           + workersState.get(workerId) + ", progressSize="
           + report.getReport().size() + ", totalReports=" + progress.size());
     }
@@ -223,7 +250,7 @@ public class ApplicationMasterService<T extends Updateable> implements
             && workerState != WorkerState.STARTED) {
 
           LOG.debug("Received an erroneous update" + ", workerId="
-              + AvroUtils.getWorkerId(workerId) + ", workerState="
+              + Utils.getWorkerId(workerId) + ", workerState="
               + workerState + ", length=" + data.limit());
 
           return false;
@@ -231,7 +258,7 @@ public class ApplicationMasterService<T extends Updateable> implements
       }
     }
 
-    LOG.info("Received update, workerId=" + AvroUtils.getWorkerId(workerId)
+    LOG.info("Received update, workerId=" + Utils.getWorkerId(workerId)
         + ", workerState=" + workerState + ", length=" + data.limit());
 
     synchronized (masterState) {
@@ -250,7 +277,7 @@ public class ApplicationMasterService<T extends Updateable> implements
     // Duplicate update?
     if (workersUpdate.containsKey(workerId)) {
       LOG.warn("Received a duplicate update for, workerId="
-          + AvroUtils.getWorkerId(workerId) + ", ignoring this update");
+          + Utils.getWorkerId(workerId) + ", ignoring this update");
 
       return false;
     }
@@ -312,7 +339,7 @@ public class ApplicationMasterService<T extends Updateable> implements
       workersState.put(workerId, WorkerState.WAITING);
 
       LOG.info("Got waiting message" + ", workerId="
-          + AvroUtils.getWorkerId(workerId) + ", workerState="
+          + Utils.getWorkerId(workerId) + ", workerState="
           + workersState.get(workerId) + ", lastUpdate=" + lastUpdate
           + ", waitingFor=" + waiting);
     }
@@ -328,7 +355,7 @@ public class ApplicationMasterService<T extends Updateable> implements
       throws AvroRemoteException {
     
     LOG.debug("Received a fetch request"
-        + ", workerId=" + AvroUtils.getWorkerId(workerId)
+        + ", workerId=" + Utils.getWorkerId(workerId)
         + ", requestedUpdateId=" + updateId);
     
     synchronized (workersState) {
@@ -344,7 +371,7 @@ public class ApplicationMasterService<T extends Updateable> implements
     workersState.put(workerId, WorkerState.COMPLETE);
 
     LOG.info("Received complete message, workerId="
-        + AvroUtils.getWorkerId(workerId));
+        + Utils.getWorkerId(workerId));
 
     workersCompleted.countDown();
   }
@@ -352,7 +379,7 @@ public class ApplicationMasterService<T extends Updateable> implements
   @Override
   public void error(WorkerId workerId, CharSequence message) {
     LOG.warn("A worker encountered an error" + ", worker="
-        + AvroUtils.getWorkerId(workerId) + ", message=" + message);
+        + Utils.getWorkerId(workerId) + ", message=" + message);
 
     workersState.put(workerId, WorkerState.ERROR);
     workersCompleted.countDown();

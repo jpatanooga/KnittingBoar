@@ -57,6 +57,8 @@ import com.google.common.io.Closeables;
  * 
  * - does the work on the subset of the training data
  * 
+ * - simulates a worker node for SGD algo development, not the actual yarn-based driver
+ * 
  * @author jpatterson
  *
  */

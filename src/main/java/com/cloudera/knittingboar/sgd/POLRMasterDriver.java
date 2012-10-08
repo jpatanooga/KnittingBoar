@@ -31,6 +31,7 @@ import com.mongodb.util.Util;
  * - sends a copy back to the slave node to update its own parameter vector
  * - manages execution of the whole POLR process
  * 
+ * - this is the basic simulated version of the POLR master
  * 
  * @author jpatterson
  *
