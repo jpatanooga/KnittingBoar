@@ -71,6 +71,24 @@ public class GradientBuffer {
     
   }
   
+  public void AccumulateGradient( Matrix other_gamma ) {
+    
+    for ( int row = 0; row < this.gamma.rowSize(); row++ ) {
+      
+      for ( int col = 0; col < this.gamma.columnSize(); col++ ) {
+    
+        double old_this_val = this.gamma.get(row, col);
+        double other_val = other_gamma.get(row, col);
+        this.gamma.set(row, col, old_this_val + other_val );
+        
+      }
+      
+    }
+       
+    this.AccumulatedGradientsCount++;
+    
+  }  
+  
   public void Accumulate( GradientBuffer other_gamma ) {
     
     for ( int row = 0; row < this.gamma.rowSize(); row++ ) {

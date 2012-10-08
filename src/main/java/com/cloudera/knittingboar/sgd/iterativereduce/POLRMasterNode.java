@@ -11,6 +11,7 @@ import org.apache.mahout.classifier.sgd.L1;
 
 import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
 import com.cloudera.knittingboar.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 import com.cloudera.knittingboar.records.CSVBasedDatasetRecordFactory;
 import com.cloudera.knittingboar.records.RCV1RecordFactory;
@@ -52,14 +53,31 @@ public class POLRMasterNode extends POLRNodeBase implements
   
   
   
-  private UpdateableInt masterTotal;
+  //private UpdateableInt masterTotal;
+  
+/*  
+  public void RecvGradientMessage() {
+    
+    GradientUpdateMessage rcvd_msg = this.incoming_gradient_updates.remove(0);
+
+    if (rcvd_msg.SrcWorkerPassCount > this.GlobalMaxPassCount) {
+      
+      this.GlobalMaxPassCount = rcvd_msg.SrcWorkerPassCount; 
+      
+    }
+    
+    // accumulate gradient
+    this.MergeGradientUpdate( rcvd_msg.gradient );
+    
+  }  
+*/
   
   @Override
   public ParameterVectorGradientUpdatable compute(
       Collection<ParameterVectorGradientUpdatable> workerUpdates,
       Collection<ParameterVectorGradientUpdatable> masterUpdates) {
     
-    int total = 0;
+    //int total = 0;
     /*
      * for (UpdateableInt i : workerUpdates) { total += i.get(); }
      * 
@@ -71,20 +89,49 @@ public class POLRMasterNode extends POLRNodeBase implements
      * ", workerUpdates=" + toStrings(workerUpdates) + ", masterUpdates=" +
      * toStrings(masterUpdates));
      */
+    
+    for (ParameterVectorGradientUpdatable i : workerUpdates) { 
+    
+      if (i.get().SrcWorkerPassCount > this.GlobalMaxPassCount) {
+        
+        this.GlobalMaxPassCount = i.get().SrcWorkerPassCount; 
+        
+      }
+      
+      // accumulate gradient
+      this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
+      
+    }
+    
+    // now generate the return trip msg
+//    master.GenerateGlobalUpdateVector();  
+//    GlobalParameterVectorUpdateMessage returned_msg = master.GetNextGlobalUpdateMsgFromQueue();
 
-    return null;
+/*    GlobalParameterVectorUpdateMessage response_msg = new GlobalParameterVectorUpdateMessage( "", this.num_categories, this.FeatureVectorSize );
+    response_msg.parameter_vector = this.global_parameter_vector.gamma.clone();
+    response_msg.GlobalPassCount = this.GlobalMaxPassCount;
+*/
+    ParameterVectorGradient gradient_msg = new ParameterVectorGradient();
+    gradient_msg.GlobalPassCount = this.GlobalMaxPassCount;
+    gradient_msg.parameter_vector = this.global_parameter_vector.getMatrix().clone();
+    
+    ParameterVectorGradientUpdatable return_msg = new ParameterVectorGradientUpdatable();
+    return_msg.set(gradient_msg);
+
+    return return_msg;
   }
-  
+ /* 
   private String toStrings(Collection<ParameterVectorGradientUpdatable> c) {
     StringBuffer sb = new StringBuffer();
     sb.append("[");
-    /*
-     * for (UpdateableInt i : c) { sb.append(i.get()).append(", "); }
-     */
+    
+      for (UpdateableInt i : c) { sb.append(i.get()).append(", "); }
+     
     sb.append("]");
     return sb.toString();
     
   }
+  */
   
   @Override
   public ParameterVectorGradientUpdatable getResults() {

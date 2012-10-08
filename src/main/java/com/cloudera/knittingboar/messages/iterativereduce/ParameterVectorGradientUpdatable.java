@@ -32,7 +32,7 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
   @Override
   public void set(ParameterVectorGradient t) {
     // TODO Auto-generated method stub
-    
+    this.param_msg = t;
   }
   @Override
   public ByteBuffer toBytes() {

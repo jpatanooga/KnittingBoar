@@ -75,7 +75,7 @@ public class POLRWorkerNode  extends POLRNodeBase implements ComputableWorker<Pa
    * 
    * @param msg
    */
-  public void ProcessIncomingParameterVectorMessage( GlobalParameterVectorUpdateMessage msg) {
+/*  public void ProcessIncomingParameterVectorMessage( GlobalParameterVectorUpdateMessage msg) {
     
     //this.RecvMasterParamVector(msg.parameter_vector);
     this.polr.SetBeta(msg.parameter_vector);
@@ -85,7 +85,7 @@ public class POLRWorkerNode  extends POLRNodeBase implements ComputableWorker<Pa
     
     this.polr.FlushGamma();
   }  
-  
+  */
   
   
   @Override
