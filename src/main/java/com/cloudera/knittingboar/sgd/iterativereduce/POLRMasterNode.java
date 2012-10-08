@@ -22,7 +22,7 @@ import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 import com.cloudera.knittingboar.yarn.UpdateableInt;
 import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
-import com.cloudera.knittingboar.yarn.sgd.POLRMaster;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
 public class POLRMasterNode extends POLRNodeBase implements
     ComputableMaster<ParameterVectorGradientUpdatable> {
   
-  private static final Log LOG = LogFactory.getLog(POLRMaster.class);
+  private static final Log LOG = LogFactory.getLog(POLRMasterNode.class);
 
   
 

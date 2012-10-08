@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 
 import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 
@@ -52,5 +53,11 @@ public class CompoundAdditionMaster implements ComputableMaster<UpdateableInt> {
   @Override
   public UpdateableInt getResults() {
     return masterTotal;
+  }
+
+  @Override
+  public void setup(Configuration c) {
+    // TODO Auto-generated method stub
+    
   }
 }

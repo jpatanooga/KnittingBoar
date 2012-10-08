@@ -25,7 +25,15 @@ public class ParameterVectorGradient {
   // coming back, this is hte new parameter vector to replace ours with
   public Matrix parameter_vector = null;
   public int GlobalPassCount = 0; // what pass should the worker dealing with?
-
+/*
+  private int numFeatures = -1;
+  private int numCategories = -1;
+  
+  public ParameterVectorGradient(int numFeatures, int numCategories ) {
+    this.numCategories = numCategories;
+    this.numFeatures = numFeatures;
+  }
+  */
   public byte[] Serialize() throws IOException {
     
 //    DataOutput d
@@ -56,5 +64,14 @@ public class ParameterVectorGradient {
     this.parameter_vector = MatrixWritable.readMatrix(in);
     
   }
+  
+  public int numFeatures() {
+    return this.parameter_vector.numCols();
+  }
 
+  public int numCategories() {
+    return this.parameter_vector.numRows();
+  }
+  
+  
 }

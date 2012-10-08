@@ -38,7 +38,7 @@ import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
  * @author jpatterson
  *
  */
-public class POLRWorkerNode  extends POLRNodeBase implements ComputableWorker<ParameterVectorGradientUpdatable, String> {
+public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<ParameterVectorGradientUpdatable, String> {
   private static final Log LOG = LogFactory.getLog(POLRWorkerNode.class);
   
   int masterTotal = 0;

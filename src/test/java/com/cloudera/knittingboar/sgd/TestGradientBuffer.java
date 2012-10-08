@@ -1,6 +1,8 @@
 package com.cloudera.knittingboar.sgd;
 
 import junit.framework.TestCase;
+import org.apache.mahout.math.DenseMatrix;
+import org.apache.mahout.math.Matrix;
 
 public class TestGradientBuffer extends TestCase {
 
@@ -99,6 +101,52 @@ public class TestGradientBuffer extends TestCase {
     
     
   }
+  
+  public void testAccumulateGradientMatrix() {
+    
+    GradientBuffer g0 = new GradientBuffer( 2, 2 );
+    
+    g0.setCell(0, 0, 0.4);
+    g0.setCell(0, 1, 0.3);
+    
+    assertEquals( g0.numFeatures(), 2 );
+
+    
+    
+/*    GradientBuffer g1 = new GradientBuffer( 2, 2 );
+    
+    g1.setCell(0, 0, 0.1);
+    g1.setCell(0, 1, 0.3);
+    
+    assertEquals( g1.numFeatures(), 2 );
+*/
+    Matrix m = new DenseMatrix(2, 2);
+    m.set(0, 0, 0.1);
+    m.set(0, 1, 0.3);
+    
+    
+    g0.AccumulateGradient(m);
+    //m.get(arg0, arg1)
+    // check source
+    assertEquals( m.get(0, 0), 0.1 );
+    // check accumlation in g0
+    assertEquals( g0.getCell(0, 0), 0.5 );
+
+    // check source
+    assertEquals( m.get(0, 1), 0.3 );
+    // check accumlation in g0
+    assertEquals( g0.getCell(0, 1), 0.6 );
+    
+    
+    System.out.println("matrix accumulation test done!");
+    
+    
+    assertNotNull(0);
+    
+    
+  }  
+  
+  
   
   
   public void testSetGradientCell() {
