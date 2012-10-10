@@ -19,9 +19,11 @@ import com.cloudera.knittingboar.metrics.POLRMetrics;
 import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
-import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
+//import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
 import com.cloudera.knittingboar.yarn.UpdateableInt;
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
+import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
+import com.cloudera.knittingboar.yarn.appworker.RecordParser;
 
 
 /**
@@ -56,8 +58,12 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   
   public String internalID = "0";
   private RecordFactory VectorFactory = null;
-  InputRecordsSplit input_split = null;
   
+  // old way
+  //InputRecordsSplit input_split = null;
+  
+  // new way
+  private HDFSLineParser lineParser = null;
   
  
   // basic stats tracking
@@ -87,9 +93,8 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   }  
   */
   
-  
   @Override
-  public ParameterVectorGradientUpdatable compute(List<String> records) {
+  public ParameterVectorGradientUpdatable compute() {
     int total = 0;
 /*    
     for(String s : records) {
@@ -109,11 +114,10 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
         + ", records=" + records.toString());
     */
     
+    //HDFSLineParser input_parser = (HDFSLineParser) this.getRecordParser();
     
     
-    
-    
-    
+    // ------------- process the next batch -----------
     
     Text value = new Text();
     long batch_vec_factory_time = 0;
@@ -121,29 +125,36 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     if (this.LocalPassCount > this.GlobalPassCount) {
       // we need to sit this one out
       System.out.println( "Worker " + this.internalID + " is ahead of global pass count [" + this.LocalPassCount + ":" + this.GlobalPassCount + "] "  );
-      return true;
+      return null;
     }
     
     if (this.LocalPassCount >= this.NumberPasses) {
       // learning is done, terminate
       System.out.println( "Worker " + this.internalID + " is done [" + this.LocalPassCount + ":" + this.GlobalPassCount + "] "  );
-      return false;
+      return null;
     }
     
     for (int x = 0; x < this.BatchSize; x++ ) {
       
-      if ( this.input_split.next(value)) {
+      //if ( this.input_split.next(value)) {
+      if ( this.lineParser.hasMoreRecords()) {
+        String val_next = this.lineParser.nextRecord();
         
         long startTime = System.currentTimeMillis();
 
         Vector v = new RandomAccessSparseVector(this.FeatureVectorSize);
-        int actual = this.VectorFactory.processLine(value.toString(), v);
+        //int actual = this.VectorFactory.processLine(value.toString(), v);
+        int actual = -1;
+        try {
+          actual = this.VectorFactory.processLine( val_next, v );
+        } catch (Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
 
         long endTime = System.currentTimeMillis();
 
         batch_vec_factory_time += (endTime - startTime);
-        
-//        String ng = this.VectorFactory.GetClassnameByID(actual); //.GetNewsgroupNameByID( actual );
         
         // calc stats ---------
         
@@ -172,7 +183,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
       }  else {
         
         this.LocalPassCount++;
-        this.input_split.ResetToStartOfSplit();
+        //this.input_split.ResetToStartOfSplit();
         // nothing else to process in split!
         break;
         
@@ -194,6 +205,13 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     return null;
   }
 
+  /**
+   * This is called when we recieve an update from the master
+   * 
+   * here we
+   * - replace the gradient vector with the new global gradient vector
+   * 
+   */
   @Override
   public void update(ParameterVectorGradientUpdatable t) {
     //masterTotal = t.get();
@@ -285,5 +303,13 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
       e.printStackTrace();
     }    
   }
+  
+  
+  @Override
+  public void setRecordParser(RecordParser r) {
+    this.lineParser = (HDFSLineParser) r;
+  }
+  
+  
 }
 

@@ -8,7 +8,14 @@ import com.cloudera.knittingboar.yarn.Updateable;
 
 public interface ComputableWorker<T extends Updateable, R> {
   void setup(Configuration c);
-  T compute(List<R> records);
+  
+  // dont like this method as much
+  //T compute(List<R> records);
+  T compute();
+  
+  // dont know a better way to do this currently
+  void setRecordParser(RecordParser r);
+  
   T getResults();
   void update(T t);
 }

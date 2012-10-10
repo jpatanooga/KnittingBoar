@@ -15,6 +15,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.LineReader;
 
+/**
+ * TODO: change from reading all the records into memory at once
+ * 
+ *
+ */
 public class HDFSLineParser implements RecordParser<String> {
   
   private static final Log LOG = LogFactory.getLog(HDFSLineParser.class);
@@ -28,6 +33,7 @@ public class HDFSLineParser implements RecordParser<String> {
   
   boolean parseComplete = false;
   int position = 0;
+  int recordCount = 0;
   
   @Override
   public void reset() {
@@ -58,15 +64,20 @@ public class HDFSLineParser implements RecordParser<String> {
       Text line = new Text();
       long read = readOffset;
       
-      if (readOffset != 0)
+      if (readOffset != 0) {
         read += ln.readLine(line);
+        recordCount++;
+      }
       
       while (read < readLength) {
         int r = ln.readLine(line);
+        
+        
         if (r == 0)
           break;
         
         records.add(line.toString());
+        recordCount++;
         read += r;
       }
       
@@ -136,5 +147,10 @@ public class HDFSLineParser implements RecordParser<String> {
       return null;
     
     return records.get(position++);
+  }
+  
+  @Override
+  public int getCurrentRecordsProcessed() {
+    return recordCount;
   }
 }

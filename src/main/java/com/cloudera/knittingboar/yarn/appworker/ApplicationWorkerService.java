@@ -100,6 +100,11 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
     this(wid, masterAddr, parser, computable, updateable, new Configuration());
   }
 
+  /**
+   * Main worker loop that feeds ComputableWorker records
+   * - switched from sending a list of records at once to
+   * - letting the end user control their own batches
+   */
   public Integer call() {
     Thread.currentThread().setName(
         "ApplicationWorkerService Thread - " + Utils.getWorkerId(workerId));
@@ -117,12 +122,14 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
 
     // Do some work
     currentState = WorkerState.STARTED;
-    LinkedList<R> records = new LinkedList<R>();
+    //LinkedList<R> records = new LinkedList<R>();
 
     int countTotal = 0;
     int countCurrent = 0;
     int currentIteration = 0;
 
+    computable.setRecordParser(recordParser);
+    
     for (currentIteration = 0; currentIteration < workerConf.getIterations(); currentIteration++) {
       synchronized (currentState) {
         currentState = WorkerState.RUNNING;
@@ -132,7 +139,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
       int lastUpdate = 0;
 
       while (recordParser.hasMoreRecords()) {
-        records.add(recordParser.nextRecord());
+        //records.add(recordParser.nextRecord());
 
         countTotal++;
         countCurrent++;
@@ -143,14 +150,25 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
           progressCounters.put("currentIteration", currentIteration);
         }
 
-        if (countCurrent == workerConf.getBatchSize()
-            || !recordParser.hasMoreRecords()) {
-          LOG.debug("Read "
+//        if (countCurrent == workerConf.getBatchSize()
+//            || !recordParser.hasMoreRecords()) {
+/*          LOG.debug("Read "
               + countCurrent
               + " records, or there are no more records; computing batch result");
+*/
+//          T workerUpdate = computable.compute(records);
+        
+        /**
+         * Run the compute side, let the user handle their own batch
+         * 
+         */
+        
+        T workerUpdate = computable.compute();
 
-          T workerUpdate = computable.compute(records);
-
+        
+        /**
+         * send update to master from this worker
+         */
           try {
             synchronized (currentState) {
               currentState = WorkerState.UPDATE;
@@ -197,8 +215,8 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
           }
 
           countCurrent = 0;
-          records.clear();
-        }
+          //records.clear();
+        //}
       }
     }
 

@@ -7,4 +7,5 @@ public interface RecordParser<T> {
   void setFile(String file);
   boolean hasMoreRecords();
   T nextRecord();
+  int getCurrentRecordsProcessed();
 }
