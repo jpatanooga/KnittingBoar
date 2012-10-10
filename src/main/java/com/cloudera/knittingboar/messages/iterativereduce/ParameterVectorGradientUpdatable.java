@@ -12,12 +12,20 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
 
   ParameterVectorGradient param_msg = null;
   
+  public ParameterVectorGradientUpdatable() {
+  }
   
+  public ParameterVectorGradientUpdatable(ParameterVectorGradient g) {
+    this.param_msg = g;
+  }
   
   @Override
   public void fromBytes(ByteBuffer b) {
-    // TODO Auto-generated method stub
+    
+    System.out.println( " > ParameterVectorGradient::fromBytes > b: " + b.array().length );
+    
     try {
+      this.param_msg = new ParameterVectorGradient();
       this.param_msg.Deserialize(b.array());
     } catch (IOException e) {
       // TODO Auto-generated catch block

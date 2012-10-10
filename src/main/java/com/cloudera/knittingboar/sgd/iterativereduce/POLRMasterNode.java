@@ -141,6 +141,8 @@ public class POLRMasterNode extends POLRNodeBase implements
   @Override
   public void setup(Configuration c) {
     
+    this.conf = c;
+    
     try {
       
       // this is hard set with LR to 2 classes
@@ -183,7 +185,7 @@ public class POLRMasterNode extends POLRNodeBase implements
       if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
         
         // so load the CSV specific stuff ----------
-        
+        System.out.println( "----- Loading CSV RecordFactory Specific Stuff -------" );
         // predictor label names
         this.PredictorLabelNames = LoadStringConfVarOrException(
             "com.cloudera.knittingboar.setup.PredictorLabelNames",
@@ -211,6 +213,7 @@ public class POLRMasterNode extends POLRNodeBase implements
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+      System.out.println( ">> Error loading conf!" );
     }
     
     this.SetupPOLR();
@@ -222,6 +225,7 @@ public class POLRMasterNode extends POLRNodeBase implements
   
   public void SetupPOLR() {
     
+    System.out.println( "SetupOLR: " + this.num_categories + ", " + this.FeatureVectorSize );
     
     this.global_parameter_vector = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
     

@@ -114,12 +114,15 @@ public class TestPOLRIterativeReduce {
   }
 
   public void setUpMaster() throws Exception {
+    
+    // /Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt
+    
     FileSplit split = FileSplit.newBuilder()
-        .setPath("testData/testWorkerService.txt").setOffset(0).setLength(200)
+        .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(834889)
         .build();
 
     StartupConfiguration conf = StartupConfiguration.newBuilder()
-        .setSplit(split).setBatchSize(2).setIterations(1).setOther(null)
+        .setSplit(split).setBatchSize(200).setIterations(1).setOther(null)
         .build();
 
     HashMap<WorkerId, StartupConfiguration> workers = new HashMap<WorkerId, StartupConfiguration>();
@@ -130,7 +133,7 @@ public class TestPOLRIterativeReduce {
     //computableMaster = new CompoundAdditionMaster();
     computableMaster = new POLRMasterNode();
     masterService = new ApplicationMasterService<ParameterVectorGradientUpdatable>(masterAddress,
-        workers, computableMaster, ParameterVectorGradientUpdatable.class);
+        workers, computableMaster, ParameterVectorGradientUpdatable.class, null, generateDebugConfigurationObject() );
 
     master = new FutureTask<Integer>(masterService);
 
@@ -141,7 +144,7 @@ public class TestPOLRIterativeReduce {
     HDFSLineParser parser = new HDFSLineParser();
     ComputableWorker<ParameterVectorGradientUpdatable, String> computableWorker = new POLRWorkerNode();
     ApplicationWorkerService<ParameterVectorGradientUpdatable, String> workerService = new ApplicationWorkerService<ParameterVectorGradientUpdatable, String>(
-        name, masterAddress, parser, computableWorker, ParameterVectorGradientUpdatable.class);
+        name, masterAddress, parser, computableWorker, ParameterVectorGradientUpdatable.class, generateDebugConfigurationObject() );
 
     FutureTask<Integer> worker = new FutureTask<Integer>(workerService);
 
