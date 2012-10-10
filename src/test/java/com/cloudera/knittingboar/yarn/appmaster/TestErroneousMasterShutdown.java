@@ -10,9 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.cloudera.knittingboar.yarn.AvroUtils;
 import com.cloudera.knittingboar.yarn.CompoundAdditionMaster;
 import com.cloudera.knittingboar.yarn.UpdateableInt;
+import com.cloudera.knittingboar.yarn.Utils;
 import com.cloudera.knittingboar.yarn.avro.generated.FileSplit;
 import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
@@ -34,8 +34,8 @@ public class TestErroneousMasterShutdown {
         .build();
 
     HashMap<WorkerId, StartupConfiguration> workers = new HashMap<WorkerId, StartupConfiguration>();
-    workers.put(AvroUtils.createWorkerId("worker1"), conf);
-    workers.put(AvroUtils.createWorkerId("worker2"), conf);
+    workers.put(Utils.createWorkerId("worker1"), conf);
+    workers.put(Utils.createWorkerId("worker2"), conf);
 
     InetSocketAddress masterAddress = new InetSocketAddress(9999);
     ComputableMaster<UpdateableInt> computableMaster = new CompoundAdditionMaster();

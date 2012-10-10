@@ -13,9 +13,9 @@ import org.apache.avro.ipc.NettyTransceiver;
 import org.apache.avro.ipc.specific.SpecificRequestor;
 import org.junit.Test;
 
-import com.cloudera.knittingboar.yarn.AvroUtils;
 import com.cloudera.knittingboar.yarn.CompoundAdditionMaster;
 import com.cloudera.knittingboar.yarn.UpdateableInt;
+import com.cloudera.knittingboar.yarn.Utils;
 import com.cloudera.knittingboar.yarn.avro.generated.FileSplit;
 import com.cloudera.knittingboar.yarn.avro.generated.KnittingBoarService;
 import com.cloudera.knittingboar.yarn.avro.generated.ProgressReport;
@@ -52,8 +52,8 @@ public class TestMasterServiceRPC {
         .build();
     
     HashMap<WorkerId, StartupConfiguration> workers = new HashMap<WorkerId, StartupConfiguration>();
-    workers.put(AvroUtils.createWorkerId("worker1"), conf);
-    workers.put(AvroUtils.createWorkerId("worker2"), conf);
+    workers.put(Utils.createWorkerId("worker1"), conf);
+    workers.put(Utils.createWorkerId("worker2"), conf);
     
     InetSocketAddress masterAddress = new InetSocketAddress(9999);
     ComputableMaster<UpdateableInt> computableMaster = new CompoundAdditionMaster();
@@ -68,8 +68,8 @@ public class TestMasterServiceRPC {
         KnittingBoarService.class, new NettyTransceiver(masterAddress));
 
     // Test 
-    WorkerId workerOne = AvroUtils.createWorkerId("worker1");
-    WorkerId workerTwo = AvroUtils.createWorkerId("worker2");
+    WorkerId workerOne = Utils.createWorkerId("worker1");
+    WorkerId workerTwo = Utils.createWorkerId("worker2");
     
     // Startup
     assertStartupConfiguration(masterPrc.startup(workerOne), "/foo/bar", 2, 1, null);

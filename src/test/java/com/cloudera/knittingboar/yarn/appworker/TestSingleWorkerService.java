@@ -15,10 +15,10 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.cloudera.knittingboar.yarn.AvroUtils;
 import com.cloudera.knittingboar.yarn.CompoundAdditionMaster;
 import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
 import com.cloudera.knittingboar.yarn.UpdateableInt;
+import com.cloudera.knittingboar.yarn.Utils;
 import com.cloudera.knittingboar.yarn.appmaster.ApplicationMasterService;
 import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 import com.cloudera.knittingboar.yarn.appworker.ApplicationWorkerService;
@@ -73,7 +73,7 @@ public class TestSingleWorkerService {
         .build();
 
     HashMap<WorkerId, StartupConfiguration> workers = new HashMap<WorkerId, StartupConfiguration>();
-    workers.put(AvroUtils.createWorkerId("worker1"), conf);
+    workers.put(Utils.createWorkerId("worker1"), conf);
 
     computableMaster = new CompoundAdditionMaster();
     masterService = new ApplicationMasterService<UpdateableInt>(masterAddress,
