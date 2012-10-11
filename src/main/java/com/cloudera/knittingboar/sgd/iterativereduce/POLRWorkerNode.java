@@ -1,5 +1,6 @@
 package com.cloudera.knittingboar.sgd.iterativereduce;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -105,8 +106,13 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     gradient.parameter_vector = this.polr.getGamma().getMatrix().clone();
     gradient.SrcWorkerPassCount = this.LocalPassCount;
     
-    System.out.println( "GenerateUpdate >> " + gradient.parameter_vector.get(0, 0));
-    
+/*    try {
+      System.out.println( "GenerateUpdate >> " + gradient.parameter_vector.get(0, 0) + ", Len: " + gradient.Serialize().length);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+*/    
     return gradient;
     
   }  
@@ -153,7 +159,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
       return null;
     }
 */
-    System.out.println( "Batchsize: " + this.BatchSize );
+    //System.out.println( "Batchsize: " + this.BatchSize );
     
     for (int x = 0; x < this.BatchSize; x++ ) {
       
@@ -185,7 +191,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
 
         metrics.AvgLogLikelihood = metrics.AvgLogLikelihood + (ll - metrics.AvgLogLikelihood) / mu; 
 
-        Vector p = new DenseVector(20);
+        Vector p = new DenseVector(this.num_categories);
         this.polr.classifyFull(p, v);
         int estimated = p.maxValueIndex();
         int correct = (estimated == actual? 1 : 0);

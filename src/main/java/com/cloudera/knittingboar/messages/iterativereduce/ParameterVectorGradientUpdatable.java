@@ -22,7 +22,9 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
   @Override
   public void fromBytes(ByteBuffer b) {
     
-    System.out.println( " > ParameterVectorGradient::fromBytes > b: " + b.array().length );
+    b.rewind();
+    
+    //System.out.println( " > ParameterVectorGradient::fromBytes > b: " + b.array().length + ", remaining: " + b.remaining() );
     
     try {
       this.param_msg = new ParameterVectorGradient();
@@ -53,8 +55,9 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
       e.printStackTrace();
     }
     
-    ByteBuffer buf = ByteBuffer.allocate(bytes.length);
-    buf.put(bytes);
+    //ByteBuffer buf = ByteBuffer.allocate(bytes.length);
+    //buf.put(bytes);
+    ByteBuffer buf = ByteBuffer.wrap(bytes);
     
     return buf;
   }
