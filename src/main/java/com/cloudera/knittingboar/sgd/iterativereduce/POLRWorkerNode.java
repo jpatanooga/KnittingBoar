@@ -1,11 +1,13 @@
 package com.cloudera.knittingboar.sgd.iterativereduce;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
+import org.apache.mahout.classifier.sgd.L1;
 import org.apache.mahout.classifier.sgd.ModelDissector;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
@@ -13,15 +15,22 @@ import org.apache.mahout.math.Vector;
 
 import com.cloudera.knittingboar.io.InputRecordsSplit;
 import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
+import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 import com.cloudera.knittingboar.metrics.POLRMetrics;
+import com.cloudera.knittingboar.records.CSVBasedDatasetRecordFactory;
+import com.cloudera.knittingboar.records.RCV1RecordFactory;
 import com.cloudera.knittingboar.records.RecordFactory;
+import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
-import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
+//import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
 import com.cloudera.knittingboar.yarn.UpdateableInt;
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
+import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
+import com.cloudera.knittingboar.yarn.appworker.RecordParser;
+import com.google.common.collect.Lists;
 
 
 /**
@@ -56,8 +65,12 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   
   public String internalID = "0";
   private RecordFactory VectorFactory = null;
-  InputRecordsSplit input_split = null;
   
+  // old way
+  //InputRecordsSplit input_split = null;
+  
+  // new way
+  private HDFSLineParser lineParser = null;
   
  
   // basic stats tracking
@@ -87,9 +100,26 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   }  
   */
   
+  public ParameterVectorGradient GenerateUpdate() {
+    
+    ParameterVectorGradient gradient = new ParameterVectorGradient();
+    gradient.parameter_vector = this.polr.getGamma().getMatrix().clone();
+    gradient.SrcWorkerPassCount = this.LocalPassCount;
+    
+/*    try {
+      System.out.println( "GenerateUpdate >> " + gradient.parameter_vector.get(0, 0) + ", Len: " + gradient.Serialize().length);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+*/    
+    return gradient;
+    
+  }  
+  
   
   @Override
-  public ParameterVectorGradientUpdatable compute(List<String> records) {
+  public ParameterVectorGradientUpdatable compute() {
     int total = 0;
 /*    
     for(String s : records) {
@@ -109,41 +139,50 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
         + ", records=" + records.toString());
     */
     
+    //HDFSLineParser input_parser = (HDFSLineParser) this.getRecordParser();
     
     
-    
-    
-    
+    // ------------- process the next batch -----------
     
     Text value = new Text();
     long batch_vec_factory_time = 0;
-    
+/*    
     if (this.LocalPassCount > this.GlobalPassCount) {
       // we need to sit this one out
       System.out.println( "Worker " + this.internalID + " is ahead of global pass count [" + this.LocalPassCount + ":" + this.GlobalPassCount + "] "  );
-      return true;
+      return null;
     }
     
     if (this.LocalPassCount >= this.NumberPasses) {
       // learning is done, terminate
       System.out.println( "Worker " + this.internalID + " is done [" + this.LocalPassCount + ":" + this.GlobalPassCount + "] "  );
-      return false;
+      return null;
     }
+*/
+    //System.out.println( "Batchsize: " + this.BatchSize );
     
     for (int x = 0; x < this.BatchSize; x++ ) {
       
-      if ( this.input_split.next(value)) {
+      //if ( this.input_split.next(value)) {
+      if ( this.lineParser.hasMoreRecords()) {
+        String val_next = this.lineParser.nextRecord();
         
         long startTime = System.currentTimeMillis();
 
         Vector v = new RandomAccessSparseVector(this.FeatureVectorSize);
-        int actual = this.VectorFactory.processLine(value.toString(), v);
+        //int actual = this.VectorFactory.processLine(value.toString(), v);
+        int actual = -1;
+        try {
+                    
+          actual = this.VectorFactory.processLine( val_next, v );
+        } catch (Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
 
         long endTime = System.currentTimeMillis();
 
         batch_vec_factory_time += (endTime - startTime);
-        
-//        String ng = this.VectorFactory.GetClassnameByID(actual); //.GetNewsgroupNameByID( actual );
         
         // calc stats ---------
         
@@ -152,7 +191,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
 
         metrics.AvgLogLikelihood = metrics.AvgLogLikelihood + (ll - metrics.AvgLogLikelihood) / mu; 
 
-        Vector p = new DenseVector(20);
+        Vector p = new DenseVector(this.num_categories);
         this.polr.classifyFull(p, v);
         int estimated = p.maxValueIndex();
         int correct = (estimated == actual? 1 : 0);
@@ -172,7 +211,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
       }  else {
         
         this.LocalPassCount++;
-        this.input_split.ResetToStartOfSplit();
+        //this.input_split.ResetToStartOfSplit();
         // nothing else to process in split!
         break;
         
@@ -187,13 +226,20 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     
     
     
-    return null;
+    return new ParameterVectorGradientUpdatable(this.GenerateUpdate());
   }
   
   public ParameterVectorGradientUpdatable getResults() {
     return null;
   }
 
+  /**
+   * This is called when we recieve an update from the master
+   * 
+   * here we
+   * - replace the gradient vector with the new global gradient vector
+   * 
+   */
   @Override
   public void update(ParameterVectorGradientUpdatable t) {
     //masterTotal = t.get();
@@ -212,6 +258,8 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
 
   @Override
   public void setup(Configuration c) {
+    
+    this.conf = c;
     
     try {
       
@@ -283,7 +331,83 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    }    
+    }  
+    
+    this.SetupPOLR();
   }
+  
+  
+  
+  private void SetupPOLR() {
+    
+    // do splitting strings into arrays here...
+    String[] predictor_label_names = this.PredictorLabelNames.split(",");
+    String[] variable_types = this.PredictorVariableTypes.split(",");
+    
+    polr_modelparams = new POLRModelParameters();
+    polr_modelparams.setTargetVariable( this.TargetVariableName ); 
+    polr_modelparams.setNumFeatures( this.FeatureVectorSize );
+    polr_modelparams.setUseBias(true); 
+    
+    List<String> typeList = Lists.newArrayList();
+    for ( int x = 0; x < variable_types.length; x++ ) {
+      typeList.add( variable_types[x] );
+    }
+
+    List<String> predictorList = Lists.newArrayList();
+    for ( int x = 0; x < predictor_label_names.length; x++ ) {
+      predictorList.add( predictor_label_names[x] );
+    }    
+    
+    // where do these come from?
+    polr_modelparams.setTypeMap(predictorList, typeList);
+    polr_modelparams.setLambda( this.Lambda ); // based on defaults - match command line
+    polr_modelparams.setLearningRate( this.LearningRate ); // based on defaults - match command line
+    
+    // setup record factory stuff here ---------
+
+    if (RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY.equals(this.RecordFactoryClassname)) {
+
+      this.VectorFactory = new TwentyNewsgroupsRecordFactory("\t");
+      
+    } else if (RecordFactory.RCV1_RECORDFACTORY.equals(this.RecordFactoryClassname)) {
+      
+      this.VectorFactory = new RCV1RecordFactory();
+      
+    } else {
+      
+      // it defaults to the CSV record factor, but a custom one
+      
+      this.VectorFactory = new CSVBasedDatasetRecordFactory(this.TargetVariableName, polr_modelparams.getTypeMap() );
+      
+      ((CSVBasedDatasetRecordFactory)this.VectorFactory).firstLine( this.ColumnHeaderNames );
+      
+      
+    }
+        
+    polr_modelparams.setTargetCategories( this.VectorFactory.getTargetCategories() );
+    
+    // ----- this normally is generated from the POLRModelParams ------
+    
+    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    .alpha(1).stepOffset(1000)
+    .decayExponent(0.9) 
+    .lambda(this.Lambda)
+    .learningRate(this.LearningRate);   
+    
+    polr_modelparams.setPOLR(polr);
+    
+    //this.bSetup = true;
+  }  
+  
+  
+  
+  
+  @Override
+  public void setRecordParser(RecordParser r) {
+    this.lineParser = (HDFSLineParser) r;
+  }
+  
+  
 }
 

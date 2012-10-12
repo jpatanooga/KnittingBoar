@@ -12,12 +12,22 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
 
   ParameterVectorGradient param_msg = null;
   
+  public ParameterVectorGradientUpdatable() {
+  }
   
+  public ParameterVectorGradientUpdatable(ParameterVectorGradient g) {
+    this.param_msg = g;
+  }
   
   @Override
   public void fromBytes(ByteBuffer b) {
-    // TODO Auto-generated method stub
+    
+    b.rewind();
+    
+    //System.out.println( " > ParameterVectorGradient::fromBytes > b: " + b.array().length + ", remaining: " + b.remaining() );
+    
     try {
+      this.param_msg = new ParameterVectorGradient();
       this.param_msg.Deserialize(b.array());
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -45,8 +55,9 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
       e.printStackTrace();
     }
     
-    ByteBuffer buf = ByteBuffer.allocate(bytes.length);
-    buf.put(bytes);
+    //ByteBuffer buf = ByteBuffer.allocate(bytes.length);
+    //buf.put(bytes);
+    ByteBuffer buf = ByteBuffer.wrap(bytes);
     
     return buf;
   }

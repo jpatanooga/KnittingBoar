@@ -297,6 +297,10 @@ public class ParallelOnlineLogisticRegression extends AbstractOnlineLogisticRegr
     
   }
   
+  public GradientBuffer getGamma() {
+    return this.gamma;
+  }
+  
   
   
   

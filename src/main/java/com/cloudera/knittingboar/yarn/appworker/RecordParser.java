@@ -9,4 +9,5 @@ public interface RecordParser<T extends Updateable> {
   void setFile(String file);
   boolean hasMoreRecords();
   T nextRecord();
+  int getCurrentRecordsProcessed();
 }
