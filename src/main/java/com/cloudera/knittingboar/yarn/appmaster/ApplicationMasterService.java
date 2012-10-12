@@ -46,14 +46,14 @@ public class ApplicationMasterService<T extends Updateable> implements
     WAITING, UPDATING
   }
 
-  private HashMap<WorkerId, StartupConfiguration> workers;
-  private HashMap<WorkerId, WorkerState> workersState;
-  private HashMap<WorkerId, LinkedHashMap<Long, ProgressReport>> workersProgress;
-  private HashMap<WorkerId, T> workersUpdate;
+  private Map<WorkerId, StartupConfiguration> workers;
+  private Map<WorkerId, WorkerState> workersState;
+  private Map<WorkerId, LinkedHashMap<Long, ProgressReport>> workersProgress;
+  private Map<WorkerId, T> workersUpdate;
 
   private MasterState masterState;
   private int currentUpdateId = 0;
-  private HashMap<Integer, T> masterUpdates;
+  private Map<Integer, T> masterUpdates;
 
   private ComputableMaster<T> computable;
   private Class<T> updateable;
@@ -66,12 +66,12 @@ public class ApplicationMasterService<T extends Updateable> implements
   private Thread ourThread;
   
   private Configuration conf;
-  private Map<String, String> appConf;
+  private Map<CharSequence, CharSequence> appConf;
 
   public ApplicationMasterService(InetSocketAddress masterAddr,
-      HashMap<WorkerId, StartupConfiguration> workers,
+      Map<WorkerId, StartupConfiguration> workers,
       ComputableMaster<T> computable, Class<T> updatable,
-      Map<String, String> appConf, Configuration conf) {
+      Map<CharSequence, CharSequence> appConf, Configuration conf) {
 
     if (masterAddr == null || computable == null || updatable == null)
       throw new IllegalStateException(
@@ -96,16 +96,16 @@ public class ApplicationMasterService<T extends Updateable> implements
   }
   
   public ApplicationMasterService(InetSocketAddress masterAddr,
-      HashMap<WorkerId, StartupConfiguration> workers,
+      Map<WorkerId, StartupConfiguration> workers,
       ComputableMaster<T> computable, Class<T> updatable,
-      Map<String, String> appConf) {
+      Map<CharSequence, CharSequence> appConf) {
 
     this(masterAddr, workers, computable, updatable, appConf,
         new Configuration());
   }
   
   public ApplicationMasterService(InetSocketAddress masterAddr,
-      HashMap<WorkerId, StartupConfiguration> workers,
+      Map<WorkerId, StartupConfiguration> workers,
       ComputableMaster<T> computable, Class<T> updatable) {
 
     this(masterAddr, workers, computable, updatable, null);
@@ -287,6 +287,7 @@ public class ApplicationMasterService<T extends Updateable> implements
     T update;
     try {
       update = updateable.newInstance();
+      data.rewind();
       update.fromBytes(data);
     } catch (Exception ex) {
       LOG.warn("Unable to instantiate a computable object", ex);
@@ -361,7 +362,10 @@ public class ApplicationMasterService<T extends Updateable> implements
       workersState.put(workerId, WorkerState.RUNNING);
     }
 
-    return masterUpdates.get(updateId).toBytes();
+    ByteBuffer bytes = masterUpdates.get(updateId).toBytes();
+    bytes.rewind();
+    
+    return bytes;
   }
 
   @Override

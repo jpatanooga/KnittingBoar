@@ -25,7 +25,7 @@ import com.cloudera.knittingboar.yarn.avro.generated.ServiceError;
 import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
 
-public class ApplicationWorkerService<T extends Updateable, R> implements
+public class ApplicationWorkerService<T extends Updateable> implements
     Callable<Integer> {
 
   private static final Log LOG = LogFactory
@@ -42,8 +42,8 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
 
   private StartupConfiguration workerConf;
 
-  private RecordParser<R> recordParser;
-  private ComputableWorker<T, R> computable;
+  private RecordParser<T> recordParser;
+  private ComputableWorker<T> computable;
   private Class<T> updateable;
 
   private Map<String, Integer> progressCounters;
@@ -80,7 +80,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
   }
 
   public ApplicationWorkerService(String wid, InetSocketAddress masterAddr,
-      RecordParser<R> parser, ComputableWorker<T, R> computable,
+      RecordParser<T> parser, ComputableWorker<T> computable,
       Class<T> updateable, Configuration conf) {
 
     this.workerId = Utils.createWorkerId(wid);
@@ -95,7 +95,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
   }
   
   public ApplicationWorkerService(String wid, InetSocketAddress masterAddr,
-      RecordParser<R> parser, ComputableWorker<T, R> computable,
+      RecordParser<T> parser, ComputableWorker<T> computable,
       Class<T> updateable) {
 
     this(wid, masterAddr, parser, computable, updateable, new Configuration());
@@ -118,7 +118,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
 
     // Do some work
     currentState = WorkerState.STARTED;
-    LinkedList<R> records = new LinkedList<R>();
+    LinkedList<T> records = new LinkedList<T>();
 
     int countTotal = 0;
     int countCurrent = 0;
@@ -151,11 +151,13 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
               + " records, or there are no more records; computing batch result");
 
           T workerUpdate = computable.compute(records);
-
           try {
             synchronized (currentState) {
+              ByteBuffer bytes = workerUpdate.toBytes(); 
+              bytes.rewind();
+              
               currentState = WorkerState.UPDATE;
-              masterService.update(workerId, workerUpdate.toBytes());
+              masterService.update(workerId, bytes);
             }
           } catch (AvroRemoteException ex) {
             LOG.error("Unable to send update message to master", ex);
@@ -179,6 +181,7 @@ public class ApplicationWorkerService<T extends Updateable, R> implements
           // Got an update
           try {
             ByteBuffer b = masterService.fetch(workerId, nextUpdate);
+            b.rewind();
             T masterUpdate = updateable.newInstance();
             masterUpdate.fromBytes(b);
             computable.update(masterUpdate);

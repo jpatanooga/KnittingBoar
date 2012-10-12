@@ -4,8 +4,8 @@ import org.apache.hadoop.conf.Configuration;
 
 import com.cloudera.knittingboar.yarn.Updateable;
 
-public abstract class AbstractComputableWorker<T extends Updateable, R> implements
-    ComputableWorker<T, R> {
+public abstract class AbstractComputableWorker<T extends Updateable> implements
+    ComputableWorker<T> {
   
   private Configuration conf;
   
