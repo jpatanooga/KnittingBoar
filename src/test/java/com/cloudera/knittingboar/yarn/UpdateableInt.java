@@ -13,7 +13,6 @@ public class UpdateableInt implements Updateable<Integer> {
     
     b.clear();
     b.putInt(i);
-    b.rewind();
     
     return b;
     
@@ -21,8 +20,12 @@ public class UpdateableInt implements Updateable<Integer> {
 
   @Override
   public void fromBytes(ByteBuffer b) {
-    b.rewind();
     i = b.getInt();
+  }
+  
+  @Override
+  public void fromString(String s) {
+    i = Integer.parseInt(s);
   }
 
   @Override

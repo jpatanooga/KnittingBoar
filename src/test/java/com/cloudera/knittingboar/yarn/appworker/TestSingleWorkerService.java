@@ -37,9 +37,9 @@ public class TestSingleWorkerService {
   private FutureTask<Integer> master;
   private ComputableMaster<UpdateableInt> computableMaster;
 
-  private ApplicationWorkerService<UpdateableInt, String> workerService;
+  private ApplicationWorkerService<UpdateableInt> workerService;
   private FutureTask<Integer> worker;
-  private ComputableWorker<UpdateableInt, String> computableWorker;
+  private ComputableWorker<UpdateableInt> computableWorker;
 
   @Before
   public void setUp() throws Exception {
@@ -85,9 +85,9 @@ public class TestSingleWorkerService {
   }
 
   private void setUpWorker() {
-    HDFSLineParser parser = new HDFSLineParser();
+    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
     computableWorker = new CompoundAdditionWorker();
-    workerService = new ApplicationWorkerService<UpdateableInt, String>(
+    workerService = new ApplicationWorkerService<UpdateableInt>(
         "worker1", masterAddress, parser, computableWorker, UpdateableInt.class);
 
     worker = new FutureTask<Integer>(workerService);

@@ -8,19 +8,18 @@ import org.apache.hadoop.conf.Configuration;
 
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
 
-public class CompoundAdditionWorker implements ComputableWorker<UpdateableInt, String> {
+public class CompoundAdditionWorker implements ComputableWorker<UpdateableInt> {
   private static final Log LOG = LogFactory.getLog(CompoundAdditionWorker.class);
   
   int masterTotal = 0;
   UpdateableInt workerTotal;
   
   @Override
-  public UpdateableInt compute(List<String> records) {
+  public UpdateableInt compute(List<UpdateableInt> records) {
     int total = 0;
     
-    for(String s : records) {
-      Integer i = Integer.parseInt(s);
-      total += i;
+    for(UpdateableInt i : records) {
+      total += i.get();
     }
     
     //masterTotal = total / 10;

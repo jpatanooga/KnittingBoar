@@ -35,9 +35,9 @@ public class TestMultipleWorkerServices {
   private FutureTask<Integer> master;
   private ComputableMaster<UpdateableInt> computableMaster;
 
-  private ArrayList<ApplicationWorkerService<UpdateableInt, String>> workerServices = new ArrayList<ApplicationWorkerService<UpdateableInt, String>>();
+  private ArrayList<ApplicationWorkerService<UpdateableInt>> workerServices = new ArrayList<ApplicationWorkerService<UpdateableInt>>();
   private ArrayList<FutureTask<Integer>> workers = new ArrayList<FutureTask<Integer>>();
-  private ArrayList<ComputableWorker<UpdateableInt, String>> computableWorkers = new ArrayList<ComputableWorker<UpdateableInt, String>>();
+  private ArrayList<ComputableWorker<UpdateableInt>> computableWorkers = new ArrayList<ComputableWorker<UpdateableInt>>();
 
   @Before
   public void setUp() throws Exception {
@@ -87,9 +87,9 @@ public class TestMultipleWorkerServices {
   }
 
   private void setUpWorker(String name) {
-    HDFSLineParser parser = new HDFSLineParser();
-    ComputableWorker<UpdateableInt, String> computableWorker = new CompoundAdditionWorker();
-    ApplicationWorkerService<UpdateableInt, String> workerService = new ApplicationWorkerService<UpdateableInt, String>(
+    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
+    ComputableWorker<UpdateableInt> computableWorker = new CompoundAdditionWorker();
+    ApplicationWorkerService<UpdateableInt> workerService = new ApplicationWorkerService<UpdateableInt>(
         name, masterAddress, parser, computableWorker, UpdateableInt.class);
 
     FutureTask<Integer> worker = new FutureTask<Integer>(workerService);

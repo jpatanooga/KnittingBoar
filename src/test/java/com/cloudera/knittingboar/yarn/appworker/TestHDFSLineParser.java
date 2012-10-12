@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.cloudera.knittingboar.yarn.UpdateableInt;
 import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
 
 import junit.framework.TestCase;
@@ -33,7 +34,7 @@ public class TestHDFSLineParser extends TestCase {
     inputFile = new Path(testDir, "test.txt");
 
     Writer writer = new OutputStreamWriter(localFs.create(inputFile, true));
-    writer.write("line1\nline2\nline3");
+    writer.write("10000\n20000\n30000");
     writer.close();
   }
   
@@ -44,77 +45,77 @@ public class TestHDFSLineParser extends TestCase {
   
   @Test
   public void testReadFullFile() throws IOException {
-    HDFSLineParser parser = new HDFSLineParser();
+    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
     parser.setFile(inputFile.toString());
     
-    List<String> records = new LinkedList<String>();
+    List<UpdateableInt> records = new LinkedList<UpdateableInt>();
 
     parser.parse();
     
     while (parser.hasMoreRecords()) {
-      String r = parser.nextRecord();
+      UpdateableInt r = parser.nextRecord();
       records.add(r);
     }
     
     assertEquals(3, records.size());
-    assertEquals("line1", records.get(0));
-    assertEquals("line2", records.get(1));
-    assertEquals("line3", records.get(2));
+    assertEquals(Integer.valueOf(10000), records.get(0).get());
+    assertEquals(Integer.valueOf(20000), records.get(1).get());
+    assertEquals(Integer.valueOf(30000), records.get(2).get());
   }
   
   @Test
   public void testReadPartialFileToEnd() throws IOException {
-    HDFSLineParser parser = new HDFSLineParser();
+    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
     parser.setFile(inputFile.toString(), 4, 500);
     
-    List<String> records = new LinkedList<String>();
+    List<UpdateableInt> records = new LinkedList<UpdateableInt>();
 
     parser.parse();
     
     while (parser.hasMoreRecords()) {
-      String r = parser.nextRecord();
+      UpdateableInt r = parser.nextRecord();
       records.add(r);
     }
     
     assertEquals(2, records.size());
-    assertEquals("line2", records.get(0));
-    assertEquals("line3", records.get(1));
+    assertEquals(Integer.valueOf(20000), records.get(0).get());
+    assertEquals(Integer.valueOf(30000), records.get(1).get());
   }
   
   @Test
   public void testReadPartialFileToMid() throws IOException {
-    HDFSLineParser parser = new HDFSLineParser();
+    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
     parser.setFile(inputFile.toString(), 4, 12);
     
-    List<String> records = new LinkedList<String>();
+    List<UpdateableInt> records = new LinkedList<UpdateableInt>();
 
     parser.parse();
     
     while (parser.hasMoreRecords()) {
-      String r = parser.nextRecord();
+      UpdateableInt r = parser.nextRecord();
       records.add(r);
     }
     
     assertEquals(1, records.size());
-    assertEquals("line2", records.get(0));
+    assertEquals(Integer.valueOf(20000), records.get(0).get());
   }
 
   @Test
   public void testReadPartialFileToMidOverflow() throws IOException {
-    HDFSLineParser parser = new HDFSLineParser();
+    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
     parser.setFile(inputFile.toString(), 4, 13);
     
-    List<String> records = new LinkedList<String>();
+    List<UpdateableInt> records = new LinkedList<UpdateableInt>();
 
     parser.parse();
     
     while (parser.hasMoreRecords()) {
-      String r = parser.nextRecord();
+      UpdateableInt r = parser.nextRecord();
       records.add(r);
     }
     
     assertEquals(2, records.size());
-    assertEquals("line2", records.get(0));
-    assertEquals("line3", records.get(1));
+    assertEquals(Integer.valueOf(20000), records.get(0).get());
+    assertEquals(Integer.valueOf(30000), records.get(1).get());
   }
 }
