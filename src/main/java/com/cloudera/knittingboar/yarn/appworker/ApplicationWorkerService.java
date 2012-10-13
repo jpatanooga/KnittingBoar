@@ -107,6 +107,9 @@ public class ApplicationWorkerService<T extends Updateable> implements
    * - letting the end user control their own batches
    */
   public Integer call() {
+    
+    System.out.println( "call ------------ " );
+    
     Thread.currentThread().setName(
         "ApplicationWorkerService Thread - " + Utils.getWorkerId(workerId));
     
@@ -123,13 +126,15 @@ public class ApplicationWorkerService<T extends Updateable> implements
 
     // Do some work
     currentState = WorkerState.STARTED;
-    LinkedList<T> records = new LinkedList<T>();
+    //LinkedList<T> records = new LinkedList<T>();
 
     int countTotal = 0;
     int countCurrent = 0;
     int currentIteration = 0;
 
     computable.setRecordParser(recordParser);
+    
+    System.out.println( "is setup ------------ " );
     
     for (currentIteration = 0; currentIteration < workerConf.getIterations(); currentIteration++) {
       synchronized (currentState) {

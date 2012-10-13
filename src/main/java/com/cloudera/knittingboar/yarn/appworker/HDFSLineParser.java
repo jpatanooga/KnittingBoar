@@ -42,6 +42,11 @@ public class HDFSLineParser<T extends Updateable> implements RecordParser<T> {
     position = 0;
   }
 
+  /**
+   * TODO: rebuild ----------------------------
+   * -  stop loading entire split
+   * 
+   */
   @Override
   public void parse() {
     if (file == null)

@@ -61,6 +61,12 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
     
     return buf;
   }
+
+  @Override
+  public void fromString(String s) {
+    // TODO Auto-generated method stub
+    
+  }
   
   
 }

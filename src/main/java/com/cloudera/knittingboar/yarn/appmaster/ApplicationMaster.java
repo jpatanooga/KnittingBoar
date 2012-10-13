@@ -283,7 +283,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
       // Get the local resources
       try {
         Map<String, LocalResource> localResources = Utils
-            .getLocalResourcesForApplication(props,
+            .getLocalResourcesForApplication(conf, null, workerId, props,
                 LocalResourceVisibility.APPLICATION);
         List<String> commands = Utils.getWorkerCommand(props, 
             masterHost + ":" + masterPort, workerId);
@@ -293,7 +293,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
         
         // Get status
         cmHandler.getContainerStatus();
-      } catch (URISyntaxException ex) { // Getting URI for local file, fatal
+      //} catch (URISyntaxException ex) { // Getting URI for local file, fatal
       } catch (YarnRemoteException ex) { // Container status, fatalish
       } catch (IOException ex) { // Starting container, fatal
       }

@@ -1,5 +1,6 @@
 package com.cloudera.knittingboar.sgd.iterativereduce;
 
+import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -227,6 +228,7 @@ public class POLRMasterNode extends POLRNodeBase implements
     
     System.out.println( "SetupOLR: " + this.num_categories + ", " + this.FeatureVectorSize );
     
+    
     this.global_parameter_vector = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
     
     
@@ -287,6 +289,12 @@ public class POLRMasterNode extends POLRNodeBase implements
     polr_modelparams.setPOLR(polr);    
     //this.bSetup = true;
 
+  }
+
+  @Override
+  public void complete(DataOutputStream out) {
+    // TODO Auto-generated method stub
+    System.out.println( "master::complete " );
   }  
   
   

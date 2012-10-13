@@ -30,6 +30,7 @@ import com.cloudera.knittingboar.yarn.UpdateableInt;
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
 import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
 import com.cloudera.knittingboar.yarn.appworker.RecordParser;
+import com.cloudera.knittingboar.yarn.appworker.TextRecordParser;
 import com.google.common.collect.Lists;
 
 
@@ -47,7 +48,7 @@ import com.google.common.collect.Lists;
  * @author jpatterson
  *
  */
-public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<ParameterVectorGradientUpdatable, String> {
+public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<ParameterVectorGradientUpdatable> {
   private static final Log LOG = LogFactory.getLog(POLRWorkerNode.class);
   
   int masterTotal = 0;
@@ -70,7 +71,8 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   //InputRecordsSplit input_split = null;
   
   // new way
-  private HDFSLineParser lineParser = null;
+  //private HDFSLineParser lineParser = null;
+  private TextRecordParser lineParser = null;
   
  
   // basic stats tracking
@@ -161,11 +163,20 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
 */
     //System.out.println( "Batchsize: " + this.BatchSize );
     
+    boolean result = true;
+    
     for (int x = 0; x < this.BatchSize; x++ ) {
       
-      //if ( this.input_split.next(value)) {
-      if ( this.lineParser.hasMoreRecords()) {
-        String val_next = this.lineParser.nextRecord();
+      try {
+        result = this.lineParser.next(value);
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      
+      if ( result ) {
+      //if ( this.lineParser.hasMoreRecords()) {
+        //String val_next = this.lineParser.nextRecord();
         
         long startTime = System.currentTimeMillis();
 
@@ -174,7 +185,8 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
         int actual = -1;
         try {
                     
-          actual = this.VectorFactory.processLine( val_next, v );
+          //actual = this.VectorFactory.processLine( val_next, v );
+          actual = this.VectorFactory.processLine( value.toString(), v );
         } catch (Exception e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
@@ -405,7 +417,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   
   @Override
   public void setRecordParser(RecordParser r) {
-    this.lineParser = (HDFSLineParser) r;
+    this.lineParser = (TextRecordParser) r;
   }
   
   

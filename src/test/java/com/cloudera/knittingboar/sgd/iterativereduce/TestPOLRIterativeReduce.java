@@ -22,12 +22,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
-import com.cloudera.knittingboar.yarn.AvroUtils;
+//import com.cloudera.knittingboar.yarn.AvroUtils;
+import com.cloudera.knittingboar.yarn.Utils;
 import com.cloudera.knittingboar.yarn.appmaster.ApplicationMasterService;
 import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 import com.cloudera.knittingboar.yarn.appworker.ApplicationWorkerService;
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
 import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
+import com.cloudera.knittingboar.yarn.appworker.TextRecordParser;
 import com.cloudera.knittingboar.yarn.avro.generated.FileSplit;
 import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
@@ -45,9 +47,9 @@ public class TestPOLRIterativeReduce {
   private FutureTask<Integer> master;
   private ComputableMaster<ParameterVectorGradientUpdatable> computableMaster;
 
-  private ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable, String>> workerServices = new ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable, String>>();
+  private ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>> workerServices = new ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>>();
   private ArrayList<FutureTask<Integer>> workers = new ArrayList<FutureTask<Integer>>();
-  private ArrayList<ComputableWorker<ParameterVectorGradientUpdatable, String>> computableWorkers = new ArrayList<ComputableWorker<ParameterVectorGradientUpdatable, String>>();
+  private ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>> computableWorkers = new ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>>();
 
   
   
@@ -58,7 +60,7 @@ public class TestPOLRIterativeReduce {
     //Logger.getRootLogger().setLevel(Level.TRACE);
     //LogFactory.getFactory()
     //Logger foo = LogFactory
-     Logger logger = Logger.getLogger(ApplicationWorkerService.class);
+/*     Logger logger = Logger.getLogger(ApplicationWorkerService.class);
     logger.setLevel(Level.FATAL);
     
     logger = Logger.getLogger(ApplicationMasterService.class);
@@ -69,7 +71,7 @@ public class TestPOLRIterativeReduce {
     Logger.getLogger("org.apache.avro.ipc.NettyServer").setLevel(Level.FATAL);
     //com.cloudera.knittingboar.yarn.appworker.HDFSLineParser
     Logger.getLogger("com.cloudera.knittingboar.yarn.appworker.HDFSLineParser").setLevel(Level.FATAL);
-    
+ */   
     try {
       defaultConf.set("fs.defaultFS", "file:///");
       localFs = FileSystem.getLocal(defaultConf);
@@ -82,6 +84,8 @@ public class TestPOLRIterativeReduce {
       
   
   public Configuration generateDebugConfigurationObject() {
+    
+    System.out.println( "generateDebugConfigurationObject " );
     
     Configuration c = new Configuration();
     
@@ -155,9 +159,9 @@ public class TestPOLRIterativeReduce {
         .build();
 
     HashMap<WorkerId, StartupConfiguration> workers = new HashMap<WorkerId, StartupConfiguration>();
-    workers.put(AvroUtils.createWorkerId("worker1"), conf);
-    workers.put(AvroUtils.createWorkerId("worker2"), conf);
-    workers.put(AvroUtils.createWorkerId("worker3"), conf);
+    workers.put(Utils.createWorkerId("worker1"), conf);
+    workers.put(Utils.createWorkerId("worker2"), conf);
+    workers.put(Utils.createWorkerId("worker3"), conf);
 
     //computableMaster = new CompoundAdditionMaster();
     computableMaster = new POLRMasterNode();
@@ -166,13 +170,18 @@ public class TestPOLRIterativeReduce {
 
     master = new FutureTask<Integer>(masterService);
 
+    System.out.println( "master setup " );
+    
     pool.submit(master);
   }
 
   private void setUpWorker(String name) {
-    HDFSLineParser parser = new HDFSLineParser();
-    ComputableWorker<ParameterVectorGradientUpdatable, String> computableWorker = new POLRWorkerNode();
-    ApplicationWorkerService<ParameterVectorGradientUpdatable, String> workerService = new ApplicationWorkerService<ParameterVectorGradientUpdatable, String>(
+    //HDFSLineParser parser = new HDFSLineParser();
+    
+    TextRecordParser parser = new TextRecordParser();
+    
+    ComputableWorker<ParameterVectorGradientUpdatable> computableWorker = new POLRWorkerNode();
+    ApplicationWorkerService<ParameterVectorGradientUpdatable> workerService = new ApplicationWorkerService<ParameterVectorGradientUpdatable>(
         name, masterAddress, parser, computableWorker, ParameterVectorGradientUpdatable.class, generateDebugConfigurationObject() );
 
     FutureTask<Integer> worker = new FutureTask<Integer>(workerService);

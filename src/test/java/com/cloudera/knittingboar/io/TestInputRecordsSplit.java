@@ -27,6 +27,7 @@ public class TestInputRecordsSplit  extends TestCase {
   private static int MAX_LENGTH = 1000;
   
   private static JobConf defaultConf = new JobConf();
+  
   private static FileSystem localFs = null; 
   static {
     try {
