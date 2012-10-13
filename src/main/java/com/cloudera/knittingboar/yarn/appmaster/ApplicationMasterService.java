@@ -138,6 +138,9 @@ public class ApplicationMasterService<T extends Updateable> implements
           break;
         }
       }
+      
+      // temp test
+      computable.complete(null);
 
       LOG.info("Shutting down master service" + ", workersComplete=" + complete
           + ", workersError=" + error);

@@ -295,6 +295,7 @@ public class POLRMasterNode extends POLRNodeBase implements
   public void complete(DataOutputStream out) {
     // TODO Auto-generated method stub
     System.out.println( "master::complete " );
+    System.out.println( "complete-ms:" + System.currentTimeMillis() );
   }  
   
   

@@ -108,7 +108,6 @@ public class ApplicationWorkerService<T extends Updateable> implements
    */
   public Integer call() {
     
-    System.out.println( "call ------------ " );
     
     Thread.currentThread().setName(
         "ApplicationWorkerService Thread - " + Utils.getWorkerId(workerId));
@@ -133,9 +132,7 @@ public class ApplicationWorkerService<T extends Updateable> implements
     int currentIteration = 0;
 
     computable.setRecordParser(recordParser);
-    
-    System.out.println( "is setup ------------ " );
-    
+        
     for (currentIteration = 0; currentIteration < workerConf.getIterations(); currentIteration++) {
       synchronized (currentState) {
         currentState = WorkerState.RUNNING;

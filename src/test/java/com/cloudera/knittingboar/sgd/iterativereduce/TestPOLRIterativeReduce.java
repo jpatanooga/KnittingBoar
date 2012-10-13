@@ -60,18 +60,18 @@ public class TestPOLRIterativeReduce {
     //Logger.getRootLogger().setLevel(Level.TRACE);
     //LogFactory.getFactory()
     //Logger foo = LogFactory
-/*     Logger logger = Logger.getLogger(ApplicationWorkerService.class);
-    logger.setLevel(Level.FATAL);
+     Logger logger = Logger.getLogger(ApplicationWorkerService.class);
+    logger.setLevel(Level.ERROR);
     
     logger = Logger.getLogger(ApplicationMasterService.class);
-    logger.setLevel(Level.FATAL);
+    logger.setLevel(Level.ERROR);
         
     // org.apache.avro.ipc.NettyTransceiver
-    Logger.getLogger("org.apache.avro.ipc.NettyTransceiver").setLevel(Level.FATAL);
-    Logger.getLogger("org.apache.avro.ipc.NettyServer").setLevel(Level.FATAL);
+    Logger.getLogger("org.apache.avro.ipc.NettyTransceiver").setLevel(Level.ERROR);
+    Logger.getLogger("org.apache.avro.ipc.NettyServer").setLevel(Level.ERROR);
     //com.cloudera.knittingboar.yarn.appworker.HDFSLineParser
-    Logger.getLogger("com.cloudera.knittingboar.yarn.appworker.HDFSLineParser").setLevel(Level.FATAL);
- */   
+    //Logger.getLogger("com.cloudera.knittingboar.yarn.appworker.HDFSLineParser").setLevel(Level.FATAL);
+   
     try {
       defaultConf.set("fs.defaultFS", "file:///");
       localFs = FileSystem.getLocal(defaultConf);
@@ -85,7 +85,6 @@ public class TestPOLRIterativeReduce {
   
   public Configuration generateDebugConfigurationObject() {
     
-    System.out.println( "generateDebugConfigurationObject " );
     
     Configuration c = new Configuration();
     
@@ -147,12 +146,18 @@ public class TestPOLRIterativeReduce {
    */
   public void setUpMaster() throws Exception {
     
+    System.out.println( "start-ms:" + System.currentTimeMillis() );
+    
     // /Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt
     
-    FileSplit split = FileSplit.newBuilder()
-        .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
-        .build();
+//    FileSplit split = FileSplit.newBuilder()
+//        .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
+//        .build();
 
+    FileSplit split = FileSplit.newBuilder()
+    .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
+    .build();    
+    
     // hey MK, how do I set multiple splits or splits of multiple files?
     StartupConfiguration conf = StartupConfiguration.newBuilder()
         .setSplit(split).setBatchSize(200).setIterations(1).setOther(null)
@@ -170,7 +175,6 @@ public class TestPOLRIterativeReduce {
 
     master = new FutureTask<Integer>(masterService);
 
-    System.out.println( "master setup " );
     
     pool.submit(master);
   }
