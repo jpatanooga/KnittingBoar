@@ -23,7 +23,7 @@ import com.cloudera.knittingboar.yarn.ConfigFields;
 import com.cloudera.knittingboar.yarn.client.Client;
 import com.google.common.collect.Lists;
 
-public class ModelTrainerCmdLineDriver {
+public class ModelTrainerCmdLineDriver extends Client {
   
   private static String input_dir = "";
   private static String output_dir = "";
@@ -31,7 +31,7 @@ public class ModelTrainerCmdLineDriver {
   public static void main(String[] args) throws Exception {
     mainToOutput(args, new PrintWriter(System.out, true));
     
-    int rc = ToolRunner.run(new Configuration(), new Client(), args);
+    int rc = ToolRunner.run(new Configuration(), new ModelTrainerCmdLineDriver(), args);
     
     // Log, because been bitten before on daemon threads; sanity check
     System.out.println("Calling System.exit(" + rc + ")");
