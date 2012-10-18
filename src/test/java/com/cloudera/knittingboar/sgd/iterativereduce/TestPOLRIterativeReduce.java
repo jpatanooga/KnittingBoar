@@ -8,8 +8,10 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.apache.hadoop.conf.Configuration;
@@ -44,11 +46,11 @@ public class TestPOLRIterativeReduce {
   ExecutorService pool;
 
   private ApplicationMasterService<ParameterVectorGradientUpdatable> masterService;
-  private FutureTask<Integer> master;
+  private Future<Integer> master;
   private ComputableMaster<ParameterVectorGradientUpdatable> computableMaster;
 
   private ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>> workerServices = new ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>>();
-  private ArrayList<FutureTask<Integer>> workers = new ArrayList<FutureTask<Integer>>();
+  private ArrayList<Future<Integer>> workers = new ArrayList<Future<Integer>>();
   private ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>> computableWorkers = new ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>>();
 
   
@@ -173,10 +175,7 @@ public class TestPOLRIterativeReduce {
     masterService = new ApplicationMasterService<ParameterVectorGradientUpdatable>(masterAddress,
         workers, computableMaster, ParameterVectorGradientUpdatable.class, null, generateDebugConfigurationObject() );
 
-    master = new FutureTask<Integer>(masterService);
-
-    
-    pool.submit(master);
+    master = pool.submit(masterService);
   }
 
   private void setUpWorker(String name) {
@@ -185,16 +184,18 @@ public class TestPOLRIterativeReduce {
     TextRecordParser parser = new TextRecordParser();
     
     ComputableWorker<ParameterVectorGradientUpdatable> computableWorker = new POLRWorkerNode();
-    ApplicationWorkerService<ParameterVectorGradientUpdatable> workerService = new ApplicationWorkerService<ParameterVectorGradientUpdatable>(
+    final ApplicationWorkerService<ParameterVectorGradientUpdatable> workerService = new ApplicationWorkerService<ParameterVectorGradientUpdatable>(
         name, masterAddress, parser, computableWorker, ParameterVectorGradientUpdatable.class, generateDebugConfigurationObject() );
 
-    FutureTask<Integer> worker = new FutureTask<Integer>(workerService);
+    Future<Integer> worker = pool.submit(new Callable<Integer>() {
+      public Integer call() {
+        return workerService.run();
+      }
+    });
 
     computableWorkers.add(computableWorker);
     workerServices.add(workerService);
     workers.add(worker);
-
-    pool.submit(worker);
   }
 
   @Test

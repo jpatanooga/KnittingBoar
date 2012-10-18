@@ -5,8 +5,10 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.apache.hadoop.conf.Configuration;
@@ -32,11 +34,11 @@ public class TestMultipleWorkerServices {
   ExecutorService pool;
 
   private ApplicationMasterService<UpdateableInt> masterService;
-  private FutureTask<Integer> master;
+  private Future<Integer> master;
   private ComputableMaster<UpdateableInt> computableMaster;
 
   private ArrayList<ApplicationWorkerService<UpdateableInt>> workerServices = new ArrayList<ApplicationWorkerService<UpdateableInt>>();
-  private ArrayList<FutureTask<Integer>> workers = new ArrayList<FutureTask<Integer>>();
+  private ArrayList<Future<Integer>> workers = new ArrayList<Future<Integer>>();
   private ArrayList<ComputableWorker<UpdateableInt>> computableWorkers = new ArrayList<ComputableWorker<UpdateableInt>>();
 
   @Before
@@ -81,24 +83,24 @@ public class TestMultipleWorkerServices {
     masterService = new ApplicationMasterService<UpdateableInt>(masterAddress,
         workers, computableMaster, UpdateableInt.class);
 
-    master = new FutureTask<Integer>(masterService);
-
-    pool.submit(master);
+    master = pool.submit(masterService);
   }
 
   private void setUpWorker(String name) {
     TextRecordParser<UpdateableInt> parser = new TextRecordParser<UpdateableInt>();
     ComputableWorker<UpdateableInt> computableWorker = new CompoundAdditionWorker();
-    ApplicationWorkerService<UpdateableInt> workerService = new ApplicationWorkerService<UpdateableInt>(
+    final ApplicationWorkerService<UpdateableInt> workerService = new ApplicationWorkerService<UpdateableInt>(
         name, masterAddress, parser, computableWorker, UpdateableInt.class);
 
-    FutureTask<Integer> worker = new FutureTask<Integer>(workerService);
+    Future<Integer> worker = pool.submit(new Callable<Integer>() {
+      public Integer call() {
+        return workerService.run();
+      }
+    });
 
     computableWorkers.add(computableWorker);
     workerServices.add(workerService);
     workers.add(worker);
-
-    pool.submit(worker);
   }
 
   @Test
