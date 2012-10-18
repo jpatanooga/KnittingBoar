@@ -19,6 +19,8 @@ import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponse;
+import org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequest;
@@ -35,6 +37,7 @@ import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
+import org.apache.hadoop.yarn.api.records.NodeReport;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.api.records.ResourceRequest;
@@ -120,7 +123,7 @@ public class ResourceManagerHandler {
     ApplicationSubmissionContext appCtx = Records.newRecord(ApplicationSubmissionContext.class);
     appCtx.setApplicationId(appId);
     appCtx.setApplicationName(appName);
-    appCtx.setQueue("");
+    appCtx.setQueue("default");
     appCtx.setUser("");
         
     Priority prio = Records.newRecord(Priority.class);
@@ -161,6 +164,17 @@ public class ResourceManagerHandler {
     return clientResourceManager.getApplicationReport(req).getApplicationReport();
   }
   
+  public List<NodeReport> getClusterNodes() throws YarnRemoteException {
+    if (clientResourceManager == null)
+      throw new IllegalArgumentException("Can't get report without connecting first!");
+    
+    GetClusterNodesRequest req = Records.newRecord(GetClusterNodesRequest.class);
+    GetClusterNodesResponse res = clientResourceManager.getClusterNodes(req);
+    
+    return res.getNodeReports();
+    
+  }
+  
   public RegisterApplicationMasterResponse registerApplicationMaster(String host, int port)
       throws YarnRemoteException {
     
@@ -188,37 +202,6 @@ public class ResourceManagerHandler {
     LOG.debug("Received a registration response"
         + ", min=" + response.getMinimumResourceCapability().getMemory()
         + ", max=" + response.getMaximumResourceCapability().getMemory());
-    
-    return response;
-  }
-  
-  public AMResponse doAllocateRequest(
-      List<ResourceRequest> requestedContainers,
-      List<ContainerId> releasedContainers) throws YarnRemoteException {
-    
-    int tries = 3;
-    int tri = 0;
-    int got = 0;
-    AMResponse response = null;
-    
-    while (tri < tries) {
-      LOG.info("Attempting allocation, try=" + tri);
-      response = doAllocateRequest(requestedContainers, releasedContainers);
-      got += response.getAllocatedContainers().size();
-      
-      if (got < requestedContainers.size()) {
-        LOG.info("Got " + got + " containers, but need "
-            + requestedContainers.size() + ", trying again");
-        
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-          ;;
-        }
-      }
-      
-      tri++;
-    }
     
     return response;
   }

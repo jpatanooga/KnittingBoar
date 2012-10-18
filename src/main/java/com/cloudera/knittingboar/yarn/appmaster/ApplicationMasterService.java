@@ -95,6 +95,11 @@ public class ApplicationMasterService<T extends Updateable> implements
     Utils.mergeConfigs(this.appConf, this.conf);
     
     this.computable.setup(this.conf);
+    
+    // Merger workers into worker state
+    for (WorkerId workerId : workers.keySet()) {
+      workersState.put(workerId, WorkerState.NONE);
+    }
   }
   
   public ApplicationMasterService(InetSocketAddress masterAddr,
@@ -125,7 +130,8 @@ public class ApplicationMasterService<T extends Updateable> implements
 
       int complete = 0;
       int error = 0;
-
+      int unknown = 0;
+      
       for (WorkerState state : workersState.values()) {
         switch (state) {
         case COMPLETE:
@@ -135,6 +141,10 @@ public class ApplicationMasterService<T extends Updateable> implements
         case ERROR:
           error++;
           break;
+          
+        default:
+          unknown++;
+          break;
         }
       }
       
@@ -142,18 +152,19 @@ public class ApplicationMasterService<T extends Updateable> implements
       // computable.complete(null);
 
       LOG.info("All workers have completed. Shutting down master service"
-          + ", workersComplete=" + complete + ", workersError=" + error);
+          + ", workersComplete=" + complete + ", workersError=" + error
+          + ", workersUnknown=" + unknown);
 
-      LOG.debug("Shutting down Netty server");
-      masterServer.close();
-
-      return (error == 0) ? 0 : 1;
+      return (error == 0 && unknown == 0) ? 0 : 1;
     } catch (InterruptedException ex) {
       // This will occur purposely if:
       // 1. Someone calls a ExecutorService.shutdownNow()
       // 2. Via our stop() method using Future.cancel()
       LOG.warn("Interrupted while waiting for workers to complete", ex);
       return -1;
+    } finally {
+      LOG.debug("Shutting down Netty server");
+      masterServer.close();
     }
   }
 
@@ -164,6 +175,11 @@ public class ApplicationMasterService<T extends Updateable> implements
     standaloneResult = standalone.submit(this);
   }
 
+  public void fail() {
+    while (workersCompleted.getCount() > 0)
+      workersCompleted.countDown();
+  }
+  
   public void stop() {
     LOG.info("Shutting down standalone server");
 
@@ -188,13 +204,16 @@ public class ApplicationMasterService<T extends Updateable> implements
       throws AvroRemoteException, ServiceError {
 
     synchronized (workersState) {
-      if (workersState.containsKey(workerId))
+      if (!workersState.containsKey(workerId)) {
         throw ServiceError
             .newBuilder()
             .setDescription(
                 "Worker " + Utils.getWorkerId(workerId)
-                    + "already registered.").build();
-
+                    + "unknown.").build();
+      }
+      
+      // TODO: can a worker "start" more than once?
+      
       StartupConfiguration workerConf = workers.get(workerId);
       Utils.mergeConfigs(appConf, workerConf);
 

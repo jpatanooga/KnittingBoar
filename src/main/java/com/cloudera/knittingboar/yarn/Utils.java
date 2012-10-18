@@ -286,7 +286,7 @@ public class Utils {
   
   public static ResourceRequest createResourceRequest(String host, int amount, int memory) {
     ResourceRequest rsrcRequest = Records.newRecord(ResourceRequest.class);
-    rsrcRequest.setHostName("*");
+    rsrcRequest.setHostName(host);
 
     Priority pri = Records.newRecord(Priority.class);
     pri.setPriority(0);
