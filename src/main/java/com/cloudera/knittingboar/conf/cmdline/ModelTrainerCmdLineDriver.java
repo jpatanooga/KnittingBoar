@@ -15,6 +15,7 @@ import org.apache.commons.cli2.builder.GroupBuilder;
 import org.apache.commons.cli2.commandline.Parser;
 import org.apache.commons.cli2.util.HelpFormatter;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.LogisticModelParameters;
 import org.apache.mahout.classifier.sgd.TrainLogistic;
 
@@ -29,6 +30,12 @@ public class ModelTrainerCmdLineDriver {
 
   public static void main(String[] args) throws Exception {
     mainToOutput(args, new PrintWriter(System.out, true));
+    
+    int rc = ToolRunner.run(new Configuration(), new Client(), args);
+    
+    // Log, because been bitten before on daemon threads; sanity check
+    System.out.println("Calling System.exit(" + rc + ")");
+    System.exit(rc);
   }
   
   static void mainToOutput(String[] args, PrintWriter output) throws Exception {
@@ -186,7 +193,7 @@ public class ModelTrainerCmdLineDriver {
     
   }      
   
-  private void BuildPropertiesFile() {
+  private void BuildPropertiesFile() throws Exception {
 
     
     // Setup app.properties
@@ -222,11 +229,12 @@ public class ModelTrainerCmdLineDriver {
     props.put( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
     
     
-    props.store(new FileOutputStream(testDir.getPath() + "/app.properties"), null);
+    props.store(new FileOutputStream("app.properties"), null);
     
     
   }
   
+  /*
   public void Train() {
     
     Client client = new Client();
@@ -234,6 +242,8 @@ public class ModelTrainerCmdLineDriver {
     client.run(new String[] { testDir + "/app.properties"});    
     
   }
+  
+  */
   
 
   private static boolean getBooleanArgument(CommandLine cmdLine, Option option) {
