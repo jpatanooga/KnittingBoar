@@ -11,3 +11,4 @@
 # Generated stuff
 target/
 testData/
+build/
