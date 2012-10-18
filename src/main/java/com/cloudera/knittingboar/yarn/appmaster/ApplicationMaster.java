@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +15,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +29,10 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
+import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
@@ -70,7 +73,8 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
   private Map<CharSequence, CharSequence> appConfig;
   
   private Configuration conf;
-  private ContainerId containerId;
+  private ApplicationAttemptId appAttemptId;
+  private String appName;
   private Properties props;
   private enum ReturnCode { 
     OK(0), MASTER_ERROR(-1), CONTAINER_ERROR(1);
@@ -105,18 +109,36 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     masterComputable = computableMaster;
     masterUpdateable = updatable;
     
-    conf = getConf();
     props = new Properties();
     props.load(new FileInputStream(ConfigFields.APP_CONFIG_FILE)); // Should be in ./ - as the Client should've shipped it
-    containerId = ConverterUtils.toContainerId(System
+    ContainerId containerId = ConverterUtils.toContainerId(System
         .getenv(ApplicationConstants.AM_CONTAINER_ID_ENV));
-    
+    appAttemptId = containerId.getApplicationAttemptId();
+    appName = props.getProperty(ConfigFields.APP_NAME,
+        ConfigFields.DEFAULT_APP_NAME).replace(' ', '_');
+
     batchSize = Integer.parseInt(props.getProperty(ConfigFields.APP_BATCH_SIZE, "200"));
     iterationCount = Integer.parseInt(props.getProperty(ConfigFields.APP_ITERATION_COUNT, "1"));
     
-    // Copy all properties into appConfig to be passed down to workers
+    // Copy all properties into appConfig to be passed down to workers, TODO: fix collection merging
+    appConfig = new HashMap<CharSequence, CharSequence>();
     for (Map.Entry<Object, Object> prop : props.entrySet()) {
       appConfig.put((String)prop.getKey(), (String)prop.getValue());
+    }
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Configurartion entries: ");
+      for (Map.Entry<CharSequence, CharSequence> entry : appConfig.entrySet()) {
+        LOG.debug(entry.getKey() + "=" + entry.getValue());
+      }
+
+      LOG.debug("Initialized application master"
+          + ", masterHost=" + masterHost
+          + ", masterPort=" + masterPort
+          + ", masterAddress=" + masterAddr
+          + ", masterComputable=" + masterComputable.getClass().getName()
+          + ", masterUpdateable=" + masterUpdateable.getClass().getName()
+          + ", appAttemptId=" + appAttemptId);
     }
   }
   
@@ -129,6 +151,11 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
       this.host = host;
       this.workerId = workerId;
       this.config = config;
+
+      LOG.debug("Created configuration typle"
+          + ", host=" + this.host
+          + ", workerId=" + this.workerId
+          + ", startupConfiguration=" + this.config);
     }
     
     public String getHost() {
@@ -147,7 +174,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
   // TODO: cache this!
   private Set<ConfigurationTuple> getConfigurationTuples() throws IOException {
     Path p = new Path(props.getProperty(ConfigFields.APP_INPUT_PATH));
-    FileSystem fs = p.getFileSystem(conf);
+    FileSystem fs = FileSystem.get(conf);
     FileStatus f = fs.getFileStatus(p);
     BlockLocation[] bl = fs.getFileBlockLocations(p, 0, f.getLen());
     Set<ConfigurationTuple> configTuples = new HashSet<ConfigurationTuple>();
@@ -178,7 +205,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     Map<WorkerId, StartupConfiguration> startupConfig = new HashMap<WorkerId, StartupConfiguration>();
     
     for (ConfigurationTuple tuple : configTuples) {
-      WorkerId wid = Utils.createWorkerId(tuple.getHost());
+      WorkerId wid = Utils.createWorkerId(tuple.getWorkerId());
       startupConfig.put(wid, tuple.getConfig());
     }
     
@@ -191,8 +218,19 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     Map<String, Integer> containerHostMapping = new HashMap<String, Integer>();
     
     for (ConfigurationTuple tuple : configTuples) {
-      int  count = containerHostMapping.get(tuple.getHost());
-      containerHostMapping.put(tuple.getHost(), count++);
+      Integer count = containerHostMapping.get(tuple.getHost());
+      
+      if (count == null)
+        count = 0;
+      
+      containerHostMapping.put(tuple.getHost(), ++count);
+    }
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Created a host->numContainers mapping, with: ");
+      for (Map.Entry<String, Integer> entry : containerHostMapping.entrySet()) {
+        LOG.debug("host=" + entry.getKey() + ", amount=" + entry.getValue());
+      }
     }
     
     return containerHostMapping;
@@ -204,9 +242,13 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     List<ResourceRequest> requestedContainers = new ArrayList<ResourceRequest>();
     int memory = Integer.parseInt(props.getProperty(ConfigFields.YARN_MEMORY, "512"));
     
-    for (ConfigurationTuple tuple : configTuples) {
-      ResourceRequest request = Utils.createResourceRequest(tuple.getHost(),
-          numberContainerHostsMapping.get(tuple.getHost()), memory);
+    for (Map.Entry<String, Integer> entry : numberContainerHostsMapping.entrySet()) {
+      LOG.debug("Creating a resource request for host " + entry.getKey()
+          + ", with " + entry.getValue() + " containers");
+      
+      ResourceRequest request = Utils.createResourceRequest(entry.getKey(),
+          entry.getValue(), memory);
+      
       requestedContainers.add(request);
     }
     
@@ -223,10 +265,18 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
       Container container = ic.next();
       Iterator<ConfigurationTuple> ict = configTuples.iterator();
 
+      LOG.debug("Looking to match up split for container on host "
+          + container.getNodeId().getHost());
+
       while (ict.hasNext()) {
         ConfigurationTuple tuple = ict.next();
-        
+
+        LOG.debug("Looking to match container host "
+            + container.getNodeId().getHost() + ", with split host "
+            + tuple.getHost());
+
         if(tuple.getHost().equals(container.getNodeId().getHost())) {
+          LOG.debug("Found matching container for split");
           LaunchContainerRunnabble runnable = new LaunchContainerRunnabble(tuple.getWorkerId(), container);
           Thread launchThread = new Thread(runnable);
           
@@ -242,6 +292,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     
     // If we have leftovers, we don't have data-local assignments
     if (allocatedContainers.size() > 0) {
+      LOG.debug("Unable to find specific matches for some app splits, launching remainder");
       ic = allocatedContainers.iterator();
       Iterator<ConfigurationTuple> ict = configTuples.iterator();
       
@@ -249,6 +300,9 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
         Container container = ic.next();
         ConfigurationTuple tuple = ict.next();
         
+        LOG.debug("Launching split for host " + tuple.getHost()
+            + " on container host " + container.getNodeId().getHost());
+
         LaunchContainerRunnabble runnable = new LaunchContainerRunnabble(tuple.getWorkerId(), container);
         Thread launchThread = new Thread(runnable);
         
@@ -275,6 +329,8 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     
     @Override
     public void run() {
+      LOG.debug("Launching container for worker=" + workerId + ", container=" + container);
+      // TODO: fix to make more robust (e.g. cache)
       cmHandler = new ContainerManagerHandler(conf, container);
 
       // Connect
@@ -282,18 +338,19 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
       
       // Get the local resources
       try {
-        Map<String, LocalResource> localResources = Utils
-            .getLocalResourcesForApplication(conf, null, workerId, props,
+        Map<String, LocalResource> localResources = 
+          Utils.getLocalResourcesForApplication(conf,
+                appAttemptId.getApplicationId(), appName, props,
                 LocalResourceVisibility.APPLICATION);
-        List<String> commands = Utils.getWorkerCommand(props, 
-            masterHost + ":" + masterPort, workerId);
 
+        List<String> commands = Utils.getWorkerCommand(conf, props, 
+            masterHost + ":" + masterPort, workerId);
+        
         // Start
         cmHandler.startContainer(commands, localResources);
         
         // Get status
         cmHandler.getContainerStatus();
-      //} catch (URISyntaxException ex) { // Getting URI for local file, fatal
       } catch (YarnRemoteException ex) { // Container status, fatalish
       } catch (IOException ex) { // Starting container, fatal
       }
@@ -302,8 +359,12 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
   
   @Override
   public int run(String[] args) throws Exception {
+    // Set our own configuration (ToolRunner only sets it prior to calling run())
+    conf = getConf();
+
     // Our own RM Handler
-    ResourceManagerHandler rmHandler = new ResourceManagerHandler(conf, containerId);
+    ResourceManagerHandler rmHandler = new ResourceManagerHandler(conf, appAttemptId);
+    
     // Connect
     rmHandler.getAMResourceManager();
     // Register
@@ -323,9 +384,10 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
       LOG.error("Error encountered while trying to generate configurations", ex);
       return ReturnCode.MASTER_ERROR.getCode();
     }
+    // Needed for our master service later
     Map<WorkerId, StartupConfiguration> startupConf = getMasterStartupConfiguration(configTuples);
 
-    // Initial containers we want, based off of the FileSplit's
+    // Initial containers we want, based off of the file splits
     List<ResourceRequest> requestedContainers = getRequestedContainersList(configTuples);
     List<ContainerId> releasedContainers = new ArrayList<ContainerId>();
 
@@ -334,6 +396,13 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     try {
       allocatedContainers = rmHandler.allocateRequest(
           requestedContainers, releasedContainers).getAllocatedContainers();
+      
+      Thread.sleep(2500);
+      
+      allocatedContainers = rmHandler.allocateRequest(
+          requestedContainers, releasedContainers).getAllocatedContainers();
+
+      LOG.info("Got allocation response, allocatedContainers=" + allocatedContainers.size());
     } catch (YarnRemoteException ex) {
       LOG.error("Encountered an error while trying to allocate containers", ex);
       return ReturnCode.MASTER_ERROR.getCode();
@@ -363,6 +432,10 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
             ex);
       }
       
+      // Notify our handlers that we got a problem
+      rmHandler.finishApplication("Unable to allocate containers, needed "
+          + numContainers + ", but got " + allocatedContainers.size(),
+          FinalApplicationStatus.FAILED);
       // bail
       return ReturnCode.MASTER_ERROR.getCode();
     }
@@ -375,15 +448,16 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     */
     
     // Launch our worker process, as we now expect workers to actally do something
+    LOG.info("Starting master service");
     ApplicationMasterService<T> masterService = new ApplicationMasterService<T>(
         masterAddr, startupConf, masterComputable, masterUpdateable, appConfig,
         conf);
     
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    FutureTask<Integer> masterThread = new FutureTask<Integer>(masterService);
-    executor.submit(masterThread);
+    Future<Integer> masterThread = executor.submit(masterService);
     
     // We got the number of containers we wanted, let's launch them
+    LOG.info("Launching child containers");
     List<Thread> launchThreads = launchContainers(configTuples, allocatedContainers);
     
     // Use an empty list for heartbeat purposes
@@ -393,6 +467,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     AtomicInteger numCompletedContainers = new AtomicInteger();
     AtomicInteger numFailedContainers = new AtomicInteger();
     
+    LOG.info("Waiting for containers to complete...");
     // Go into run-loop waiting for containers to finish, also our heartbeat
     while (numCompletedContainers.get() < numContainers) {
       // Don't pound the RM
@@ -431,6 +506,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
 
     // All containers have completed
     // Wait for launch threads to complete (this shouldn't really happen)
+    LOG.info("Containers completed");
     for (Thread launchThread : launchThreads) {
       try {
         launchThread.join(1000);
@@ -452,8 +528,13 @@ public class ApplicationMaster<T extends Updateable> extends Configured implemen
     fos.close();
     
     // Ensure that our master service has completed as well
+    if (!masterThread.isDone()) {
+      masterService.stop();
+    }
+    
     int masterExit = masterThread.get();
-    LOG.info("Master services completed with exitCode=" + masterExit);
+    LOG.info("Master service completed with exitCode=" + masterExit);
+    executor.shutdown();
     
     // Application finished
     ReturnCode rc = (numFailedContainers.get() == 0) ? ReturnCode.OK : ReturnCode.CONTAINER_ERROR;

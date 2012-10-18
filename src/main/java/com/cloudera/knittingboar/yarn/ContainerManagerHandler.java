@@ -54,7 +54,7 @@ public class ContainerManagerHandler {
     
     LOG.info("Connecting to container manager at " + cmAddr);
     containerManager = ((ContainerManager) rpc.getProxy(ContainerManager.class,
-        cmAddr, yarnConf));
+        cmAddr, conf));
    
     return containerManager;
   }
@@ -65,7 +65,7 @@ public class ContainerManagerHandler {
     if (containerManager == null)
       throw new IllegalStateException(
           "Cannot start a continer before connecting to the container manager!");
-    
+
     ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
     ctx.setContainerId(container.getId());
     ctx.setResource(container.getResource());
@@ -73,6 +73,14 @@ public class ContainerManagerHandler {
     ctx.setCommands(commands);
     ctx.setUser(UserGroupInformation.getCurrentUser().getShortUserName());
 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Using ContainerLaunchContext with"
+          + ", containerId=" + ctx.getContainerId()
+          + ", memory=" + ctx.getResource().getMemory()
+          + ", localResources=" + ctx.getLocalResources().toString()
+          + ", commands=" + ctx.getCommands().toString());
+    }
+    
     StartContainerRequest request = Records.newRecord(StartContainerRequest.class);
     request.setContainerLaunchContext(ctx);
     

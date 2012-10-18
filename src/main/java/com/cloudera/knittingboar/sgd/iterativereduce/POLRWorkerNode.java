@@ -1,6 +1,7 @@
 package com.cloudera.knittingboar.sgd.iterativereduce;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +27,7 @@ import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 //import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
-import com.cloudera.knittingboar.yarn.UpdateableInt;
+import com.cloudera.knittingboar.yarn.Updateable;
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
 import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
 import com.cloudera.knittingboar.yarn.appworker.RecordParser;
@@ -48,11 +49,14 @@ import com.google.common.collect.Lists;
  * @author jpatterson
  *
  */
+
+
 public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<ParameterVectorGradientUpdatable> {
+
   private static final Log LOG = LogFactory.getLog(POLRWorkerNode.class);
   
   int masterTotal = 0;
-  UpdateableInt workerTotal;
+  //UpdateableInt workerTotal;
   
   
   
@@ -418,6 +422,14 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   @Override
   public void setRecordParser(RecordParser r) {
     this.lineParser = (TextRecordParser) r;
+  }
+
+
+  @Override
+  public ParameterVectorGradientUpdatable compute(
+      List<ParameterVectorGradientUpdatable> records) {
+    // TODO Auto-generated method stub
+    return compute();
   }
   
   

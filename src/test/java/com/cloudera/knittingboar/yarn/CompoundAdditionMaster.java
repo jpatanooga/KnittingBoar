@@ -1,5 +1,7 @@
 package com.cloudera.knittingboar.yarn;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
@@ -59,5 +61,10 @@ public class CompoundAdditionMaster implements ComputableMaster<UpdateableInt> {
   public void setup(Configuration c) {
     // TODO Auto-generated method stub
     
+  }
+
+  @Override
+  public void complete(DataOutputStream out) throws IOException {
+    out.write(String.valueOf(masterTotal.get()).getBytes());
   }
 }

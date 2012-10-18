@@ -1,5 +1,7 @@
 package com.cloudera.knittingboar.yarn;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.yarn.api.AMRMProtocol;
 import org.apache.hadoop.yarn.api.ClientRMProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponse;
@@ -23,6 +26,7 @@ import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRespo
 import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponse;
 import org.apache.hadoop.yarn.api.records.AMResponse;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
@@ -31,6 +35,7 @@ import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
+import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.api.records.ResourceRequest;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
@@ -43,20 +48,22 @@ public class ResourceManagerHandler {
   private static final Log LOG = LogFactory.getLog(ResourceManagerHandler.class);
   
   private Configuration conf;
-  private ContainerId masterContainerId;
+  private ApplicationAttemptId appAttemptId;
 
   private AMRMProtocol amResourceManager;
   private ClientRMProtocol clientResourceManager;
   private AtomicInteger rmRequestId = new AtomicInteger();
   
-  public ResourceManagerHandler(Configuration conf, ContainerId masterContainerId) {
+  public ResourceManagerHandler(Configuration conf, ApplicationAttemptId appAttemptId) {
     this.conf = conf;
-    this.masterContainerId = masterContainerId;
+    this.appAttemptId = appAttemptId;
   }
   
   public AMRMProtocol getAMResourceManager() {
     if (amResourceManager != null)
       return amResourceManager;
+    
+    LOG.debug("Using configuration: " + conf);
     
     YarnConfiguration yarnConf = new YarnConfiguration(conf);
     YarnRPC rpc = YarnRPC.create(yarnConf);
@@ -66,7 +73,7 @@ public class ResourceManagerHandler {
 
     LOG.info("Connecting to the resource manager (scheduling) at " + rmAddress);
     amResourceManager = (AMRMProtocol) rpc.getProxy(AMRMProtocol.class,
-        rmAddress, yarnConf);
+        rmAddress, conf);
     
     return amResourceManager;
   }
@@ -84,7 +91,7 @@ public class ResourceManagerHandler {
     LOG.info("Connecting to the resource manager (client) at " + rmAddress);
     
     clientResourceManager = (ClientRMProtocol) rpc.getProxy(
-        ClientRMProtocol.class, rmAddress, yarnConf);
+        ClientRMProtocol.class, rmAddress, conf);
     
     return clientResourceManager;
   }
@@ -113,14 +120,22 @@ public class ResourceManagerHandler {
     ApplicationSubmissionContext appCtx = Records.newRecord(ApplicationSubmissionContext.class);
     appCtx.setApplicationId(appId);
     appCtx.setApplicationName(appName);
-    
-    Resource capability = Records.newRecord(Resource.class);
-    capability.setMemory(memory);
+    appCtx.setQueue("");
+    appCtx.setUser("");
+        
+    Priority prio = Records.newRecord(Priority.class);
+    prio.setPriority(0);
+    appCtx.setPriority(prio);
 
+    // Launch ctx
     ContainerLaunchContext containerCtx = Records.newRecord(ContainerLaunchContext.class);
     containerCtx.setLocalResources(localResources);
     containerCtx.setCommands(commands);
+
+    Resource capability = Records.newRecord(Resource.class);
+    capability.setMemory(memory);
     containerCtx.setResource(capability);
+    
     appCtx.setAMContainerSpec(containerCtx);
 
     SubmitApplicationRequest submitReq = Records.newRecord(SubmitApplicationRequest.class);
@@ -153,20 +168,62 @@ public class ResourceManagerHandler {
       throw new IllegalStateException(
           "Cannot register application master before connecting to the resource manager!");
     
-    LOG.info("Sending application registration request");
-
     RegisterApplicationMasterRequest request = Records
         .newRecord(RegisterApplicationMasterRequest.class);
     
-    request.setApplicationAttemptId(masterContainerId.getApplicationAttemptId());
+    request.setApplicationAttemptId(appAttemptId);
     request.setHost(host);
     request.setRpcPort(port);
-    request.setTrackingUrl("");
+    request.setTrackingUrl("http://some-place.com/some/endpoint");
     
-    return amResourceManager.registerApplicationMaster(request);
+    LOG.info("Sending application registration request"
+        + ", masterHost=" + request.getHost()
+        + ", masterRpcPort=" + request.getRpcPort()
+        + ", trackingUrl=" + request.getTrackingUrl()
+        + ", applicationAttempt=" + request.getApplicationAttemptId()
+        + ", applicationId=" + request.getApplicationAttemptId().getApplicationId());
+
+
+    RegisterApplicationMasterResponse response = amResourceManager.registerApplicationMaster(request);
+    LOG.debug("Received a registration response"
+        + ", min=" + response.getMinimumResourceCapability().getMemory()
+        + ", max=" + response.getMaximumResourceCapability().getMemory());
+    
+    return response;
   }
   
-  public AMResponse allocateRequest(
+  public AMResponse doAllocateRequest(
+      List<ResourceRequest> requestedContainers,
+      List<ContainerId> releasedContainers) throws YarnRemoteException {
+    
+    int tries = 3;
+    int tri = 0;
+    int got = 0;
+    AMResponse response = null;
+    
+    while (tri < tries) {
+      LOG.info("Attempting allocation, try=" + tri);
+      response = doAllocateRequest(requestedContainers, releasedContainers);
+      got += response.getAllocatedContainers().size();
+      
+      if (got < requestedContainers.size()) {
+        LOG.info("Got " + got + " containers, but need "
+            + requestedContainers.size() + ", trying again");
+        
+        try {
+          Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+          ;;
+        }
+      }
+      
+      tri++;
+    }
+    
+    return response;
+  }
+  
+  public AMResponse allocateRequest (
       List<ResourceRequest> requestedContainers,
       List<ContainerId> releasedContainers) throws YarnRemoteException {
     
@@ -174,15 +231,37 @@ public class ResourceManagerHandler {
       throw new IllegalStateException(
           "Cannot send allocation request before connecting to the resource manager!");
 
-    LOG.info("Sending allocation request");
+    LOG.info("Sending allocation request"
+        + ", requestedSize=" + requestedContainers.size()
+        + ", releasedSize=" + releasedContainers.size());
+    
+    for (ResourceRequest req : requestedContainers)
+      LOG.info("Requesting container, host=" + req.getHostName() 
+          + ", amount=" + req.getNumContainers()
+          + ", memory=" + req.getCapability().getMemory()
+          + ", priority=" + req.getPriority().getPriority());
+    
+    for (ContainerId rel : releasedContainers)
+      LOG.info("Releasing container: " + rel.getId());
     
     AllocateRequest request = Records.newRecord(AllocateRequest.class);
     request.setResponseId(rmRequestId.incrementAndGet());
-    request.setApplicationAttemptId(masterContainerId.getApplicationAttemptId());
+    request.setApplicationAttemptId(appAttemptId);
     request.addAllAsks(requestedContainers);
     request.addAllReleases(releasedContainers);
 
-    return amResourceManager.allocate(request).getAMResponse();
+    AllocateResponse response = amResourceManager.allocate(request);
+    
+    LOG.debug("Got an allocation response, "
+        + ", responseId=" + response.getAMResponse().getResponseId()
+        + ", numClusterNodes=" + response.getNumClusterNodes()
+        + ", headroom=" + response.getAMResponse().getAvailableResources().getMemory()
+        + ", allocatedSize=" + response.getAMResponse().getAllocatedContainers().size()
+        + ", updatedNodes=" + response.getAMResponse().getUpdatedNodes().size()
+        + ", reboot=" + response.getAMResponse().getReboot()
+        + ", completedSize=" + response.getAMResponse().getCompletedContainersStatuses().size());
+    
+    return response.getAMResponse();
   }
   
   public void finishApplication(String diagnostics,
@@ -193,7 +272,7 @@ public class ResourceManagerHandler {
           "Cannot finish an application without connecting to resource manager!");
 
     FinishApplicationMasterRequest request = Records.newRecord(FinishApplicationMasterRequest.class);
-    request.setAppAttemptId(masterContainerId.getApplicationAttemptId());
+    request.setAppAttemptId(appAttemptId);
     request.setDiagnostics(diagnostics);
     request.setFinishApplicationStatus(finishState);
 

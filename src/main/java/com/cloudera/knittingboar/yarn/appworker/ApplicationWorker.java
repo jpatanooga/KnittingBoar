@@ -36,9 +36,9 @@ public class ApplicationWorker<T extends Updateable> extends
 
   @Override
   public int run(String[] args) throws Exception {
-    if (args.length < 4 || args[0] != "--master-addr" || args[2] != "--worker-id")
+    if (args.length < 4 || !args[0].equals("--master-addr") || !args[2].equals("--worker-id"))
       throw new IllegalArgumentException(
-          "Expected two and only two options: --master-addr host:port and --worker-id");
+          "Expected two and only two options: --master-addr <host:port> and --worker-id <workerid>");
 
     String[] masterHostPort = args[1].split(":");
     InetSocketAddress masterAddr = new InetSocketAddress(masterHostPort[0],
@@ -54,17 +54,10 @@ public class ApplicationWorker<T extends Updateable> extends
         + ", computable=" + computable.getClass().getName()
         + ", updateable=" + updateable.getName());
     
-    ExecutorService pool = Executors.newSingleThreadExecutor();
-    Future<Integer> workerResult = new FutureTask<Integer>(worker);
-    Integer result;
+    // Launch, and wait for completion
+    int rc = worker.run();
+    LOG.info("Worker completed with exit code " + rc);
     
-    // Launch
-    pool.submit(worker);
-    
-    // Wait for completion
-    result = workerResult.get();
-    LOG.info("Worker completed with exit code " + result);
-
-    return result;
+    return rc;
   }
 }

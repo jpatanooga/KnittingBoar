@@ -4,6 +4,8 @@ import java.util.Properties;
 
 public class ConfigFields {
   public static final String DEFAULT_CONFIG_FILE = "app.properties";
+  public static final String DEFAULT_APP_NAME = "KnittingBoar App";
+
   public static final String APP_CONFIG_FILE = "knittingboar.app.properties";
   
   public static final String JAR_PATH = "knittingboar.jar.path";

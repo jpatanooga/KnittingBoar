@@ -25,8 +25,7 @@ import com.cloudera.knittingboar.yarn.avro.generated.ServiceError;
 import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
 
-public class ApplicationWorkerService<T extends Updateable> implements
-    Callable<Integer> {
+public class ApplicationWorkerService<T extends Updateable> {
 
   private static final Log LOG = LogFactory
       .getLog(ApplicationWorkerService.class);
@@ -38,6 +37,7 @@ public class ApplicationWorkerService<T extends Updateable> implements
   private WorkerId workerId;
   private InetSocketAddress masterAddr;
   private WorkerState currentState;
+  private NettyTransceiver nettyTransceiver;
   private KnittingBoarService masterService;
 
   private StartupConfiguration workerConf;
@@ -49,7 +49,7 @@ public class ApplicationWorkerService<T extends Updateable> implements
   private Map<String, Integer> progressCounters;
   private ProgressReport progressReport;
 
-  private long statusSleepTime = 3000L;
+  private long statusSleepTime = 2000L;
   private long updateSleepTime = 1000L;
   
   private ExecutorService updateExecutor;
@@ -59,22 +59,29 @@ public class ApplicationWorkerService<T extends Updateable> implements
     @Override
     public void run() {
       Thread.currentThread().setName("Periodic worker heartbeat thread");
-
-      synchronized (currentState) {
-        if (WorkerState.RUNNING == currentState) {
-          try {
-            masterService.progress(workerId, createProgressReport());
-          } catch (AvroRemoteException ex) {
-            LOG.warn("Encountered an exception while heartbeating to master",
-                ex);
+      
+      while (true) {
+        LOG.debug("Attemping to acquire state lock");
+        synchronized (currentState) {
+          if (WorkerState.RUNNING == currentState) {
+            LOG.debug("Worker is running, sending a progress report");
+            try {
+              masterService.progress(workerId, createProgressReport());
+            } catch (AvroRemoteException ex) {
+              LOG.warn("Encountered an exception while heartbeating to master",
+                  ex);
+            }
           }
         }
-      }
-
-      try {
-        Thread.sleep(statusSleepTime);
-      } catch (InterruptedException ex) {
-        return;
+  
+        try {
+          LOG.debug("Thread " + Thread.currentThread().getName()
+              + " is going to sleep for " + statusSleepTime);
+          Thread.sleep(statusSleepTime);
+        } catch (InterruptedException ex) {
+          LOG.warn("Interrupted while sleeping on progress report");
+          return;
+        }
       }
     }
   }
@@ -106,20 +113,21 @@ public class ApplicationWorkerService<T extends Updateable> implements
    * - switched from sending a list of records at once to
    * - letting the end user control their own batches
    */
-  public Integer call() {
-    
-    
+  public int run() {
     Thread.currentThread().setName(
         "ApplicationWorkerService Thread - " + Utils.getWorkerId(workerId));
     
     if (!initializeService())
       return -1;
 
+    LOG.info("Worker " + Utils.getWorkerId(workerId) + " initialized");
+    
     recordParser.setFile(workerConf.getSplit().getPath().toString(), workerConf.getSplit()
         .getOffset(), workerConf.getSplit().getLength());
     recordParser.parse();
 
     // Create an updater thread
+    LOG.debug("Launching periodic update thread");
     updateExecutor = Executors.newSingleThreadExecutor();
     updateExecutor.execute(new PeridoicUpdateThread());
 
@@ -132,8 +140,9 @@ public class ApplicationWorkerService<T extends Updateable> implements
     int currentIteration = 0;
 
     computable.setRecordParser(recordParser);
-        
     for (currentIteration = 0; currentIteration < workerConf.getIterations(); currentIteration++) {
+      LOG.debug("Beginning iteration " + (currentIteration +1) + "/" + workerConf.getIterations());
+      
       synchronized (currentState) {
         currentState = WorkerState.RUNNING;
       }
@@ -176,8 +185,10 @@ public class ApplicationWorkerService<T extends Updateable> implements
               ByteBuffer bytes = workerUpdate.toBytes(); 
               bytes.rewind();
               
+              LOG.info("Sending an update to master");
               currentState = WorkerState.UPDATE;
-              masterService.update(workerId, bytes);
+              if (!masterService.update(workerId, bytes))
+                LOG.warn("The master rejected our update");
             }
           } catch (AvroRemoteException ex) {
             LOG.error("Unable to send update message to master", ex);
@@ -198,7 +209,7 @@ public class ApplicationWorkerService<T extends Updateable> implements
             return -1;
           }
 
-          // Got an update
+          // Time to get an update
           try {
             ByteBuffer b = masterService.fetch(workerId, nextUpdate);
             b.rewind();
@@ -227,15 +238,20 @@ public class ApplicationWorkerService<T extends Updateable> implements
     }
 
     // We're done
+    LOG.info("Completed processing, notfiying master that we're done");
     masterService.complete(workerId, createProgressReport());
-
+    nettyTransceiver.close();
+    updateExecutor.shutdownNow();
+    
+    LOG.debug("Returning with code 0");
     return 0;
   }
 
   private boolean initializeService() {
     try {
+      nettyTransceiver = new NettyTransceiver(masterAddr);
       masterService = SpecificRequestor.getClient(KnittingBoarService.class,
-          new NettyTransceiver(masterAddr));
+          nettyTransceiver);
 
       LOG.info("Connected to master via NettyTranseiver at " + masterAddr);
 
@@ -253,6 +269,7 @@ public class ApplicationWorkerService<T extends Updateable> implements
 
   private boolean getConfiguration() {
     try {
+      LOG.info("Checking in and downloading configuration from master");
       workerConf = masterService.startup(workerId);
 
       LOG.info("Recevied startup configuration from master" + ", fileSplit=["

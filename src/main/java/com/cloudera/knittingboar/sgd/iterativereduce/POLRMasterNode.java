@@ -21,7 +21,6 @@ import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
-import com.cloudera.knittingboar.yarn.UpdateableInt;
 import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 
 import com.google.common.collect.Lists;

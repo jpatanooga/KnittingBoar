@@ -9,6 +9,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.avro.AvroRemoteException;
 import org.apache.avro.ipc.NettyServer;
@@ -62,11 +64,11 @@ public class ApplicationMasterService<T extends Updateable> implements
   private Server masterServer;
   private CountDownLatch workersCompleted;
 
-  private boolean isRunning;
-  private Thread ourThread;
-  
   private Configuration conf;
   private Map<CharSequence, CharSequence> appConf;
+  
+  private ExecutorService standalone;
+  private Future<Integer> standaloneResult;
 
   public ApplicationMasterService(InetSocketAddress masterAddr,
       Map<WorkerId, StartupConfiguration> workers,
@@ -118,9 +120,6 @@ public class ApplicationMasterService<T extends Updateable> implements
     masterServer = new NettyServer(new SpecificResponder(
         KnittingBoarService.class, this), masterAddr);
 
-    isRunning = true;
-    ourThread = Thread.currentThread();
-
     try {
       workersCompleted.await();
 
@@ -139,42 +138,46 @@ public class ApplicationMasterService<T extends Updateable> implements
         }
       }
       
-      // temp test
-      computable.complete(null);
+      // TODO: fix, and move here from ApplicationMaster
+      // computable.complete(null);
 
-      LOG.info("Shutting down master service" + ", workersComplete=" + complete
-          + ", workersError=" + error);
+      LOG.info("All workers have completed. Shutting down master service"
+          + ", workersComplete=" + complete + ", workersError=" + error);
 
-      isRunning = false;
+      LOG.debug("Shutting down Netty server");
       masterServer.close();
 
       return (error == 0) ? 0 : 1;
     } catch (InterruptedException ex) {
+      // This will occur purposely if:
+      // 1. Someone calls a ExecutorService.shutdownNow()
+      // 2. Via our stop() method using Future.cancel()
       LOG.warn("Interrupted while waiting for workers to complete", ex);
       return -1;
     }
   }
 
   public void start() {
-    try {
-      LOG.debug("Starting ApplicationMasterService as a standalone server");
+    LOG.info("Starting ApplicationMasterService as a standalone server");
 
-      ExecutorService pool = Executors.newSingleThreadExecutor();
-      pool.submit(this).get();
-
-    } catch (Exception ex) {
-      // nadda
-    }
-
-    LOG.debug("Completed and exiting standalone server");
+    standalone = Executors.newSingleThreadExecutor();
+    standaloneResult = standalone.submit(this);
   }
 
   public void stop() {
-    if (isRunning == true && ourThread != null) {
-      LOG.warn("Forcefully shutting ourselves down");
-      ourThread.interrupt();
-    }
+    LOG.info("Shutting down standalone server");
 
+    if (standalone != null)
+      standalone.shutdownNow();
+
+    if (standaloneResult != null) {
+      try {
+        LOG.info("Master service completed with exit code " + standaloneResult.get(0, TimeUnit.SECONDS));
+      } catch (Exception ex) {
+        LOG.warn("Unable to get exit code from master service", ex);
+      }
+    }
+    
     LOG.info("Shutting down MasterService [NettyServer]");
     if (masterServer != null)
       masterServer.close();

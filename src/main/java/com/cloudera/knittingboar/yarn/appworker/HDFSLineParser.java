@@ -156,4 +156,10 @@ public class HDFSLineParser<T extends Updateable> implements RecordParser<T> {
 
     return records.get(position++);
   }
+
+  @Override
+  public int getCurrentRecordsProcessed() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 }

@@ -27,7 +27,7 @@ public class UpdateableInt implements Updateable<Integer> {
   public void fromString(String s) {
     i = Integer.parseInt(s);
   }
-
+  
   @Override
   public Integer get() {
     return i;

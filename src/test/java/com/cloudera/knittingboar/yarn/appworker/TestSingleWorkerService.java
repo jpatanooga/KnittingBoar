@@ -11,6 +11,7 @@ import java.util.concurrent.FutureTask;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -47,8 +48,6 @@ public class TestSingleWorkerService {
     pool = Executors.newFixedThreadPool(2);
 
     setUpMaster();
-
-    setUpWorker();
   }
 
   @Before
@@ -62,6 +61,11 @@ public class TestSingleWorkerService {
     writer.write("10\n20\n30\n40\n50\n60\n70\n80\n90\n100");
     writer.close();
   }
+  
+  @After
+  public void cleanup() {
+    pool.shutdown();
+  }
 
   public void setUpMaster() throws Exception {
     FileSplit split = FileSplit.newBuilder()
@@ -69,7 +73,7 @@ public class TestSingleWorkerService {
         .build();
 
     StartupConfiguration conf = StartupConfiguration.newBuilder()
-        .setSplit(split).setBatchSize(2).setIterations(1).setOther(null)
+        .setSplit(split).setBatchSize(200).setIterations(1).setOther(null)
         .build();
 
     HashMap<WorkerId, StartupConfiguration> workers = new HashMap<WorkerId, StartupConfiguration>();
@@ -84,24 +88,26 @@ public class TestSingleWorkerService {
     pool.submit(master);
   }
 
-  private void setUpWorker() {
-    HDFSLineParser<UpdateableInt> parser = new HDFSLineParser<UpdateableInt>(UpdateableInt.class);
+  @Test
+  public void testWorkerService() throws Exception {
+    TextRecordParser<UpdateableInt> parser = new TextRecordParser<UpdateableInt>();
     computableWorker = new CompoundAdditionWorker();
     workerService = new ApplicationWorkerService<UpdateableInt>(
         "worker1", masterAddress, parser, computableWorker, UpdateableInt.class);
 
-    worker = new FutureTask<Integer>(workerService);
-
-    pool.submit(worker);
-  }
-
-  @Test
-  public void testWorkerService() throws Exception {
-    worker.get();
-    master.get();
+    assertEquals(0, workerService.run());
+    assertEquals(Integer.valueOf(0), master.get());
+    
+    // Needed now that we join?
 
     // Bozo numbers
-    assertEquals(Integer.valueOf(1300), computableWorker.getResults().get());
-    assertEquals(Integer.valueOf(2970), computableMaster.getResults().get());
+    //assertEquals(Integer.valueOf(1300), computableWorker.getResults().get());
+    //assertEquals(Integer.valueOf(2970), computableMaster.getResults().get());
+  }
+  
+  public static void main(String[] args) throws Exception {
+    TestSingleWorkerService tsws = new TestSingleWorkerService();
+    tsws.setUp();
+    tsws.testWorkerService();
   }
 }
