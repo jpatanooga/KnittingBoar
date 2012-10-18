@@ -12,6 +12,16 @@
 
 	<build>
 		<plugins>
+		  <plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-compiler-plugin</artifactId>
+		    <version>2.1</version>
+		    <configuration>
+		      <source>1.6</source>
+		      <target>1.6</target>
+		    </configuration>
+		  </plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -31,9 +41,19 @@
 					</execution>
 				</executions>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-test-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<archive>
 						<manifest>
@@ -44,7 +64,7 @@
 					</archive>
 				</configuration>
 			</plugin>
-
+			
 			<plugin>
 				<groupId>org.apache.avro</groupId>
 				<artifactId>avro-maven-plugin</artifactId>
@@ -67,12 +87,10 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
 		</plugins>
 	</build>
+	
 	<repositories>
-
 		<repository>
 			<id>org.apache.hadoop</id>
 			<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
@@ -82,10 +100,7 @@
 			<id>org.apache.mahout</id>
 			<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
 		</repository>
-
 	</repositories>
-
-
 
 	<dependencyManagement>
 		<dependencies>
@@ -96,16 +111,14 @@
 	</properties>
 
 	<dependencies>
-
-
-
+    <!--
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
-			<scope>test</scope>
+      <scope>test</scope>
 		</dependency>
-
+    -->
 
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
