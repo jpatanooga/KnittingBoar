@@ -1,7 +1,10 @@
 package com.cloudera.knittingboar.conf.cmdline;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.cli2.CommandLine;
 import org.apache.commons.cli2.Group;
@@ -11,12 +14,18 @@ import org.apache.commons.cli2.builder.DefaultOptionBuilder;
 import org.apache.commons.cli2.builder.GroupBuilder;
 import org.apache.commons.cli2.commandline.Parser;
 import org.apache.commons.cli2.util.HelpFormatter;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.mahout.classifier.sgd.LogisticModelParameters;
 import org.apache.mahout.classifier.sgd.TrainLogistic;
 
+import com.cloudera.knittingboar.yarn.ConfigFields;
+import com.cloudera.knittingboar.yarn.client.Client;
 import com.google.common.collect.Lists;
 
 public class ModelTrainerCmdLineDriver {
+  
+  private static String input_dir = "";
+  private static String output_dir = "";
 
   public static void main(String[] args) throws Exception {
     mainToOutput(args, new PrintWriter(System.out, true));
@@ -118,7 +127,8 @@ public class ModelTrainerCmdLineDriver {
     }
     
     
-    String strInput = getStringArgument(cmdLine, inputFile);
+    input_dir = getStringArgument(cmdLine, inputFile);
+    output_dir = getStringArgument(cmdLine, outputFile);
     
     
 /*
@@ -151,9 +161,77 @@ public class ModelTrainerCmdLineDriver {
     return true;
   }
   
+  
+  public Configuration generateDebugConfigurationObject() {
+    
+    
+    Configuration c = new Configuration();
+    
+    // feature vector size
+    c.setInt( "com.cloudera.knittingboar.setup.FeatureVectorSize", 10000 );
+
+    c.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);
+    
+    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
+    
+    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 1);
+    
+    // local input split path
+    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
+
+    // setup 20newsgroups
+    c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
+    
+    return c;
+    
+  }      
+  
+  private void BuildPropertiesFile() {
+
+    
+    // Setup app.properties
+    InputStream is = Thread.currentThread().getContextClassLoader()
+        .getResourceAsStream("app.properties");
+    if (is == null)
+      throw new RuntimeException(
+          "Could not find 'app.properties' template file in classpath");
+    
+    
+    
+    Properties props = new Properties();
+    props.load(is);
+    props.put(ConfigFields.JAR_PATH, "/dev/null");      // what about these?
+    props.put(ConfigFields.APP_JAR_PATH, "/dev/null");  // what about these?
+    props.put(ConfigFields.APP_INPUT_PATH, ModelTrainerCmdLineDriver.input_dir );
+    props.put(ConfigFields.APP_OUTPUT_PATH, ModelTrainerCmdLineDriver.output_dir );
+    props.put(ConfigFields.YARN_MASTER, "com.cloudera.knittingboar.sgd.iterativereduce.POLRMasterNode");
+    props.put(ConfigFields.YARN_WORKER, "com.cloudera.knittingboar.sgd.iterativereduce.POLRWorkerNode");
+    
+    props.put( "com.cloudera.knittingboar.setup.FeatureVectorSize", 10000 );
+
+    props.put( "com.cloudera.knittingboar.setup.numCategories", 20);
+    
+    props.put("com.cloudera.knittingboar.setup.BatchSize", 200);
+    
+    props.put("com.cloudera.knittingboar.setup.NumberPasses", 1);
+    
+    // local input split path
+    //props.put( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
+
+    // setup 20newsgroups
+    props.put( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
+    
+    
+    props.store(new FileOutputStream(testDir.getPath() + "/app.properties"), null);
+    
+    
+  }
+  
   public void Train() {
     
-    
+    Client client = new Client();
+    client.setConf(yarnCluster.getConfig());
+    client.run(new String[] { testDir + "/app.properties"});    
     
   }
   

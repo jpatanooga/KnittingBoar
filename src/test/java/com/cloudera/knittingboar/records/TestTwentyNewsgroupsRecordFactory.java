@@ -183,6 +183,8 @@ public class TestTwentyNewsgroupsRecordFactory extends TestCase {
       
       int total_read = 0;
       
+      long ts_start = System.currentTimeMillis();
+      
       for (int x = 0; x < splits.length; x++) {
         
         System.out.println( "> Split [" + x + "]: " + splits[x].getLength()  );
@@ -208,7 +210,15 @@ public class TestTwentyNewsgroupsRecordFactory extends TestCase {
         
       } // for each split
       
-      System.out.println( "total read across all splits: " + total_read );
+      long ts_total = System.currentTimeMillis() - ts_start;
+      
+      double vectors_per_sec =  (double)total_read / ((double)ts_total / 1000);
+      
+      System.out.println( "Time: " + ts_total  );
+      
+      System.out.println( "total recs read across all splits: " + total_read );
+      
+      System.out.println( "Vectors converted / sec: " + vectors_per_sec );
       
       assertEquals( total_read, 11314 );
       

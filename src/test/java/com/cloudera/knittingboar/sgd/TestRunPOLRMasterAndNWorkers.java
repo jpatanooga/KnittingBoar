@@ -53,7 +53,7 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
     
     c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
     
-    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 1);
+    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 10);
     
     // local input split path
     c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
@@ -113,7 +113,9 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
   
   public void testRunMasterAndTwoWorkers() throws Exception {
     
-    System.out.println( "start-ms:" + System.currentTimeMillis() );
+    long ts_start = System.currentTimeMillis();
+    
+    System.out.println( "start-ms:" + ts_start );
     
     POLRMasterDriver master = new POLRMasterDriver();
     // ------------------    
@@ -145,8 +147,8 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
     
     ArrayList<POLRWorkerDriver> workers = new ArrayList<POLRWorkerDriver>();
     
-    for ( int x = 0; x < splits.length; x++ ) {
-    //for ( int x = 0; x < 3; x++ ) {
+    //for ( int x = 0; x < splits.length; x++ ) {
+    for ( int x = 0; x < 1; x++ ) {
       
       POLRWorkerDriver worker_model_builder = new POLRWorkerDriver(); //workers.get(x);
       worker_model_builder.internalID = String.valueOf(x);
@@ -224,9 +226,9 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
     
     
     
+    long ts_total = System.currentTimeMillis() - ts_start;
     
-    
-    System.out.println( "end-ms:" + System.currentTimeMillis() );
+    System.out.println( "total:" + ts_total );
     
     
     

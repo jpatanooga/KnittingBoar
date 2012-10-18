@@ -37,6 +37,11 @@ public class DataConverterCmdLineDriver {
     
     int shard_rec_count = Integer.parseInt(strrecordsPerBlock);
     
+    System.out.println( "Converting " );
+    System.out.println( "From: " + strInputFile );
+    System.out.println( "To: " + strOutputFile );
+    System.out.println( "File shard size (record count/file): " + shard_rec_count );
+    
     int count = DatasetConverter.ConvertNewsgroupsFromSingleFiles( strInputFile, strOutputFile, shard_rec_count );
 
     output.write( "Total Records Converted: " + count );
