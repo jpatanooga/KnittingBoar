@@ -7,7 +7,7 @@ public class ConfigFields {
   public static final String DEFAULT_APP_NAME = "KnittingBoar App";
 
   public static final String APP_CONFIG_FILE = "knittingboar.app.properties";
-  
+  public static final String APP_ALLOCATION_MAX_ATTEMPTS = "knittingboar.allocation.maxattempts";
   public static final String JAR_PATH = "knittingboar.jar.path";
 
   public static final String APP_NAME = "app.name";
@@ -28,6 +28,8 @@ public class ConfigFields {
   
   public static final String YARN_WORKER = "yarn.worker.main";
   public static final String YARN_WORKER_ARGS = "yarn.worker.args";
+  
+  public static final String CLASSPATH_EXTRA ="app.classpath.extra";
   
   public static void validateConfig(Properties props) throws IllegalArgumentException {
     StringBuffer errors = new StringBuffer();

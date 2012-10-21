@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.L1;
 import org.apache.mahout.classifier.sgd.ModelDissector;
 import org.apache.mahout.math.DenseVector;
@@ -28,6 +29,7 @@ import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 //import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
 import com.cloudera.knittingboar.yarn.Updateable;
+import com.cloudera.knittingboar.yarn.appworker.ApplicationWorker;
 import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
 import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
 import com.cloudera.knittingboar.yarn.appworker.RecordParser;
@@ -432,6 +434,13 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     return compute();
   }
   
-  
+  public static void main(String[] args) throws Exception {
+    TextRecordParser parser = new TextRecordParser(); 
+    POLRWorkerNode pwn = new POLRWorkerNode();
+    ApplicationWorker<ParameterVectorGradientUpdatable> aw = new ApplicationWorker<ParameterVectorGradientUpdatable>(
+        parser, pwn, ParameterVectorGradientUpdatable.class);
+    
+    ToolRunner.run(aw, args);
+  }
 }
 

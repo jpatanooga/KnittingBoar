@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.avro.AvroRemoteException;
 import org.apache.avro.ipc.NettyServer;
@@ -32,7 +33,24 @@ import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
  * @author Michael
  * 
  *         TODO: change to ConcurrentHashMap (maybe)?
+ * 
+ *         TODO: Have an expiration period for all workers to check in,
+ *         otherwise we need to bail?
+ * 
+ *         TODO: We need to fix the overall logic, that actually waits for
+ *         workers to check in. For example, what happens if we have 2/3 workers
+ *         check-in, and 1 didn't for some reason, does that mean that
+ *         everything continues? Do we let our other workers start and waste
+ *         their time?
+ * 
+ *         Additionally, what implications does that have on the RPC? Do workers
+ *         poll for a command to tell them to start, or do we want to push that
+ *         down to them?
+ * 
  * @param <T>
+ */
+
+/*
  */
 public class ApplicationMasterService<T extends Updateable> implements
     KnittingBoarService, Callable<Integer> {
@@ -52,6 +70,7 @@ public class ApplicationMasterService<T extends Updateable> implements
   private Map<WorkerId, WorkerState> workersState;
   private Map<WorkerId, LinkedHashMap<Long, ProgressReport>> workersProgress;
   private Map<WorkerId, T> workersUpdate;
+  private AtomicInteger workersActive;
 
   private MasterState masterState;
   private int currentUpdateId = 0;
@@ -323,7 +342,8 @@ public class ApplicationMasterService<T extends Updateable> implements
       workersUpdate.put(workerId, update);
       workersState.put(workerId, WorkerState.UPDATE);
 
-      if (workersUpdate.size() == workersState.size()) {
+      // Our latch should have the number of currently active workers
+      if (workersUpdate.size() == workersCompleted.getCount()) {
         LOG.info("Received updates from all workers, spawing local compute thread");
 
         // Fire off thread to compute update

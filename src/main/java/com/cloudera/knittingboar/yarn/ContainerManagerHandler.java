@@ -60,7 +60,7 @@ public class ContainerManagerHandler {
   }
   
   public StartContainerResponse startContainer(List<String> commands,
-      Map<String, LocalResource> localResources) throws IOException {
+      Map<String, LocalResource> localResources, Map<String, String> env) throws IOException {
 
     if (containerManager == null)
       throw new IllegalStateException(
@@ -72,19 +72,24 @@ public class ContainerManagerHandler {
     ctx.setLocalResources(localResources);
     ctx.setCommands(commands);
     ctx.setUser(UserGroupInformation.getCurrentUser().getShortUserName());
+    ctx.setEnvironment(env);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Using ContainerLaunchContext with"
           + ", containerId=" + ctx.getContainerId()
           + ", memory=" + ctx.getResource().getMemory()
           + ", localResources=" + ctx.getLocalResources().toString()
-          + ", commands=" + ctx.getCommands().toString());
+          + ", commands=" + ctx.getCommands().toString()
+          + ", env=" + ctx.getEnvironment().toString());
     }
     
     StartContainerRequest request = Records.newRecord(StartContainerRequest.class);
     request.setContainerLaunchContext(ctx);
     
-    LOG.info("Starting container, containerId=" + container.getId().toString());
+    LOG.info("Starting container, containerId=" + container.getId().toString()
+        + ", host=" + container.getNodeId().getHost()
+        + ", http=" + container.getNodeHttpAddress());
+    
     return containerManager.startContainer(request);
   }
   

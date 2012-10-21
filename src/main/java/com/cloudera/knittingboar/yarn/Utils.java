@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -152,7 +153,13 @@ public class Utils {
     file = props.getProperty(ConfigFields.APP_JAR_PATH);
     copyToFs(conf, file, tempDir + "/" + getFileName(file));
     
-    // TODO: libs?
+    // Libs
+    for (String f : props.getProperty(ConfigFields.APP_LIB_PATH).split(",")) {
+      if (f.trim().equals(""))
+        continue;
+      
+      copyToFs(conf, f, tempDir + "/" + getFileName(f));
+    }
   }
 
   
@@ -204,21 +211,72 @@ public class Utils {
     return localResources;
   }
   
+  public static Map<String, String> getEnvironment(Configuration conf, Properties props) {
+    Map<String, String> env = new LinkedHashMap<String, String>();
+    
+    // First lets get any arbitrary environment variables in the config
+    for (Map.Entry<Object, Object> entry : props.entrySet()) {
+      String key = ((String)entry.getKey());
+      if (key.startsWith("env.")) {
+        String envname = key.substring(4);
+        String envvalue = (String)entry.getValue();
+        env.put(envname, envvalue);
+        
+        LOG.debug("Adding " + envname + "=" + envvalue + " to envrionment");
+      }
+    }
+    
+    StringBuffer sb = new StringBuffer("${CLASSPATH}:./*:");
+    String path;
+    
+    // Probably redundant
+    // Our Jar
+    path = Utils.getFileName(props.getProperty(ConfigFields.JAR_PATH));
+    sb.append("./").append(path).append(":");
+    
+    // App Jar
+    path = Utils.getFileName(props.getProperty(ConfigFields.APP_JAR_PATH));
+    sb.append("./").append(path).append(":");
+
+    // Any libraries we may have copied over?
+    for (String c : props.getProperty(ConfigFields.APP_LIB_PATH).split(",")) {
+      if (c.trim().equals(""))
+        continue;
+      
+      path = Utils.getFileName(c.trim());
+      sb.append("./").append(path).append(":");
+    }
+    
+    // Generic
+    for (String c : conf.get(YarnConfiguration.YARN_APPLICATION_CLASSPATH)
+        .split(",")) {
+      sb.append(c.trim());
+      sb.append(':');
+    }
+
+    if (props.get(ConfigFields.CLASSPATH_EXTRA) != null) {
+      sb.append(props.get(ConfigFields.CLASSPATH_EXTRA)).append(":");
+    }
+    
+    sb.append("./log4j.properties");
+
+    LOG.debug("Adding CLASSPATH=" + sb.toString() + " to environment");
+    env.put("CLASSPATH", sb.toString());
+    
+    return env;
+  }
+  
   public static List<String> getWorkerCommand(Configuration conf,
       Properties props, String masterAddress, String workerId) {
     
     List<String> commands = new ArrayList<String>();
     String command = props.getProperty(ConfigFields.YARN_WORKER);
     String args = props.getProperty(props.getProperty(ConfigFields.YARN_WORKER));
-    StringBuffer argsSb = new StringBuffer();
     
-    argsSb.append("--master-addr ").append(masterAddress).append(" ");
-    argsSb.append("--worker-id ").append(workerId);
+    command += " --master-addr " + masterAddress;
+    command += " --worker-id " + workerId;
     
-    if (args != null)
-      argsSb.append(" ").append(args);
-    
-    StringBuffer cmd = getCommandsBase(conf, props, command, argsSb.toString());
+    StringBuffer cmd = getCommandsBase(conf, props, command, args);
     commands.add(cmd.toString());
 
     return commands;
@@ -240,36 +298,15 @@ public class Utils {
       String args) {
     
     StringBuffer sb = new StringBuffer();
-
-    // Create classpath
-    String path;
-    StringBuffer classpath = new StringBuffer();
-
-    // Our Jar
-    path = Utils.getFileName(props.getProperty(ConfigFields.JAR_PATH));
-    classpath.append("./").append(path).append(":");
-    // App Jar
-    path = Utils.getFileName(props.getProperty(ConfigFields.APP_JAR_PATH));
-    classpath.append("./").append(path).append(":");
     
-    // All our other YARN/Hadoop stuff
-    for (String c : conf.get(YarnConfiguration.YARN_APPLICATION_CLASSPATH)
-        .split(",")) {
-      classpath.append(':');
-      classpath.append(c.trim());
-    }
-    
-    // Log4j at the end (last one wins)
-    classpath.append(":").append("./log4j.properties");
-    
-    // TODO: libs
-    sb.append("java -cp ");
-    sb.append(classpath.toString()).append(" ");
-    sb.append("-Xmx").append(props.getProperty(ConfigFields.YARN_MEMORY, "512")).append(" ");
-    sb.append(command);
+    sb.append("java ");
+    sb.append("-Xmx").append(props.getProperty(ConfigFields.YARN_MEMORY, "512")).append("m ");
 
     if (args != null)
-      sb.append(" ").append(args);
+      sb.append(" ").append(args).append(" ");
+
+    // Actual command
+    sb.append(command);
 
     sb.append(" 1> ")
         .append(ApplicationConstants.LOG_DIR_EXPANSION_VAR)

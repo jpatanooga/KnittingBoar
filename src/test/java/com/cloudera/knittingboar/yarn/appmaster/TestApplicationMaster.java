@@ -24,7 +24,7 @@ public class TestApplicationMaster {
   public static void main(String[] args) throws Exception {
     CompoundAdditionMaster cam = new CompoundAdditionMaster();
     ApplicationMaster<UpdateableInt> am = new ApplicationMaster<UpdateableInt>(cam, UpdateableInt.class);
-        
+
     ToolRunner.run(am, args);
   }
 }

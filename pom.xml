@@ -41,7 +41,32 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2.1</version>
+        <configuration>
+          <descriptorRefs>
+           <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>com.cloudera.knittingboar.yarn.client.Client</mainClass>
+            </manifest>
+          </archive>
+          <excludes>
+             <exclude>**/*.properties</exclude>
+             <exclude>**/*.xml</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -62,6 +87,10 @@
 							<mainClass>com.cloudera.knittingboar.yarn.client.Client</mainClass>
 						</manifest>
 					</archive>
+					<excludes>
+					   <exclude>**/*.properties</exclude>
+             <exclude>**/*.xml</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 			

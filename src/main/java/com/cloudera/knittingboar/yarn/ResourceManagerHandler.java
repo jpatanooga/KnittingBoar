@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.api.AMRMProtocol;
 import org.apache.hadoop.yarn.api.ClientRMProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequest;
@@ -111,10 +113,9 @@ public class ResourceManagerHandler {
     return appRes.getApplicationId();
   }
   
-  public void submitApplication(ApplicationId appId, String appName,
+  public void submitApplication(ApplicationId appId, String appName, Map<String, String> env, 
       Map<String, LocalResource> localResources, 
-      List<String> commands, int memory) throws YarnRemoteException,
-      URISyntaxException {
+      List<String> commands, int memory) throws URISyntaxException, IOException {
     
     if (clientResourceManager == null)
       throw new IllegalStateException(
@@ -124,7 +125,7 @@ public class ResourceManagerHandler {
     appCtx.setApplicationId(appId);
     appCtx.setApplicationName(appName);
     appCtx.setQueue("default");
-    appCtx.setUser("");
+    appCtx.setUser(UserGroupInformation.getCurrentUser().getShortUserName());
         
     Priority prio = Records.newRecord(Priority.class);
     prio.setPriority(0);
@@ -134,6 +135,7 @@ public class ResourceManagerHandler {
     ContainerLaunchContext containerCtx = Records.newRecord(ContainerLaunchContext.class);
     containerCtx.setLocalResources(localResources);
     containerCtx.setCommands(commands);
+    containerCtx.setEnvironment(env);
 
     Resource capability = Records.newRecord(Resource.class);
     capability.setMemory(memory);
@@ -260,8 +262,8 @@ public class ResourceManagerHandler {
     request.setFinishApplicationStatus(finishState);
 
     LOG.info("Sending finish application notification "
-        + ", state=" + finishState
-        + ", diagnostics=" + diagnostics);
+        + ", state=" + request.getFinalApplicationStatus()
+        + ", diagnostics=" + request.getDiagnostics());
     
     amResourceManager.finishApplicationMaster(request);
   }

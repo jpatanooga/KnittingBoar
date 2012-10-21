@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.L1;
 
 import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
@@ -21,6 +22,7 @@ import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
+import com.cloudera.knittingboar.yarn.appmaster.ApplicationMaster;
 import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 
 import com.google.common.collect.Lists;
@@ -297,7 +299,11 @@ public class POLRMasterNode extends POLRNodeBase implements
     System.out.println( "complete-ms:" + System.currentTimeMillis() );
   }  
   
-  
-  
-  
+  public static void main(String[] args) throws Exception {
+    POLRMasterNode pmn = new POLRMasterNode();
+    ApplicationMaster<ParameterVectorGradientUpdatable> am = new ApplicationMaster<ParameterVectorGradientUpdatable>(
+        pmn, ParameterVectorGradientUpdatable.class);
+        
+    ToolRunner.run(am, args);
+  }
 }

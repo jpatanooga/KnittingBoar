@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,7 +31,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.yarn.api.AMRMProtocol;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
+import org.apache.hadoop.yarn.api.ClientRMProtocol;
+import org.apache.hadoop.yarn.api.protocolrecords.KillApplicationRequest;
 import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.Container;
@@ -43,6 +47,7 @@ import org.apache.hadoop.yarn.api.records.NodeReport;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.api.records.ResourceRequest;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
@@ -56,6 +61,7 @@ import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 import com.cloudera.knittingboar.yarn.avro.generated.FileSplit;
 import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
+import com.sun.jersey.api.client.ClientResponse;
 
 /*
  * Future YARN entry point
@@ -377,7 +383,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured
             + ":" + masterPort, workerId);
 
         // Start
-        cmHandler.startContainer(commands, localResources);
+        cmHandler.startContainer(commands, localResources, Utils.getEnvironment(conf, props));
 
         // Get status
         cmHandler.getContainerStatus();
@@ -425,29 +431,34 @@ public class ApplicationMaster<T extends Updateable> extends Configured
     List<ContainerId> releasedContainers = new ArrayList<ContainerId>();
 
     // Send an initial allocation request
-    List<Container> allocatedContainers = null;
+    List<Container> allocatedContainers = new ArrayList<Container>();
     try {
       int needed = configTuples.size();
       int got = 0;
-      int maxAttempts = 10;
+      int maxAttempts = Integer.parseInt(props.getProperty(ConfigFields.APP_ALLOCATION_MAX_ATTEMPTS, "10"));;
       int attempts = 0;
 
+      List<Container> acquiredContainers = null;
+      
       while (got < needed && attempts < maxAttempts) {
         LOG.info("Requesting containers" + ", got=" + got + ", needed="
             + needed + ", attempts=" + attempts + ", maxAttempts="
             + maxAttempts);
 
-        allocatedContainers = rmHandler.allocateRequest(requestedContainers,
+        acquiredContainers = rmHandler.allocateRequest(requestedContainers,
             releasedContainers).getAllocatedContainers();
 
-        got += allocatedContainers.size();
+        got += acquiredContainers.size();
         attempts++;
+
+        allocatedContainers.addAll(acquiredContainers);
+        acquiredContainers.clear();
+        
+        LOG.info("Got allocation response, allocatedContainers="
+            + acquiredContainers.size());
 
         Thread.sleep(2500);
       }
-
-      LOG.info("Got allocation response, allocatedContainers="
-          + allocatedContainers.size());
     } catch (YarnRemoteException ex) {
       LOG.error("Encountered an error while trying to allocate containers", ex);
       return ReturnCode.MASTER_ERROR.getCode();
@@ -456,7 +467,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured
     final int numContainers = configTuples.size();
 
     // Make sure we got all our containers, or else bail
-    if (allocatedContainers.size() != numContainers) {
+    if (allocatedContainers.size() < numContainers) {
       LOG.info("Unable to get requried number of containers, will not continue"
           + ", needed=" + numContainers + ", allocated="
           + allocatedContainers.size());
@@ -544,6 +555,19 @@ public class ApplicationMaster<T extends Updateable> extends Configured
         if (exitCode != 0) {
           numCompletedContainers.incrementAndGet();
           numFailedContainers.incrementAndGet();
+
+          masterService.fail();
+          executor.shutdown();
+          
+          // Force kill our application, fail fast?
+          LOG.info("At least one container failed with a non-zero exit code ("
+              + exitCode + "); killing application");
+          rmHandler
+              .finishApplication(
+                  "Failing, due to at least container coming back with an non-zero exit code.",
+                  FinalApplicationStatus.KILLED);
+          
+          return -10;
         } else {
           numCompletedContainers.incrementAndGet();
         }

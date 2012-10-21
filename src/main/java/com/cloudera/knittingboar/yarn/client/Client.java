@@ -36,6 +36,7 @@ public class Client extends Configured implements Tool {
       LOG.info("No configuration file specified, using default ("
           + ConfigFields.DEFAULT_CONFIG_FILE + ")");
     
+    long startTime = System.currentTimeMillis();
     String configFile = (args.length < 1) ? ConfigFields.DEFAULT_CONFIG_FILE : args[0];
     Properties props = new Properties();
     Configuration conf = getConf();
@@ -97,7 +98,7 @@ public class Client extends Configured implements Tool {
             LocalResourceVisibility.APPLICATION);
 
     // Submit app
-    rmHandler.submitApplication(appId, appName, 
+    rmHandler.submitApplication(appId, appName, Utils.getEnvironment(conf, props), 
         localResources, commands,
         Integer.parseInt(props.getProperty(ConfigFields.YARN_MEMORY, "512")));    
 
@@ -120,6 +121,8 @@ public class Client extends Configured implements Tool {
           + ", user=" + report.getUser());
       
       if (YarnApplicationState.FINISHED == report.getYarnApplicationState()) {
+        LOG.info("Application finished in " + (System.currentTimeMillis() - startTime) + "ms");
+
         if (FinalApplicationStatus.SUCCEEDED == report.getFinalApplicationStatus()) {
           LOG.info("Application completed succesfully.");
           return 0;
