@@ -84,7 +84,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured
   private ApplicationAttemptId appAttemptId;
   private String appName;
   private Properties props;
-
+  
   private enum ReturnCode {
     OK(0), MASTER_ERROR(-1), CONTAINER_ERROR(1);
 
@@ -405,6 +405,7 @@ public class ApplicationMaster<T extends Updateable> extends Configured
 
     // Connect
     rmHandler.getAMResourceManager();
+    
     // Register
     try {
       rmHandler.registerApplicationMaster(masterHost, masterPort);

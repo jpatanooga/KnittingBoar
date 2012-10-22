@@ -119,7 +119,7 @@ public class Client extends Configured implements Tool {
           + ", finalState=" + report.getFinalApplicationStatus().toString()
           + ", trackingUrl=" + report.getTrackingUrl()
           + ", user=" + report.getUser());
-      
+
       if (YarnApplicationState.FINISHED == report.getYarnApplicationState()) {
         LOG.info("Application finished in " + (System.currentTimeMillis() - startTime) + "ms");
 

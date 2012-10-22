@@ -58,4 +58,7 @@ protocol KnittingBoarService {
   // Worker informs master that an error occurred
   // @returns void -- this is an error condition and assumes the worker is no longer active
   void `error`(WorkerId workerId, string message) oneway;
+  
+  // Used by worker to send metrics to master
+  void metricsReport(WorkerId workerId, map<long> metrics)  oneway;
 }

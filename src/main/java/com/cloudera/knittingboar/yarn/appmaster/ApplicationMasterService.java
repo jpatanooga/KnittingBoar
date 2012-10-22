@@ -2,8 +2,10 @@ package com.cloudera.knittingboar.yarn.appmaster;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -70,7 +72,6 @@ public class ApplicationMasterService<T extends Updateable> implements
   private Map<WorkerId, WorkerState> workersState;
   private Map<WorkerId, LinkedHashMap<Long, ProgressReport>> workersProgress;
   private Map<WorkerId, T> workersUpdate;
-  private AtomicInteger workersActive;
 
   private MasterState masterState;
   private int currentUpdateId = 0;
@@ -88,6 +89,12 @@ public class ApplicationMasterService<T extends Updateable> implements
   
   private ExecutorService standalone;
   private Future<Integer> standaloneResult;
+
+  // Metrics
+  private Map<WorkerId, Map<CharSequence, Long>> workerMetrics;
+  private long mMasterTime;
+  private long mMasterExecutions;
+  private long mUpdates;
 
   public ApplicationMasterService(InetSocketAddress masterAddr,
       Map<WorkerId, StartupConfiguration> workers,
@@ -184,6 +191,8 @@ public class ApplicationMasterService<T extends Updateable> implements
     } finally {
       LOG.debug("Shutting down Netty server");
       masterServer.close();
+
+      printMetrics();
     }
   }
 
@@ -216,6 +225,25 @@ public class ApplicationMasterService<T extends Updateable> implements
     LOG.info("Shutting down MasterService [NettyServer]");
     if (masterServer != null)
       masterServer.close();
+  }
+  
+  private void printMetrics() {
+    StringBuffer metrics = new StringBuffer("Master metrics:\n");
+    metrics.append("  MasterTime: ").append(mMasterTime).append("\n");
+    metrics.append("  MasterExecutions: ").append(mMasterExecutions).append("\n");
+    metrics.append("  UpdatesReceived: " ).append(mUpdates).append("\n");
+    metrics.append("\n");
+
+    for (WorkerId wid : workerMetrics.keySet()) {
+      metrics.append("  Worker Metrics - ").append(Utils.getWorkerId(wid)).append(":").append("\n");
+      
+      for (Map.Entry<CharSequence, Long> entry : workerMetrics.get(wid).entrySet()) {
+        metrics.append("    ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+      }
+      metrics.append("\n");
+    }
+    
+    LOG.info(metrics.toString());
   }
 
   @Override
@@ -359,6 +387,9 @@ public class ApplicationMasterService<T extends Updateable> implements
             endTime = System.currentTimeMillis();
 
             LOG.info("Computed local update in " + (endTime - startTime) + "ms");
+            
+            mMasterExecutions++;
+            mMasterTime += (endTime - startTime);
 
             synchronized (masterUpdates) {
               currentUpdateId++;
@@ -373,6 +404,7 @@ public class ApplicationMasterService<T extends Updateable> implements
       }
     }
 
+    mUpdates++;
     return true;
   }
 
@@ -431,5 +463,14 @@ public class ApplicationMasterService<T extends Updateable> implements
 
     workersState.put(workerId, WorkerState.ERROR);
     workersCompleted.countDown();
+  }
+
+  @Override
+  public void metricsReport(WorkerId workerId, Map<CharSequence, Long> metrics) {
+    if (workerMetrics == null)
+      workerMetrics = new HashMap<WorkerId, Map<CharSequence, Long>>();
+    
+    // Bludgeon it for now, TODO: be smarter about merging them
+    workerMetrics.put(workerId, metrics);
   }
 }

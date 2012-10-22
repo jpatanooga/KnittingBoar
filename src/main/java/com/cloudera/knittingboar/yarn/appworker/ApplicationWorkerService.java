@@ -54,6 +54,13 @@ public class ApplicationWorkerService<T extends Updateable> {
   
   private ExecutorService updateExecutor;
   private Configuration conf;
+  
+  // Metrics
+  private long mWorkerTime;
+  private long mWorkerExecutions;
+  private long mWaits;
+  private long mWaitTime;
+  private long mUpdates;
 
   class PeridoicUpdateThread implements Runnable {
     @Override
@@ -175,7 +182,11 @@ public class ApplicationWorkerService<T extends Updateable> {
          * 
          */
         
+        long mWorkerStart = System.currentTimeMillis();
         T workerUpdate = computable.compute();
+        
+        mWorkerExecutions++;
+        mWorkerTime += (System.currentTimeMillis() - mWorkerStart);
         
         /**
          * send update to master from this worker
@@ -189,6 +200,8 @@ public class ApplicationWorkerService<T extends Updateable> {
               currentState = WorkerState.UPDATE;
               if (!masterService.update(workerId, bytes))
                 LOG.warn("The master rejected our update");
+              
+              mUpdates++;
             }
           } catch (AvroRemoteException ex) {
             LOG.error("Unable to send update message to master", ex);
@@ -201,6 +214,7 @@ public class ApplicationWorkerService<T extends Updateable> {
           try {
             LOG.info("Completed a batch, waiting on an update from master");
             nextUpdate = waitOnMasterUpdate(lastUpdate);
+            
           } catch (InterruptedException ex) {
             LOG.warn("Interrupted while waiting on master", ex);
             return -1;
@@ -237,6 +251,9 @@ public class ApplicationWorkerService<T extends Updateable> {
       }
     }
 
+    // Send a metrics report
+    reportMetrics();
+    
     // We're done
     LOG.info("Completed processing, notfiying master that we're done");
     masterService.complete(workerId, createProgressReport());
@@ -313,7 +330,11 @@ public class ApplicationWorkerService<T extends Updateable> {
       waitingFor = System.currentTimeMillis() - waitStarted;
 
       LOG.debug("Waiting on update from master for " + waitingFor + "ms");
+      
+      mWaits++;
     }
+    
+    mWaitTime += waitingFor;
 
     return nextUpdate;
   }
@@ -351,5 +372,16 @@ public class ApplicationWorkerService<T extends Updateable> {
     }
 
     return progressReport;
+  }
+  
+  private void reportMetrics() {
+    Map<CharSequence, Long> report = new HashMap<CharSequence, Long>();
+    report.put("ComputableWorkerTime", mWorkerTime);
+    report.put("ComputableWorkerExecutions", mWorkerExecutions);
+    report.put("WaitCount", mWaits);
+    report.put("WaitTime", mWaitTime);
+    report.put("UpdatesSent", mUpdates);
+  
+    masterService.metricsReport(workerId, report);
   }
 }
