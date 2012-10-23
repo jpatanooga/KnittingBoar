@@ -254,6 +254,17 @@ public class ApplicationWorkerService<T extends Updateable> {
     // Send a metrics report
     reportMetrics();
     
+    // Send final update to master
+    T finalUpdate = computable.getResults();
+    if (finalUpdate != null) {
+      try {
+        LOG.info("Sending final update to master");
+        masterService.update(workerId, finalUpdate.toBytes());
+      } catch (AvroRemoteException ex) {
+        LOG.warn("Failed to send final update to master", ex);
+      }
+    }
+    
     // We're done
     LOG.info("Completed processing, notfiying master that we're done");
     masterService.complete(workerId, createProgressReport());

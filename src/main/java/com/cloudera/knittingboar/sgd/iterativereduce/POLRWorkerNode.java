@@ -248,7 +248,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   }
   
   public ParameterVectorGradientUpdatable getResults() {
-    return null;
+    return new ParameterVectorGradientUpdatable(GenerateUpdate());
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.cloudera.knittingboar.sgd.iterativereduce;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -293,10 +294,16 @@ public class POLRMasterNode extends POLRNodeBase implements
   }
 
   @Override
-  public void complete(DataOutputStream out) {
+  public void complete(DataOutputStream out) throws IOException {
     // TODO Auto-generated method stub
     System.out.println( "master::complete " );
     System.out.println( "complete-ms:" + System.currentTimeMillis() );
+
+    try {
+      this.polr_modelparams.saveTo(out);
+    } catch (Exception ex) {
+      throw new IOException("Unable to save model", ex);
+    }
   }  
   
   public static void main(String[] args) throws Exception {
