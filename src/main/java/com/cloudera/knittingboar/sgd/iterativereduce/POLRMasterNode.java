@@ -101,19 +101,16 @@ public class POLRMasterNode extends POLRNodeBase implements
         
       }
       
-      // accumulate gradient
+      // accumulate gradient of parameter vectors
       this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
       
     }
     
-    // now generate the return trip msg
-//    master.GenerateGlobalUpdateVector();  
-//    GlobalParameterVectorUpdateMessage returned_msg = master.GetNextGlobalUpdateMsgFromQueue();
+    // now average the parameter vectors together
+    this.global_parameter_vector.AverageAccumulations( workerUpdates.size() );
 
-/*    GlobalParameterVectorUpdateMessage response_msg = new GlobalParameterVectorUpdateMessage( "", this.num_categories, this.FeatureVectorSize );
-    response_msg.parameter_vector = this.global_parameter_vector.gamma.clone();
-    response_msg.GlobalPassCount = this.GlobalMaxPassCount;
-*/
+    
+    
     ParameterVectorGradient gradient_msg = new ParameterVectorGradient();
     gradient_msg.GlobalPassCount = this.GlobalMaxPassCount;
     gradient_msg.parameter_vector = this.global_parameter_vector.getMatrix().clone();

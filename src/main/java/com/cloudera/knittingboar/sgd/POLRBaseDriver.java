@@ -94,7 +94,7 @@ public abstract class POLRBaseDriver {
     
     
     //    protected double LearningRate = 50;
-    this.LearningRate = Double.parseDouble( this.conf.get("com.cloudera.knittingboar.setup.LearningRate", "50") );
+    this.LearningRate = Double.parseDouble( this.conf.get("com.cloudera.knittingboar.setup.LearningRate", "10") );
 
     
     

@@ -79,7 +79,14 @@ public class GradientBuffer {
     
         double old_this_val = this.gamma.get(row, col);
         double other_val = other_gamma.get(row, col);
+        
+        //System.out.println( "Accumulate: " + old_this_val + ", " + other_val );
+        
         this.gamma.set(row, col, old_this_val + other_val );
+        
+        //System.out.println( "new value: " + this.gamma.get(row, col) );
+        
+        
         
       }
       
@@ -97,6 +104,9 @@ public class GradientBuffer {
     
         double old_this_val = this.gamma.get(row, col);
         double other_val = other_gamma.getCell(row, col);
+        
+        
+        
         this.gamma.set(row, col, old_this_val + other_val );
         
       }
@@ -104,6 +114,22 @@ public class GradientBuffer {
     }
        
     this.AccumulatedGradientsCount++;
+    
+  }
+  
+  public void AverageAccumulations( int denominator ) {
+    
+    for ( int row = 0; row < this.gamma.rowSize(); row++ ) {
+      
+      for ( int col = 0; col < this.gamma.columnSize(); col++ ) {
+    
+        double old_this_val = this.gamma.get(row, col);
+        //double other_val = other_gamma.getCell(row, col);
+        this.gamma.set(row, col, old_this_val / denominator );
+        
+      }
+      
+    }    
     
   }
   
@@ -154,6 +180,8 @@ public class GradientBuffer {
       }
       
     }    
+   
+   this.AccumulatedGradientsCount = 0;
     
   }
   

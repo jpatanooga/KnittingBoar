@@ -203,7 +203,7 @@ public class TestBaseOLR_Test20Newsgroups extends TestCase {
         if (k % (bump * scale) == 0) {
           step += 0.25;
           
-          System.out.printf("Worker %s:\t Trained Recs: %10d, numCorrect: %d, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
+          System.out.printf("Worker %s:\t Tested Recs: %10d, numCorrect: %d, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
               "OLR-standard-test", k, num_correct, metrics.AvgLogLikelihood, metrics.AvgCorrect * 100, batch_vec_factory_time);
           
         }

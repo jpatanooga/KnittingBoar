@@ -15,6 +15,7 @@ import org.apache.hadoop.mapred.TextInputFormat;
 import com.cloudera.knittingboar.io.InputRecordsSplit;
 import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
 import com.cloudera.knittingboar.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.utils.Utils;
 
 import junit.framework.TestCase;
 
@@ -53,7 +54,7 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
     
     c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
     
-    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 10);
+    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 1);
     
     // local input split path
     c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
@@ -147,8 +148,8 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
     
     ArrayList<POLRWorkerDriver> workers = new ArrayList<POLRWorkerDriver>();
     
-    //for ( int x = 0; x < splits.length; x++ ) {
-    for ( int x = 0; x < 1; x++ ) {
+    for ( int x = 0; x < splits.length; x++ ) {
+    //for ( int x = 0; x < 1; x++ ) {
       
       POLRWorkerDriver worker_model_builder = new POLRWorkerDriver(); //workers.get(x);
       worker_model_builder.internalID = String.valueOf(x);
@@ -183,7 +184,9 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
         if (result) {
           bContinuePass = true;
         }
-        GradientUpdateMessage msg0 = workers.get(worker_id).GenerateUpdateMessage();
+        
+        //GradientUpdateMessage msg0 = workers.get(worker_id).GenerateUpdateMessage();
+        GradientUpdateMessage msg0 = workers.get(worker_id).GenerateParamVectorUpdateMessage();
         
         master.AddIncomingGradientMessageToQueue(msg0);
         master.RecvGradientMessage(); // process msg
@@ -195,7 +198,8 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
       if (bContinuePass) {
         
         
-        master.GenerateGlobalUpdateVector();
+        //master.GenerateGlobalUpdateVector();
+        master.AveragePVec_GenerateGlobalUpdateVector(workers.size());
         
         GlobalParameterVectorUpdateMessage returned_msg = master.GetNextGlobalUpdateMsgFromQueue();
   
@@ -204,6 +208,7 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
           
           workers.get(worker_id).ProcessIncomingParameterVectorMessage(returned_msg);
 
+          
         }
         
         
@@ -226,9 +231,12 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
     
     
     
+    Utils.PrintVectorSection( master.global_parameter_vector.gamma.viewRow(0), 3 );
+    
+    
     long ts_total = System.currentTimeMillis() - ts_start;
     
-    System.out.println( "total:" + ts_total );
+    System.out.println( "total time in ms:" + ts_total );
     
     
     

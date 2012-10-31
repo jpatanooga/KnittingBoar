@@ -18,7 +18,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.mahout.classifier.sgd.CsvRecordFactory;
 import org.apache.mahout.classifier.sgd.L1;
+import org.apache.mahout.classifier.sgd.L2;
 import org.apache.mahout.classifier.sgd.ModelDissector;
+import org.apache.mahout.classifier.sgd.UniformPrior;
 //import org.apache.mahout.classifier.sgd.RecordFactory;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Matrix;
@@ -169,7 +171,8 @@ public class POLRWorkerDriver extends POLRBaseDriver {
     
     // ----- this normally is generated from the POLRModelParams ------
     
-    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    //this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new UniformPrior())
     .alpha(1).stepOffset(1000)
     .decayExponent(0.9) 
     .lambda(this.Lambda)
@@ -334,6 +337,26 @@ public class POLRWorkerDriver extends POLRBaseDriver {
     
   }
 
+  
+  /**
+   * Generates update message
+   * 
+   * @return
+   */
+  public GradientUpdateMessage GenerateParamVectorUpdateMessage() {
+    
+    GradientBuffer gb = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
+    gb.setMatrix(this.polr.getBeta());
+    
+    GradientUpdateMessage msg0 = new GradientUpdateMessage(this.getHostAddress(), gb );
+    msg0.SrcWorkerPassCount = this.LocalPassCount;
+    return msg0;
+    
+  }
+  
+  
+  
+  
   
   /**
    * TODO: break this down, review how it fits into where we're going

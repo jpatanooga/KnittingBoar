@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+import com.cloudera.knittingboar.utils.Utils;
+
 public class TestGradientBuffer extends TestCase {
 
 
@@ -188,6 +190,52 @@ public class TestGradientBuffer extends TestCase {
     assertEquals( g1.getCell(0, 1), val2 );
     
     System.out.println( "copy test complete" );
+    
+  }
+  
+  public void testAverageGradientBuffer() {
+    
+    System.out.println( "testAverageGradientBuffer --------" ); 
+    
+    GradientBuffer g0 = new GradientBuffer( 2, 2 );
+    
+    g0.setCell(0, 0, 0.1d);
+    g0.setCell(0, 1, 0.5d);
+    
+    assertEquals( g0.numFeatures(), 2 );
+
+    Matrix m = new DenseMatrix(2, 2);
+    m.set(0, 0, 0.5d);
+    m.set(0, 1, 0.1d);
+    
+    
+    g0.AccumulateGradient(m);
+    //m.get(arg0, arg1)
+    // check source
+    assertEquals( m.get(0, 0), 0.5d );
+    // check accumlation in g0
+    //assertEquals( g0.getCell(0, 0), 0.6 );
+
+    junit.framework.Assert.assertEquals( 0.6d, g0.getCell(0, 0), 0.0001);
+    
+    // check source
+    assertEquals( m.get(0, 1), 0.1d );
+    // check accumlation in g0
+//    assertEquals( g0.getCell(0, 1), 0.6 );
+    
+    Utils.PrintVectorNonZero(g0.gamma.viewRow(0));
+    //Utils.PrintVectorNonZero(g0.gamma.viewRow(1));
+    
+    g0.AverageAccumulations(2);
+    
+    Utils.PrintVectorNonZero(g0.gamma.viewRow(0));
+    
+    System.out.println("matrix accumulation AVG test done!");
+    
+    //System.out.println( "add test: " + ( 10.0d + 6.0d ) );
+    
+    
+    assertNotNull(0);    
     
   }
   

@@ -285,6 +285,7 @@ public class TestBaseOLR_Train20Newsgroups extends TestCase {
         learningAlgorithm.close();  
                 
         
+        
     /*    if (k>4) {
           break;
         }
@@ -294,6 +295,7 @@ public class TestBaseOLR_Train20Newsgroups extends TestCase {
         
     }
     
+    Utils.PrintVectorSection( learningAlgorithm.getBeta().viewRow(0), 3 );
 
     long endTime = System.currentTimeMillis();
 
