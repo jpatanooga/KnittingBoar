@@ -19,8 +19,8 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.LogisticModelParameters;
 import org.apache.mahout.classifier.sgd.TrainLogistic;
 
-import com.cloudera.knittingboar.yarn.ConfigFields;
-import com.cloudera.knittingboar.yarn.client.Client;
+import com.cloudera.iterativereduce.ConfigFields;
+import com.cloudera.iterativereduce.yarn.client.Client;
 import com.google.common.collect.Lists;
 
 public class ModelTrainerCmdLineDriver extends Client {

@@ -25,16 +25,16 @@ import org.junit.Test;
 
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 //import com.cloudera.knittingboar.yarn.AvroUtils;
-import com.cloudera.knittingboar.yarn.Utils;
-import com.cloudera.knittingboar.yarn.appmaster.ApplicationMasterService;
-import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
-import com.cloudera.knittingboar.yarn.appworker.ApplicationWorkerService;
-import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
-import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
-import com.cloudera.knittingboar.yarn.appworker.TextRecordParser;
-import com.cloudera.knittingboar.yarn.avro.generated.FileSplit;
-import com.cloudera.knittingboar.yarn.avro.generated.StartupConfiguration;
-import com.cloudera.knittingboar.yarn.avro.generated.WorkerId;
+import com.cloudera.iterativereduce.Utils;
+import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMasterService;
+import com.cloudera.iterativereduce.ComputableMaster;
+import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorkerService;
+import com.cloudera.iterativereduce.ComputableWorker;
+import com.cloudera.iterativereduce.io.HDFSLineParser;
+import com.cloudera.iterativereduce.io.TextRecordParser;
+import com.cloudera.iterativereduce.yarn.avro.generated.FileSplit;
+import com.cloudera.iterativereduce.yarn.avro.generated.StartupConfiguration;
+import com.cloudera.iterativereduce.yarn.avro.generated.WorkerId;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

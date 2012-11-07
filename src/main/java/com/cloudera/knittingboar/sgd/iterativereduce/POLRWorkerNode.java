@@ -28,12 +28,12 @@ import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 //import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
-import com.cloudera.knittingboar.yarn.Updateable;
-import com.cloudera.knittingboar.yarn.appworker.ApplicationWorker;
-import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
-import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
-import com.cloudera.knittingboar.yarn.appworker.RecordParser;
-import com.cloudera.knittingboar.yarn.appworker.TextRecordParser;
+import com.cloudera.iterativereduce.Updateable;
+import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
+import com.cloudera.iterativereduce.ComputableWorker;
+import com.cloudera.iterativereduce.io.HDFSLineParser;
+import com.cloudera.iterativereduce.io.RecordParser;
+import com.cloudera.iterativereduce.io.TextRecordParser;
 import com.google.common.collect.Lists;
 
 
