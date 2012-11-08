@@ -11,6 +11,8 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.mahout.classifier.sgd.L1;
+import org.apache.mahout.classifier.sgd.L2;
+import org.apache.mahout.classifier.sgd.UniformPrior;
 
 import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
 import com.cloudera.knittingboar.messages.GradientUpdateMessage;
@@ -113,7 +115,8 @@ public class POLRMasterDriver extends POLRBaseDriver {
     
     // ----- this normally is generated from the POLRModelParams ------
     
-    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    //this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new UniformPrior())
     .alpha(1).stepOffset(1000)
     .decayExponent(0.9) 
     .lambda(this.Lambda)
@@ -168,6 +171,19 @@ public class POLRMasterDriver extends POLRBaseDriver {
     this.SendParameterUpdateMessage(response_msg);
     
   }
+  
+  public void AveragePVec_GenerateGlobalUpdateVector( int denominator ) {
+    
+    this.global_parameter_vector.AverageAccumulations(denominator);
+    
+    // post message back to sender async
+    GlobalParameterVectorUpdateMessage response_msg = new GlobalParameterVectorUpdateMessage( "", this.num_categories, this.FeatureVectorSize );
+    response_msg.parameter_vector = this.global_parameter_vector.gamma.clone();
+    response_msg.GlobalPassCount = this.GlobalMaxPassCount;
+    
+    this.SendParameterUpdateMessage(response_msg);
+    
+  }  
   
   public void SendParameterUpdateMessage( GlobalParameterVectorUpdateMessage msg) {
     

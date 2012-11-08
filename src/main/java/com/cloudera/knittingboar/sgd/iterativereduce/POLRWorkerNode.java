@@ -25,15 +25,16 @@ import com.cloudera.knittingboar.records.CSVBasedDatasetRecordFactory;
 import com.cloudera.knittingboar.records.RCV1RecordFactory;
 import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
+import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 //import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
-import com.cloudera.iterativereduce.Updateable;
-import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
-import com.cloudera.iterativereduce.ComputableWorker;
-import com.cloudera.iterativereduce.io.HDFSLineParser;
-import com.cloudera.iterativereduce.io.RecordParser;
-import com.cloudera.iterativereduce.io.TextRecordParser;
+import com.cloudera.knittingboar.yarn.Updateable;
+import com.cloudera.knittingboar.yarn.appworker.ApplicationWorker;
+import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
+import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
+import com.cloudera.knittingboar.yarn.appworker.RecordParser;
+import com.cloudera.knittingboar.yarn.appworker.TextRecordParser;
 import com.google.common.collect.Lists;
 
 
@@ -107,11 +108,28 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     this.polr.FlushGamma();
   }  
   */
-  
+  /*
+  public GradientUpdateMessage GenerateParamVectorUpdateMessage() {
+    
+    GradientBuffer gb = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
+    gb.setMatrix(this.polr.getBeta());
+    
+    GradientUpdateMessage msg0 = new GradientUpdateMessage(this.getHostAddress(), gb );
+    msg0.SrcWorkerPassCount = this.LocalPassCount;
+    return msg0;
+    
+  }
+   */
+  /**
+   * Sends a full copy of the multinomial logistic regression array of parameter vectors to the master
+   * - this method plugs the local parameter vector into the message
+   */
   public ParameterVectorGradient GenerateUpdate() {
     
+    
+    
     ParameterVectorGradient gradient = new ParameterVectorGradient();
-    gradient.parameter_vector = this.polr.getGamma().getMatrix().clone();
+    gradient.parameter_vector = this.polr.getBeta().clone(); //this.polr.getGamma().getMatrix().clone();
     gradient.SrcWorkerPassCount = this.LocalPassCount;
     
 /*    try {
@@ -443,4 +461,3 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     ToolRunner.run(aw, args);
   }
 }
-
