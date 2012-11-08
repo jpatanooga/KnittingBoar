@@ -238,5 +238,4 @@ public class TestGradientBuffer extends TestCase {
     assertNotNull(0);    
     
   }
-  
 }

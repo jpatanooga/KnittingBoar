@@ -10,14 +10,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.L1;
-import org.apache.mahout.classifier.sgd.ModelDissector;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import com.cloudera.knittingboar.io.InputRecordsSplit;
-import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 import com.cloudera.knittingboar.metrics.POLRMetrics;
@@ -29,12 +25,12 @@ import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 //import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
-import com.cloudera.knittingboar.yarn.Updateable;
-import com.cloudera.knittingboar.yarn.appworker.ApplicationWorker;
-import com.cloudera.knittingboar.yarn.appworker.ComputableWorker;
-import com.cloudera.knittingboar.yarn.appworker.HDFSLineParser;
-import com.cloudera.knittingboar.yarn.appworker.RecordParser;
-import com.cloudera.knittingboar.yarn.appworker.TextRecordParser;
+
+import com.cloudera.iterativereduce.ComputableWorker;
+import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
+
+import com.cloudera.iterativereduce.io.RecordParser;
+import com.cloudera.iterativereduce.io.TextRecordParser;
 import com.google.common.collect.Lists;
 
 
@@ -461,4 +457,3 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     ToolRunner.run(aw, args);
   }
 }
-

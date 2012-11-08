@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import org.apache.mahout.math.Matrix;
 
 import com.cloudera.knittingboar.sgd.GradientBuffer;
-import com.cloudera.knittingboar.yarn.Updateable;
+import com.cloudera.iterativereduce.Updateable;
 
 public class ParameterVectorGradientUpdatable implements Updateable<ParameterVectorGradient> {
 
