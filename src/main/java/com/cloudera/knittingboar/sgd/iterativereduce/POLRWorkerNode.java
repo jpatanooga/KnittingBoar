@@ -318,7 +318,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
       
       // protected double LearningRate = 50;
       this.LearningRate = Double.parseDouble(this.conf.get(
-          "com.cloudera.knittingboar.setup.LearningRate", "50"));
+          "com.cloudera.knittingboar.setup.LearningRate", "10"));
       
       // local input split path
       this.LocalInputSplitPath = LoadStringConfVarOrException(
