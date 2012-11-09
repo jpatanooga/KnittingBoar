@@ -10,6 +10,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.L1;
+import org.apache.mahout.classifier.sgd.UniformPrior;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
@@ -295,7 +296,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     
     try {
       
-      // this is hard set with LR to 2 classes
+
       this.num_categories = this.conf.getInt(
           "com.cloudera.knittingboar.setup.numCategories", 2);
       
@@ -421,7 +422,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     
     // ----- this normally is generated from the POLRModelParams ------
     
-    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new UniformPrior())
     .alpha(1).stepOffset(1000)
     .decayExponent(0.9) 
     .lambda(this.Lambda)

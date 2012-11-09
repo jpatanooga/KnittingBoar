@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.L1;
+import org.apache.mahout.classifier.sgd.UniformPrior;
 
 import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
 import com.cloudera.knittingboar.messages.GradientUpdateMessage;
@@ -283,7 +284,7 @@ public class POLRMasterNode extends POLRNodeBase implements
     
     // ----- this normally is generated from the POLRModelParams ------
     
-    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new L1())
+    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new UniformPrior())
     .alpha(1).stepOffset(1000)
     .decayExponent(0.9) 
     .lambda(this.Lambda)

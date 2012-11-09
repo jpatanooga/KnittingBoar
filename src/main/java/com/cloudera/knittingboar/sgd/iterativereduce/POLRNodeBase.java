@@ -9,7 +9,7 @@ public class POLRNodeBase {
   protected int FeatureVectorSize = -1;
   protected int BatchSize = 200;
   protected double Lambda = 1.0e-4;
-  protected double LearningRate = 50;
+  protected double LearningRate = 10;
   
   String LocalInputSplitPath = "";
   String PredictorLabelNames = "";
