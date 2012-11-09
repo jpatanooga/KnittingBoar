@@ -322,9 +322,9 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
           "com.cloudera.knittingboar.setup.LearningRate", "10"));
       
       // local input split path
-      this.LocalInputSplitPath = LoadStringConfVarOrException(
-          "com.cloudera.knittingboar.setup.LocalInputSplitPath",
-          "Error loading config: could not load local input split path");
+//      this.LocalInputSplitPath = LoadStringConfVarOrException(
+//          "com.cloudera.knittingboar.setup.LocalInputSplitPath",
+//          "Error loading config: could not load local input split path");
       
       // System.out.println("LoadConfig()");
       
