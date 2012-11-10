@@ -274,10 +274,9 @@
 		</dependency>
 		<dependency>
 			<groupId>com.cloudera</groupId>
-			<artifactId>iterativereduce</artifactId>
+			<artifactId>IterativeReduce</artifactId>
 			<version>0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
