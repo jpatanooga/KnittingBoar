@@ -49,8 +49,6 @@ public class POLRMasterNode extends POLRNodeBase implements
   
 
   GradientBuffer global_parameter_vector = null;
-  //private ArrayList<GlobalParameterVectorUpdateMessage> outgoing_parameter_updates = new ArrayList<GlobalParameterVectorUpdateMessage>();
-  //private ArrayList<GradientUpdateMessage> incoming_gradient_updates = new ArrayList<GradientUpdateMessage>();
   
   private int GlobalMaxPassCount = 0;
 
@@ -60,43 +58,13 @@ public class POLRMasterNode extends POLRNodeBase implements
   private RecordFactory VectorFactory = null;
   
   
-  
-  //private UpdateableInt masterTotal;
-  
-/*  
-  public void RecvGradientMessage() {
-    
-    GradientUpdateMessage rcvd_msg = this.incoming_gradient_updates.remove(0);
-
-    if (rcvd_msg.SrcWorkerPassCount > this.GlobalMaxPassCount) {
-      
-      this.GlobalMaxPassCount = rcvd_msg.SrcWorkerPassCount; 
-      
-    }
-    
-    // accumulate gradient
-    this.MergeGradientUpdate( rcvd_msg.gradient );
-    
-  }  
-*/
+ 
   
   @Override
   public ParameterVectorGradientUpdatable compute(
       Collection<ParameterVectorGradientUpdatable> workerUpdates,
       Collection<ParameterVectorGradientUpdatable> masterUpdates) {
     
-    //int total = 0;
-    /*
-     * for (UpdateableInt i : workerUpdates) { total += i.get(); }
-     * 
-     * for (UpdateableInt i : masterUpdates) { total += i.get(); }
-     * 
-     * //if (masterTotal == null) masterTotal = new UpdateableInt();
-     * 
-     * masterTotal.set(total); LOG.debug("Current total=" + masterTotal.get() +
-     * ", workerUpdates=" + toStrings(workerUpdates) + ", masterUpdates=" +
-     * toStrings(masterUpdates));
-     */
     
     for (ParameterVectorGradientUpdatable i : workerUpdates) { 
     
@@ -114,6 +82,7 @@ public class POLRMasterNode extends POLRNodeBase implements
     // now average the parameter vectors together
     this.global_parameter_vector.AverageAccumulations( workerUpdates.size() );
 
+    LOG.debug("Master node accumulating and averaging " + workerUpdates.size() + " worker updates.");
     
     
     ParameterVectorGradient gradient_msg = new ParameterVectorGradient();
@@ -125,19 +94,7 @@ public class POLRMasterNode extends POLRNodeBase implements
 
     return return_msg;
   }
- /* 
-  private String toStrings(Collection<ParameterVectorGradientUpdatable> c) {
-    StringBuffer sb = new StringBuffer();
-    sb.append("[");
-    
-      for (UpdateableInt i : c) { sb.append(i.get()).append(", "); }
-     
-    sb.append("]");
-    return sb.toString();
-    
-  }
-  */
-  
+   
   @Override
   public ParameterVectorGradientUpdatable getResults() {
     return null;
@@ -231,7 +188,7 @@ public class POLRMasterNode extends POLRNodeBase implements
   public void SetupPOLR() {
     
     System.out.println( "SetupOLR: " + this.num_categories + ", " + this.FeatureVectorSize );
-    
+    LOG.debug("SetupOLR: " + this.num_categories + ", " + this.FeatureVectorSize);
     
     this.global_parameter_vector = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
     
@@ -301,6 +258,9 @@ public class POLRMasterNode extends POLRNodeBase implements
     System.out.println( "master::complete " );
     System.out.println( "complete-ms:" + System.currentTimeMillis() );
 
+    LOG.debug("Master complete, saving model.");
+
+    
     try {
       this.polr_modelparams.saveTo(out);
     } catch (Exception ex) {

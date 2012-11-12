@@ -37,14 +37,6 @@ import com.google.common.collect.Lists;
 
 /**
  * TODO
- * -  Need a way to provide a record reader
- *    - need a way to tell the record reader how many records to do per batch
- * 
- * - how does configure() integrate?
- * 
- * - 
- * 
- * 
  * 
  * @author jpatterson
  *
@@ -56,13 +48,6 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   private static final Log LOG = LogFactory.getLog(POLRWorkerNode.class);
   
   int masterTotal = 0;
-  //UpdateableInt workerTotal;
-  
-  
-  
-  
-  
-  
   
 
   public ParallelOnlineLogisticRegression polr = null; //lmp.createRegression();
@@ -71,11 +56,6 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   public String internalID = "0";
   private RecordFactory VectorFactory = null;
   
-  // old way
-  //InputRecordsSplit input_split = null;
-  
-  // new way
-  //private HDFSLineParser lineParser = null;
   private TextRecordParser lineParser = null;
   
  
@@ -94,48 +74,15 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
    * 
    * @param msg
    */
-/*  public void ProcessIncomingParameterVectorMessage( GlobalParameterVectorUpdateMessage msg) {
-    
-    //this.RecvMasterParamVector(msg.parameter_vector);
-    this.polr.SetBeta(msg.parameter_vector);
-    
-    // update global count
-    this.GlobalPassCount = msg.GlobalPassCount;
-    
-    this.polr.FlushGamma();
-  }  
-  */
-  /*
-  public GradientUpdateMessage GenerateParamVectorUpdateMessage() {
-    
-    GradientBuffer gb = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
-    gb.setMatrix(this.polr.getBeta());
-    
-    GradientUpdateMessage msg0 = new GradientUpdateMessage(this.getHostAddress(), gb );
-    msg0.SrcWorkerPassCount = this.LocalPassCount;
-    return msg0;
-    
-  }
-   */
   /**
    * Sends a full copy of the multinomial logistic regression array of parameter vectors to the master
    * - this method plugs the local parameter vector into the message
    */
   public ParameterVectorGradient GenerateUpdate() {
     
-    
-    
     ParameterVectorGradient gradient = new ParameterVectorGradient();
     gradient.parameter_vector = this.polr.getBeta().clone(); //this.polr.getGamma().getMatrix().clone();
     gradient.SrcWorkerPassCount = this.LocalPassCount;
-    
-/*    try {
-      System.out.println( "GenerateUpdate >> " + gradient.parameter_vector.get(0, 0) + ", Len: " + gradient.Serialize().length);
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-*/    
     return gradient;
     
   }  
@@ -144,27 +91,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
   @Override
   public ParameterVectorGradientUpdatable compute() {
     int total = 0;
-/*    
-    for(String s : records) {
-      Integer i = Integer.parseInt(s);
-      total += i;
-    }
-    
-    
-    
-    //masterTotal = total / 10;
-    
-    //if (workerTotal == null)
-      workerTotal = new UpdateableInt();
-    
-    workerTotal.set(masterTotal + total);
-    LOG.debug("Current total=" + workerTotal.get() 
-        + ", records=" + records.toString());
-    */
-    
-    //HDFSLineParser input_parser = (HDFSLineParser) this.getRecordParser();
-    
-    
+
     // ------------- process the next batch -----------
     
     Text value = new Text();
@@ -234,8 +161,13 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
         k++;
         if (x == this.BatchSize - 1) {
 
-          System.out.printf("Worker %s:\t Trained Recs: %10d, loglikelihood: %10.3f, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
-              this.internalID, k, ll, metrics.AvgLogLikelihood, metrics.AvgCorrect * 100, batch_vec_factory_time);
+//          System.out.printf("Worker %s:\t Trained Recs: %10d, loglikelihood: %10.3f, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
+//              this.internalID, k, ll, metrics.AvgLogLikelihood, metrics.AvgCorrect * 100, batch_vec_factory_time);
+
+          
+           
+          LOG.debug( "Worker " + this.internalID + ":\t Trained Recs: " + k + ", loglikelihood: " + ll + ", AvgLL: " + metrics.AvgLogLikelihood + ", Percent Correct: " + (metrics.AvgCorrect * 100) + ", VF: " + batch_vec_factory_time + "\n" );
+
           
         }
         

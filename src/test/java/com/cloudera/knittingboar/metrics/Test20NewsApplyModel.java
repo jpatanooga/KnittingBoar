@@ -33,7 +33,9 @@ public class Test20NewsApplyModel extends TestCase {
     }
   }
   
+  // "/Users/jpatterson/Downloads/datasets/20news-kboar/models/mode_9_03pm.model"
   private static Path model20News = new Path( "/tmp/TestRunPOLRMasterAndNWorkers.20news.model" );
+//  private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/mode_9_03pm.model" );
   
   private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  
   
