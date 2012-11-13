@@ -236,4 +236,26 @@ public class TestSaveLoadModel extends TestCase {
     
   }  
   
+/*  public void testSACModel() throws IOException {
+    
+    String model = "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_11_31pm.model";
+    
+    System.out.println( "testSACModel ------------------------ " );
+    
+    POLRModelTester tester = new POLRModelTester();
+    
+    
+    
+    tester.Load( model );
+    
+    System.out.println("Lambda: " + tester.polr.getLambda() );
+    System.out.println("Categories: " + tester.polr.numCategories() );
+    System.out.println("Features: " + tester.polr.numFeatures() );
+//    System.out.println("Features: " + tester.polr. );
+        
+    
+    
+  }*/
+  
+  
 }

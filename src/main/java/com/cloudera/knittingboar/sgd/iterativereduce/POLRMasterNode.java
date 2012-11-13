@@ -82,7 +82,8 @@ public class POLRMasterNode extends POLRNodeBase implements
       Collection<ParameterVectorGradientUpdatable> workerUpdates,
       Collection<ParameterVectorGradientUpdatable> masterUpdates) {
     
-    
+    System.out.println( "SuperStep: Worker Info ----- " );
+    int x = 0;
     for (ParameterVectorGradientUpdatable i : workerUpdates) { 
     
       if (i.get().SrcWorkerPassCount > this.GlobalMaxPassCount) {
@@ -91,6 +92,8 @@ public class POLRMasterNode extends POLRNodeBase implements
         
       }
       
+      System.out.println( "Worker: " + x + " Trained Recs: " + i.get().TrainedRecords + " AvgLogLikelihood: " + i.get().AvgLogLikelihood + " PercentCorrect: " + i.get().PercentCorrect );
+      x++;
       // accumulate gradient of parameter vectors
       this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
       

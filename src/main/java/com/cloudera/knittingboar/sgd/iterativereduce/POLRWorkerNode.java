@@ -100,6 +100,11 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
     ParameterVectorGradient gradient = new ParameterVectorGradient();
     gradient.parameter_vector = this.polr.getBeta().clone(); //this.polr.getGamma().getMatrix().clone();
     gradient.SrcWorkerPassCount = this.LocalPassCount;
+    
+    gradient.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood)).floatValue();
+    gradient.PercentCorrect = (new Double(metrics.AvgCorrect * 100)).floatValue();
+    gradient.TrainedRecords = (new Long(metrics.TotalRecordsProcessed)).intValue();
+    
     return gradient;
     
   }  
@@ -176,6 +181,7 @@ public class POLRWorkerNode extends POLRNodeBase implements ComputableWorker<Par
         this.polr.train(actual, v);
         
         k++;
+        metrics.TotalRecordsProcessed = k;
         if (x == this.BatchSize - 1) {
 
           System.err.printf("Worker %s:\t Trained Recs: %10d, loglikelihood: %10.3f, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
