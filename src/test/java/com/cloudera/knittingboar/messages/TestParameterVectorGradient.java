@@ -1,3 +1,20 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cloudera.knittingboar.messages;
 
 import java.io.DataInput;
@@ -53,12 +70,13 @@ public class TestParameterVectorGradient extends TestCase {
 
     System.out.println( "matrix created..." );
     
-    //GradientUpdateMessage msg = new GradientUpdateMessage( ip, g );
-    //msg.SrcWorkerPassCount = pass_count;
     
     ParameterVectorGradient vec_gradient = new ParameterVectorGradient();
     vec_gradient.SrcWorkerPassCount = pass_count;
     vec_gradient.parameter_vector = m;
+    vec_gradient.AvgLogLikelihood = -1.368f;
+    vec_gradient.PercentCorrect = 72.68f;
+    vec_gradient.TrainedRecords = 2500;
     
     
     assertEquals( 10000, vec_gradient.numFeatures() );
@@ -67,28 +85,22 @@ public class TestParameterVectorGradient extends TestCase {
     assertEquals( 20, vec_gradient.numCategories() );
     assertEquals( 20, vec_gradient.parameter_vector.rowSize() );
     
-    //ByteArrayOutputStream bas = new ByteArrayOutputStream();
-//    OutputStream modelOutput = new FileOutputStream(msg_file);
-//    DataOutput d = new DataOutputStream(modelOutput);
-
-    //msg.Serialize(d);
     byte[] buf = vec_gradient.Serialize();
     
-    //DataInput in = new DataInputStream(new FileInputStream(msg_file));
-    
-    //GradientUpdateMessage msg_deser = new GradientUpdateMessage( "", new GradientBuffer( classes, features ) );
-    //msg_deser.Deserialize(in);
     
     ParameterVectorGradient vec_gradient_deserialized = new ParameterVectorGradient();
     vec_gradient_deserialized.Deserialize(buf);
     
-    //assertEquals( ip, msg_deser.src_host );
     assertEquals( pass_count, vec_gradient_deserialized.SrcWorkerPassCount );
     assertEquals( 0.1, vec_gradient_deserialized.parameter_vector.get(0, 1) );
     assertEquals( 0.2, vec_gradient_deserialized.parameter_vector.get(0, 2) );
     assertEquals( 0.3, vec_gradient_deserialized.parameter_vector.get(0, 3) );
     assertEquals( 0.4, vec_gradient_deserialized.parameter_vector.get(0, 4) );
     assertEquals( 0.5, vec_gradient_deserialized.parameter_vector.get(0, 5) );
+    
+    assertEquals( -1.368f, vec_gradient_deserialized.AvgLogLikelihood );
+    assertEquals( 72.68f, vec_gradient_deserialized.PercentCorrect );
+    assertEquals( 2500, vec_gradient_deserialized.TrainedRecords );
     
   }
   

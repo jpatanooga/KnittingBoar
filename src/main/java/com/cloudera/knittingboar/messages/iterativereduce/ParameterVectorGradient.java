@@ -42,15 +42,12 @@ public class ParameterVectorGradient {
   // coming back, this is hte new parameter vector to replace ours with
   public Matrix parameter_vector = null;
   public int GlobalPassCount = 0; // what pass should the worker dealing with?
-/*
-  private int numFeatures = -1;
-  private int numCategories = -1;
+
+  public int TrainedRecords = 0;
+  public float AvgLogLikelihood = 0;
+  public float PercentCorrect = 0;
+
   
-  public ParameterVectorGradient(int numFeatures, int numCategories ) {
-    this.numCategories = numCategories;
-    this.numFeatures = numFeatures;
-  }
-  */
   public byte[] Serialize() throws IOException {
     
 //    DataOutput d
@@ -62,6 +59,10 @@ public class ParameterVectorGradient {
     //d.writeUTF(src_host);
     d.writeInt(this.SrcWorkerPassCount);
     d.writeInt(this.GlobalPassCount);
+    
+    d.writeInt(this.TrainedRecords);
+    d.writeFloat(this.AvgLogLikelihood);
+    d.writeFloat(this.PercentCorrect);
     //buf.write
     //MatrixWritable.writeMatrix(d, this.worker_gradient.getMatrix());
     MatrixWritable.writeMatrix(d, this.parameter_vector);
@@ -78,6 +79,12 @@ public class ParameterVectorGradient {
     //this.src_host = in.readUTF();
     this.SrcWorkerPassCount = in.readInt();
     this.GlobalPassCount = in.readInt();
+    
+    this.TrainedRecords = in.readInt(); //d.writeInt(this.TrainedRecords);
+    this.AvgLogLikelihood = in.readFloat(); //d.writeFloat(this.AvgLogLikelihood);
+    this.PercentCorrect = in.readFloat(); //d.writeFloat(this.PercentCorrect);
+    
+    
     this.parameter_vector = MatrixWritable.readMatrix(in);
     
   }
