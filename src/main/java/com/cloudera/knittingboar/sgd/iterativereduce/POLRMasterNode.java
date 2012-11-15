@@ -112,11 +112,15 @@ public class POLRMasterNode extends POLRNodeBase implements
     ParameterVectorGradientUpdatable return_msg = new ParameterVectorGradientUpdatable();
     return_msg.set(gradient_msg);
 
+    // set the master copy!
+    this.polr.SetBeta(this.global_parameter_vector.getMatrix().clone());
+    
     return return_msg;
   }
    
   @Override
   public ParameterVectorGradientUpdatable getResults() {
+    System.out.println( ">>> getResults() - null!!!" );
     return null;
   }
   

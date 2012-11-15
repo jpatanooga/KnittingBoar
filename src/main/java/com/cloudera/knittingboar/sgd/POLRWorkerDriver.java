@@ -250,8 +250,6 @@ public class POLRWorkerDriver extends POLRBaseDriver {
   /**
    * When the messaging systme gets the parameter vector update back, we call this method
    * 1. udpate the local p-vector
-   * 2. process an latent gradient -> update
-   * 3. lets the training cycle continue on w/o further blocking
    * 
    */
   private void RecvMasterParamVector( Matrix beta ) {

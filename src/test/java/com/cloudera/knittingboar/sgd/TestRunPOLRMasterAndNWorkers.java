@@ -69,7 +69,7 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
 
     c.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);
     
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
+    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 500);
     
     c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 1);
     
