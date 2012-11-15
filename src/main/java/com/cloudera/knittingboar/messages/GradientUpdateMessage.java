@@ -26,34 +26,33 @@ import org.apache.mahout.math.MatrixWritable;
 import com.cloudera.knittingboar.sgd.GradientBuffer;
 
 public class GradientUpdateMessage {
-
+  
   public String src_host = "";
   public int SrcWorkerPassCount = 0; // what pass is the worker dealing with?
   
   public GradientBuffer gradient = null;
   
   /**
-   * Gradient message to send to master process
-   * - takes a snapshot of the gradient to send
+   * Gradient message to send to master process - takes a snapshot of the
+   * gradient to send
    * 
    * 
    * @param remote_src_host
    * @param buf
    */
-  public GradientUpdateMessage( String remote_src_host, GradientBuffer buf ) {
+  public GradientUpdateMessage(String remote_src_host, GradientBuffer buf) {
     
     this.src_host = remote_src_host;
     
-    if (null == buf ) {
-      System.out.println( "ERR > null ctor buffer!" );
+    if (null == buf) {
+      System.out.println("ERR > null ctor buffer!");
     }
     
-    //System.out.println( "numCat: " + buf.numCategories() ); 
+    // System.out.println( "numCat: " + buf.numCategories() );
     
-    this.gradient = new GradientBuffer( buf.numCategories(), buf.numFeatures() );
+    this.gradient = new GradientBuffer(buf.numCategories(), buf.numFeatures());
     // get a snapshot of the current state of the gradient
     this.gradient.Copy(buf);
-    
     
   }
   
@@ -61,9 +60,9 @@ public class GradientUpdateMessage {
     
     d.writeUTF(src_host);
     d.writeInt(this.SrcWorkerPassCount);
-    //buf.write
+    // buf.write
     MatrixWritable.writeMatrix(d, this.gradient.getMatrix());
-    //MatrixWritable.
+    // MatrixWritable.
     
   }
   
@@ -71,9 +70,8 @@ public class GradientUpdateMessage {
     
     this.src_host = in.readUTF();
     this.SrcWorkerPassCount = in.readInt();
-    this.gradient.setMatrix( MatrixWritable.readMatrix(in) );
+    this.gradient.setMatrix(MatrixWritable.readMatrix(in));
     
   }
-  
   
 }

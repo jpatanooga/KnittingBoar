@@ -27,17 +27,18 @@ import com.cloudera.knittingboar.utils.Utils;
 /**
  * Gradient accumulation buffer for parallel sgd
  * 
- * basically a wrapper around another Matrix object to hold the intermediate updates per batch
- * which are sent to the master node for accumulation into the global parameter vector
+ * basically a wrapper around another Matrix object to hold the intermediate
+ * updates per batch which are sent to the master node for accumulation into the
+ * global parameter vector
  * 
  * @author jpatterson
- *
+ * 
  */
 public class GradientBuffer {
-
   
-  protected Matrix gamma; // this is the saved updated gradient we merge at the super step
-
+  protected Matrix gamma; // this is the saved updated gradient we merge at the
+                          // super step
+  
   private int AccumulatedGradientsCount = 0;
   private int numCategories = 2; // default
   
@@ -48,25 +49,25 @@ public class GradientBuffer {
     
   }
   
-  public void setMatrix( Matrix m ) {
+  public void setMatrix(Matrix m) {
     
     this.gamma = m;
     
   }
-
+  
   public Matrix getMatrix() {
-    //close();
+    // close();
     return this.gamma;
   }
-
+  
   public void setCell(int i, int j, double gammaIJ) {
     this.gamma.set(i, j, gammaIJ);
   }
-
+  
   public double getCell(int row, int col) {
     return this.gamma.get(row, col);
   }
-
+  
   public int numFeatures() {
     return this.gamma.numCols();
   }
@@ -74,9 +75,9 @@ public class GradientBuffer {
   public int numCategories() {
     return this.numCategories;
   }
-
+  
   private void ClearGradientBuffer() {
-
+    
     this.gamma = this.gamma.like();
     
   }
@@ -88,65 +89,62 @@ public class GradientBuffer {
     
   }
   
-  public void AccumulateGradient( Matrix other_gamma ) {
+  public void AccumulateGradient(Matrix other_gamma) {
     
-    for ( int row = 0; row < this.gamma.rowSize(); row++ ) {
+    for (int row = 0; row < this.gamma.rowSize(); row++) {
       
-      for ( int col = 0; col < this.gamma.columnSize(); col++ ) {
-    
+      for (int col = 0; col < this.gamma.columnSize(); col++) {
+        
         double old_this_val = this.gamma.get(row, col);
         double other_val = other_gamma.get(row, col);
         
-        //System.out.println( "Accumulate: " + old_this_val + ", " + other_val );
+        // System.out.println( "Accumulate: " + old_this_val + ", " + other_val
+        // );
         
-        this.gamma.set(row, col, old_this_val + other_val );
+        this.gamma.set(row, col, old_this_val + other_val);
         
-        //System.out.println( "new value: " + this.gamma.get(row, col) );
-        
-        
-        
-      }
-      
-    }
-       
-    this.AccumulatedGradientsCount++;
-    
-  }  
-  
-  public void Accumulate( GradientBuffer other_gamma ) {
-    
-    for ( int row = 0; row < this.gamma.rowSize(); row++ ) {
-      
-      for ( int col = 0; col < this.gamma.columnSize(); col++ ) {
-    
-        double old_this_val = this.gamma.get(row, col);
-        double other_val = other_gamma.getCell(row, col);
-        
-        
-        
-        this.gamma.set(row, col, old_this_val + other_val );
+        // System.out.println( "new value: " + this.gamma.get(row, col) );
         
       }
       
     }
-       
+    
     this.AccumulatedGradientsCount++;
     
   }
   
-  public void AverageAccumulations( int denominator ) {
+  public void Accumulate(GradientBuffer other_gamma) {
     
-    for ( int row = 0; row < this.gamma.rowSize(); row++ ) {
+    for (int row = 0; row < this.gamma.rowSize(); row++) {
       
-      for ( int col = 0; col < this.gamma.columnSize(); col++ ) {
-    
+      for (int col = 0; col < this.gamma.columnSize(); col++) {
+        
         double old_this_val = this.gamma.get(row, col);
-        //double other_val = other_gamma.getCell(row, col);
-        this.gamma.set(row, col, old_this_val / denominator );
+        double other_val = other_gamma.getCell(row, col);
+        
+        this.gamma.set(row, col, old_this_val + other_val);
         
       }
       
-    }    
+    }
+    
+    this.AccumulatedGradientsCount++;
+    
+  }
+  
+  public void AverageAccumulations(int denominator) {
+    
+    for (int row = 0; row < this.gamma.rowSize(); row++) {
+      
+      for (int col = 0; col < this.gamma.columnSize(); col++) {
+        
+        double old_this_val = this.gamma.get(row, col);
+        // double other_val = other_gamma.getCell(row, col);
+        this.gamma.set(row, col, old_this_val / denominator);
+        
+      }
+      
+    }
     
   }
   
@@ -155,13 +153,13 @@ public class GradientBuffer {
    * 
    * @param other
    */
-  public void Copy( GradientBuffer other ) {
+  public void Copy(GradientBuffer other) {
     
-    this.Accumulate( other );
+    this.Accumulate(other);
     
   }
   
-  public static GradientBuffer Merge( ArrayList<GradientBuffer> gammas ) {
+  public static GradientBuffer Merge(ArrayList<GradientBuffer> gammas) {
     
     int numFeatures = gammas.get(0).numFeatures();
     int numCategories = gammas.get(0).numCategories();
@@ -170,14 +168,13 @@ public class GradientBuffer {
     
     // accumulate all the gradients into buffers
     
-    for ( int x = 0; x < gammas.size(); x++ ) {
+    for (int x = 0; x < gammas.size(); x++) {
       
       merged.Accumulate(gammas.get(x));
       
     }
     
     // calc average
-    
     
     return merged;
     
@@ -188,41 +185,37 @@ public class GradientBuffer {
    */
   public void Reset() {
     
-   for ( int row = 0; row < this.gamma.rowSize(); row++ ) {
+    for (int row = 0; row < this.gamma.rowSize(); row++) {
       
-      for ( int col = 0; col < this.gamma.columnSize(); col++ ) {
-    
-        this.gamma.set(row, col, 0 );
+      for (int col = 0; col < this.gamma.columnSize(); col++) {
+        
+        this.gamma.set(row, col, 0);
         
       }
       
-    }    
-   
-   this.AccumulatedGradientsCount = 0;
+    }
+    
+    this.AccumulatedGradientsCount = 0;
     
   }
   
   public void Debug() {
     
-    System.out.println( "\nGamma: " );
+    System.out.println("\nGamma: ");
     
-    for ( int x = 0; x < this.gamma.rowSize(); x++ ) {
+    for (int x = 0; x < this.gamma.rowSize(); x++) {
       
-      Utils.PrintVectorSectionNonZero( this.gamma.viewRow(x), 3 );
+      Utils.PrintVectorSectionNonZero(this.gamma.viewRow(x), 3);
       
     }
     
   }
-
   
-  
-  public void DebugRowInGamma( int row ) {
+  public void DebugRowInGamma(int row) {
     
-    System.out.println( "\nGamma: " );
-      Utils.PrintVectorSectionNonZero( this.gamma.viewRow(row), 3 );
-      
+    System.out.println("\nGamma: ");
+    Utils.PrintVectorSectionNonZero(this.gamma.viewRow(row), 3);
     
-  }  
-  
+  }
   
 }

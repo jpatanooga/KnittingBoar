@@ -25,17 +25,24 @@ import com.cloudera.knittingboar.records.RecordFactory;
  * Base class for both the master and the worker process for POLR
  * 
  * Basic usage:
- * -  either have a configuration variable loaded from YARN params/data 
+ * 
+ * - either have a configuration variable loaded from YARN params/data
+ * 
  * [or]
- * - create a debug/test/sythetic Configuration object and pass that in via .debug_setConf( Configuration )
+ * 
+ * - create a debug/test/sythetic Configuration object and pass that in via
+ * .debug_setConf( Configuration )
+ * 
  * - LoadConfigVarsLocally() is called to pull data from conf
- * - Setup() is called to build any ML/SGD specific stuff based on the configuration 
+ * 
+ * - Setup() is called to build any ML/SGD specific stuff based on the
+ * configuration
  * 
  * @author jpatterson
- *
+ * 
  */
 public abstract class POLRBaseDriver {
-
+  
   boolean bConfLoaded = false;
   boolean bSetup = false;
   boolean bRunning = false;
@@ -60,12 +67,12 @@ public abstract class POLRBaseDriver {
   protected String RecordFactoryClassname = "";
   
   /**
-   * used with unit tests to pre-set a Configuration 
+   * used with unit tests to pre-set a Configuration
    * 
    * 
    * @param c
    */
-  public void debug_setConf( Configuration c ) {
+  public void debug_setConf(Configuration c) {
     
     this.conf = c;
     
@@ -76,15 +83,15 @@ public abstract class POLRBaseDriver {
     return this.conf;
     
   }
-
+  
   /**
    * Loads the config from [HDFS / JobConf]
    * 
    * 
-   * NOTES
-   * - the mechanics of Configuration may be different in this context
-   * - where does Configuration typically get its info from onload?
-   * @throws Exception 
+   * NOTES - the mechanics of Configuration may be different in this context -
+   * where does Configuration typically get its info from onload?
+   * 
+   * @throws Exception
    * 
    */
   public void LoadConfigVarsLocally() throws Exception {
@@ -93,60 +100,73 @@ public abstract class POLRBaseDriver {
     
     this.bConfLoaded = false;
     
-    
     // this is hard set with LR to 2 classes
-    this.num_categories = this.conf.getInt("com.cloudera.knittingboar.setup.numCategories", 2);
-
+    this.num_categories = this.conf.getInt(
+        "com.cloudera.knittingboar.setup.numCategories", 2);
+    
     // feature vector size
-    this.FeatureVectorSize = LoadIntConfVarOrException( "com.cloudera.knittingboar.setup.FeatureVectorSize", "Error loading config: could not load feature vector size" );
-
+    this.FeatureVectorSize = LoadIntConfVarOrException(
+        "com.cloudera.knittingboar.setup.FeatureVectorSize",
+        "Error loading config: could not load feature vector size");
+    
     // feature vector size
-    this.BatchSize = this.conf.getInt( "com.cloudera.knittingboar.setup.BatchSize", 200 );
+    this.BatchSize = this.conf.getInt(
+        "com.cloudera.knittingboar.setup.BatchSize", 200);
     
+    this.NumberPasses = this.conf.getInt(
+        "com.cloudera.knittingboar.setup.NumberPasses", 1);
     
-    this.NumberPasses = this.conf.getInt( "com.cloudera.knittingboar.setup.NumberPasses", 1 );
+    // protected double Lambda = 1.0e-4;
+    this.Lambda = Double.parseDouble(this.conf.get(
+        "com.cloudera.knittingboar.setup.Lambda", "1.0e-4"));
     
-//    protected double Lambda = 1.0e-4;
-    this.Lambda = Double.parseDouble( this.conf.get("com.cloudera.knittingboar.setup.Lambda", "1.0e-4") );
-    
-    
-    //    protected double LearningRate = 50;
-    this.LearningRate = Double.parseDouble( this.conf.get("com.cloudera.knittingboar.setup.LearningRate", "10") );
-
-    
+    // protected double LearningRate = 50;
+    this.LearningRate = Double.parseDouble(this.conf.get(
+        "com.cloudera.knittingboar.setup.LearningRate", "10"));
     
     // local input split path
-    this.LocalInputSplitPath = LoadStringConfVarOrException( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "Error loading config: could not load local input split path" );
+    this.LocalInputSplitPath = LoadStringConfVarOrException(
+        "com.cloudera.knittingboar.setup.LocalInputSplitPath",
+        "Error loading config: could not load local input split path");
     
-    //System.out.println("LoadConfig()");
+    // System.out.println("LoadConfig()");
     
-    // maps to either CSV, 20newsgroups, or RCV1 
-    this.RecordFactoryClassname = LoadStringConfVarOrException( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "Error loading config: could not load RecordFactory classname" );
-        
-    if ( this.RecordFactoryClassname.equals( RecordFactory.CSV_RECORDFACTORY ) ) {
+    // maps to either CSV, 20newsgroups, or RCV1
+    this.RecordFactoryClassname = LoadStringConfVarOrException(
+        "com.cloudera.knittingboar.setup.RecordFactoryClassname",
+        "Error loading config: could not load RecordFactory classname");
+    
+    if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
       
       // so load the CSV specific stuff ----------
       
       // predictor label names
-      this.PredictorLabelNames = LoadStringConfVarOrException( "com.cloudera.knittingboar.setup.PredictorLabelNames", "Error loading config: could not load predictor label names" );
-
+      this.PredictorLabelNames = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.PredictorLabelNames",
+          "Error loading config: could not load predictor label names");
+      
       // predictor var types
-      this.PredictorVariableTypes = LoadStringConfVarOrException( "com.cloudera.knittingboar.setup.PredictorVariableTypes", "Error loading config: could not load predictor variable types" );
+      this.PredictorVariableTypes = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.PredictorVariableTypes",
+          "Error loading config: could not load predictor variable types");
       
       // target variables
-      this.TargetVariableName = LoadStringConfVarOrException( "com.cloudera.knittingboar.setup.TargetVariableName", "Error loading config: Target Variable Name" );
-
-      // column header names
-      this.ColumnHeaderNames = LoadStringConfVarOrException( "com.cloudera.knittingboar.setup.ColumnHeaderNames", "Error loading config: Column Header Names" );
+      this.TargetVariableName = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.TargetVariableName",
+          "Error loading config: Target Variable Name");
       
-      //System.out.println("LoadConfig(): " + this.ColumnHeaderNames);
+      // column header names
+      this.ColumnHeaderNames = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.ColumnHeaderNames",
+          "Error loading config: Column Header Names");
+      
+      // System.out.println("LoadConfig(): " + this.ColumnHeaderNames);
       
     }
     
-    
     this.bConfLoaded = true;
     
-  }  
+  }
   
   public int GetCurrentLocalPassCount() {
     return this.LocalPassCount;
@@ -156,21 +176,21 @@ public abstract class POLRBaseDriver {
     this.GlobalPassCount++;
   }
   
-  
-  
-  private String LoadStringConfVarOrException( String ConfVarName, String ExcepMsg ) throws Exception {
+  private String LoadStringConfVarOrException(String ConfVarName,
+      String ExcepMsg) throws Exception {
     
-    if ( null == this.conf.get(ConfVarName) ) {
+    if (null == this.conf.get(ConfVarName)) {
       throw new Exception(ExcepMsg);
     } else {
       return this.conf.get(ConfVarName);
     }
     
   }
-
-  private int LoadIntConfVarOrException( String ConfVarName, String ExcepMsg ) throws Exception {
+  
+  private int LoadIntConfVarOrException(String ConfVarName, String ExcepMsg)
+      throws Exception {
     
-    if ( null == this.conf.get(ConfVarName) ) {
+    if (null == this.conf.get(ConfVarName)) {
       throw new Exception(ExcepMsg);
     } else {
       return this.conf.getInt(ConfVarName, 0);
@@ -179,63 +199,63 @@ public abstract class POLRBaseDriver {
   }
   
   /**
-   * After the config is loaded, the driver then sets up its local data stuctures
+   * After the config is loaded, the driver then sets up its local data
+   * stuctures
    */
-  public void Setup() { }
+  public void Setup() {}
   
   public void DebugPrintConfig() {
- 
-    System.out.println( "" );
+    
+    System.out.println("");
     
     // this is hard set with LR to 2 classes
-    System.out.println( "Num Categories: " + this.num_categories );
-
+    System.out.println("Num Categories: " + this.num_categories);
+    
     // feature vector size
-    System.out.println( "Feature Vector Size: " + this.FeatureVectorSize );
-
+    System.out.println("Feature Vector Size: " + this.FeatureVectorSize);
+    
     // local input split path
-    System.out.println( "Local Input Split Path: " + this.LocalInputSplitPath );
+    System.out.println("Local Input Split Path: " + this.LocalInputSplitPath);
     
     // predictor label names
-    System.out.println( "Predictor Label Names: " + this.PredictorLabelNames );
-
+    System.out.println("Predictor Label Names: " + this.PredictorLabelNames);
+    
     // predictor var types
-    System.out.println( "Predictor Variable Types: " + this.PredictorVariableTypes );
+    System.out.println("Predictor Variable Types: "
+        + this.PredictorVariableTypes);
     
     // target variables
-    System.out.println( "Target Variable Name: " + this.TargetVariableName );
-
+    System.out.println("Target Variable Name: " + this.TargetVariableName);
+    
     // column header names
-    System.out.println( "Column Header Names: " + this.ColumnHeaderNames );
-
-    System.out.println( "Lambda: " + this.Lambda );
+    System.out.println("Column Header Names: " + this.ColumnHeaderNames);
     
-    System.out.println( "LearningRate: " + this.LearningRate );
+    System.out.println("Lambda: " + this.Lambda);
     
-    System.out.println( "NumberPasses: " + this.NumberPasses );
+    System.out.println("LearningRate: " + this.LearningRate);
+    
+    System.out.println("NumberPasses: " + this.NumberPasses);
     
   }
   
   /**
    * based control method
    */
-  public void Run() { }
-
-  /**
-   * based control method
-   */
-  public void Start() { }
+  public void Run() {}
   
   /**
    * based control method
    */
-  public void Stop() { }
+  public void Start() {}
+  
+  /**
+   * based control method
+   */
+  public void Stop() {}
   
   // TODO: fix!
   public String getHostAddress() {
     return "127.0..1";
   }
-  
-  
   
 }

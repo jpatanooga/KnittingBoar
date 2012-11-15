@@ -40,8 +40,7 @@ import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
 import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
-import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
-//import com.cloudera.knittingboar.yarn.appmaster.ApplicationMaster;
+import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression; //import com.cloudera.knittingboar.yarn.appmaster.ApplicationMaster;
 //import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
 import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
 import com.cloudera.iterativereduce.ComputableMaster;
@@ -51,8 +50,9 @@ import com.cloudera.iterativereduce.ComputableMaster;
 import com.google.common.collect.Lists;
 
 /**
- * TODO - MK does shit here
- * 
+ * Master node for the IR-KnittingBoar YARN process - coordinates the parallel
+ * SGD process amongst many workers - gets the parameter vector updates from
+ * many workers and averages them together, sending them back to the workers
  * 
  * 
  * @author jpatterson
@@ -62,37 +62,35 @@ public class POLRMasterNode extends POLRNodeBase implements
     ComputableMaster<ParameterVectorGradientUpdatable> {
   
   private static final Log LOG = LogFactory.getLog(POLRMasterNode.class);
-
   
-
   GradientBuffer global_parameter_vector = null;
   
   private int GlobalMaxPassCount = 0;
-
+  
   // these are only used for saving the model
-  public ParallelOnlineLogisticRegression polr = null; 
+  public ParallelOnlineLogisticRegression polr = null;
   public POLRModelParameters polr_modelparams;
   private RecordFactory VectorFactory = null;
-  
-  
- 
   
   @Override
   public ParameterVectorGradientUpdatable compute(
       Collection<ParameterVectorGradientUpdatable> workerUpdates,
       Collection<ParameterVectorGradientUpdatable> masterUpdates) {
     
-    System.out.println( "SuperStep: Worker Info ----- " );
+    System.out.println("SuperStep: Worker Info ----- ");
     int x = 0;
-    for (ParameterVectorGradientUpdatable i : workerUpdates) { 
-    
+    for (ParameterVectorGradientUpdatable i : workerUpdates) {
+      
       if (i.get().SrcWorkerPassCount > this.GlobalMaxPassCount) {
         
-        this.GlobalMaxPassCount = i.get().SrcWorkerPassCount; 
+        this.GlobalMaxPassCount = i.get().SrcWorkerPassCount;
         
       }
       
-      System.out.println( "Worker: " + x + " Trained Recs: " + i.get().TrainedRecords + " AvgLogLikelihood: " + i.get().AvgLogLikelihood + " PercentCorrect: " + i.get().PercentCorrect );
+      System.out.println("Worker: " + x + " Trained Recs: "
+          + i.get().TrainedRecords + " AvgLogLikelihood: "
+          + i.get().AvgLogLikelihood + " PercentCorrect: "
+          + i.get().PercentCorrect);
       x++;
       // accumulate gradient of parameter vectors
       this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
@@ -100,27 +98,28 @@ public class POLRMasterNode extends POLRNodeBase implements
     }
     
     // now average the parameter vectors together
-    this.global_parameter_vector.AverageAccumulations( workerUpdates.size() );
-
-    LOG.debug("Master node accumulating and averaging " + workerUpdates.size() + " worker updates.");
+    this.global_parameter_vector.AverageAccumulations(workerUpdates.size());
     
+    LOG.debug("Master node accumulating and averaging " + workerUpdates.size()
+        + " worker updates.");
     
     ParameterVectorGradient gradient_msg = new ParameterVectorGradient();
     gradient_msg.GlobalPassCount = this.GlobalMaxPassCount;
-    gradient_msg.parameter_vector = this.global_parameter_vector.getMatrix().clone();
+    gradient_msg.parameter_vector = this.global_parameter_vector.getMatrix()
+        .clone();
     
     ParameterVectorGradientUpdatable return_msg = new ParameterVectorGradientUpdatable();
     return_msg.set(gradient_msg);
-
+    
     // set the master copy!
     this.polr.SetBeta(this.global_parameter_vector.getMatrix().clone());
     
     return return_msg;
   }
-   
+  
   @Override
   public ParameterVectorGradientUpdatable getResults() {
-    System.out.println( ">>> getResults() - null!!!" );
+    System.out.println(">>> getResults() - null!!!");
     return null;
   }
   
@@ -157,9 +156,9 @@ public class POLRMasterNode extends POLRNodeBase implements
           "com.cloudera.knittingboar.setup.LearningRate", "10"));
       
       // local input split path
-//      this.LocalInputSplitPath = LoadStringConfVarOrException(
-//          "com.cloudera.knittingboar.setup.LocalInputSplitPath",
- //         "Error loading config: could not load local input split path");
+      // this.LocalInputSplitPath = LoadStringConfVarOrException(
+      // "com.cloudera.knittingboar.setup.LocalInputSplitPath",
+      // "Error loading config: could not load local input split path");
       
       // System.out.println("LoadConfig()");
       
@@ -171,7 +170,8 @@ public class POLRMasterNode extends POLRNodeBase implements
       if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
         
         // so load the CSV specific stuff ----------
-        System.out.println( "----- Loading CSV RecordFactory Specific Stuff -------" );
+        System.out
+            .println("----- Loading CSV RecordFactory Specific Stuff -------");
         // predictor label names
         this.PredictorLabelNames = LoadStringConfVarOrException(
             "com.cloudera.knittingboar.setup.PredictorLabelNames",
@@ -199,54 +199,58 @@ public class POLRMasterNode extends POLRNodeBase implements
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-      System.out.println( ">> Error loading conf!" );
+      System.out.println(">> Error loading conf!");
     }
     
     this.SetupPOLR();
     
   } // setup()
   
-  
-  
-  
   public void SetupPOLR() {
     
-    System.err.println( "SetupOLR: " + this.num_categories + ", " + this.FeatureVectorSize );
-    LOG.debug("SetupOLR: " + this.num_categories + ", " + this.FeatureVectorSize);
+    System.err.println("SetupOLR: " + this.num_categories + ", "
+        + this.FeatureVectorSize);
+    LOG.debug("SetupOLR: " + this.num_categories + ", "
+        + this.FeatureVectorSize);
     
-    this.global_parameter_vector = new GradientBuffer( this.num_categories, this.FeatureVectorSize );
-    
+    this.global_parameter_vector = new GradientBuffer(this.num_categories,
+        this.FeatureVectorSize);
     
     String[] predictor_label_names = this.PredictorLabelNames.split(",");
-
+    
     String[] variable_types = this.PredictorVariableTypes.split(",");
     
     polr_modelparams = new POLRModelParameters();
-    polr_modelparams.setTargetVariable( this.TargetVariableName ); //getStringArgument(cmdLine, target));
-    polr_modelparams.setNumFeatures( this.FeatureVectorSize );
-    polr_modelparams.setUseBias(true); //!getBooleanArgument(cmdLine, noBias));
+    polr_modelparams.setTargetVariable(this.TargetVariableName); // getStringArgument(cmdLine,
+                                                                 // target));
+    polr_modelparams.setNumFeatures(this.FeatureVectorSize);
+    polr_modelparams.setUseBias(true); // !getBooleanArgument(cmdLine, noBias));
     
     List<String> typeList = Lists.newArrayList();
-    for ( int x = 0; x < variable_types.length; x++ ) {
-      typeList.add( variable_types[x] );
+    for (int x = 0; x < variable_types.length; x++) {
+      typeList.add(variable_types[x]);
     }
-
+    
     List<String> predictorList = Lists.newArrayList();
-    for ( int x = 0; x < predictor_label_names.length; x++ ) {
-      predictorList.add( predictor_label_names[x] );
-    }    
+    for (int x = 0; x < predictor_label_names.length; x++) {
+      predictorList.add(predictor_label_names[x]);
+    }
     
     polr_modelparams.setTypeMap(predictorList, typeList);
-    polr_modelparams.setLambda( this.Lambda ); // based on defaults - match command line
-    polr_modelparams.setLearningRate( this.LearningRate ); // based on defaults - match command line
+    polr_modelparams.setLambda(this.Lambda); // based on defaults - match
+                                             // command line
+    polr_modelparams.setLearningRate(this.LearningRate); // based on defaults -
+                                                         // match command line
     
     // setup record factory stuff here ---------
-
-    if (RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY.equals(this.RecordFactoryClassname)) {
-
+    
+    if (RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY
+        .equals(this.RecordFactoryClassname)) {
+      
       this.VectorFactory = new TwentyNewsgroupsRecordFactory("\t");
       
-    } else if (RecordFactory.RCV1_RECORDFACTORY.equals(this.RecordFactoryClassname)) {
+    } else if (RecordFactory.RCV1_RECORDFACTORY
+        .equals(this.RecordFactoryClassname)) {
       
       this.VectorFactory = new RCV1RecordFactory();
       
@@ -254,49 +258,48 @@ public class POLRMasterNode extends POLRNodeBase implements
       
       // need to rethink this
       
-      this.VectorFactory = new CSVBasedDatasetRecordFactory(this.TargetVariableName, polr_modelparams.getTypeMap() );
+      this.VectorFactory = new CSVBasedDatasetRecordFactory(
+          this.TargetVariableName, polr_modelparams.getTypeMap());
       
-      ((CSVBasedDatasetRecordFactory)this.VectorFactory).firstLine( this.ColumnHeaderNames );
+      ((CSVBasedDatasetRecordFactory) this.VectorFactory)
+          .firstLine(this.ColumnHeaderNames);
       
     }
     
-    
-    polr_modelparams.setTargetCategories( this.VectorFactory.getTargetCategories() );
+    polr_modelparams.setTargetCategories(this.VectorFactory
+        .getTargetCategories());
     
     // ----- this normally is generated from the POLRModelParams ------
     
-    this.polr = new ParallelOnlineLogisticRegression(this.num_categories, this.FeatureVectorSize, new UniformPrior())
-    .alpha(1).stepOffset(1000)
-    .decayExponent(0.9) 
-    .lambda(this.Lambda)
-    .learningRate( this.LearningRate );   
+    this.polr = new ParallelOnlineLogisticRegression(this.num_categories,
+        this.FeatureVectorSize, new UniformPrior()).alpha(1).stepOffset(1000)
+        .decayExponent(0.9).lambda(this.Lambda).learningRate(this.LearningRate);
     
-    polr_modelparams.setPOLR(polr);    
-    //this.bSetup = true;
-
+    polr_modelparams.setPOLR(polr);
+    // this.bSetup = true;
+    
   }
-
+  
   @Override
   public void complete(DataOutputStream out) throws IOException {
     // TODO Auto-generated method stub
-    System.out.println( "master::complete " );
-    System.out.println( "complete-ms:" + System.currentTimeMillis() );
-
+    System.out.println("master::complete ");
+    System.out.println("complete-ms:" + System.currentTimeMillis());
+    
     LOG.debug("Master complete, saving model.");
-
     
     try {
       this.polr_modelparams.saveTo(out);
     } catch (Exception ex) {
       throw new IOException("Unable to save model", ex);
     }
-  }  
+  }
   
   public static void main(String[] args) throws Exception {
     POLRMasterNode pmn = new POLRMasterNode();
     ApplicationMaster<ParameterVectorGradientUpdatable> am = new ApplicationMaster<ParameterVectorGradientUpdatable>(
         pmn, ParameterVectorGradientUpdatable.class);
-        
+    
     ToolRunner.run(am, args);
   }
 }

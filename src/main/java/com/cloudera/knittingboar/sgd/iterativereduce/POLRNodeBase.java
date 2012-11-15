@@ -19,8 +19,14 @@ package com.cloudera.knittingboar.sgd.iterativereduce;
 
 import org.apache.hadoop.conf.Configuration;
 
+/**
+ * Base class for IR-KnittingBoar nodes
+ * 
+ * @author jpatterson
+ * 
+ */
 public class POLRNodeBase {
-
+  
   protected Configuration conf = null;
   protected int num_categories = 2;
   protected int FeatureVectorSize = -1;
@@ -40,24 +46,25 @@ public class POLRNodeBase {
   
   protected String RecordFactoryClassname = "";
   
-  
-  protected String LoadStringConfVarOrException( String ConfVarName, String ExcepMsg ) throws Exception {
+  protected String LoadStringConfVarOrException(String ConfVarName,
+      String ExcepMsg) throws Exception {
     
-    if ( null == this.conf.get(ConfVarName) ) {
+    if (null == this.conf.get(ConfVarName)) {
       throw new Exception(ExcepMsg);
     } else {
       return this.conf.get(ConfVarName);
     }
     
   }
-
-  protected int LoadIntConfVarOrException( String ConfVarName, String ExcepMsg ) throws Exception {
+  
+  protected int LoadIntConfVarOrException(String ConfVarName, String ExcepMsg)
+      throws Exception {
     
-    if ( null == this.conf.get(ConfVarName) ) {
+    if (null == this.conf.get(ConfVarName)) {
       throw new Exception(ExcepMsg);
     } else {
       return this.conf.getInt(ConfVarName, 0);
     }
     
-  }  
+  }
 }

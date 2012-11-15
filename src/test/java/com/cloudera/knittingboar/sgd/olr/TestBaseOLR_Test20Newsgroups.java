@@ -54,7 +54,7 @@ public class TestBaseOLR_Test20Newsgroups extends TestCase {
 
   private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/kboar-shard-0.txt"));  
 
-  //private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/mode_9_03pm.model" ); 
+  //private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model" ); 
   private static Path model20News = new Path( "/tmp/olr-news-group.model" );
   
   //private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  

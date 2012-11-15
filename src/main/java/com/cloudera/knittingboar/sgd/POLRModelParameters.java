@@ -30,10 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.hadoop.io.Writable;
-//import org.apache.mahout.classifier.sgd.CsvRecordFactory;
+import org.apache.hadoop.io.Writable; //import org.apache.mahout.classifier.sgd.CsvRecordFactory;
 //import org.apache.mahout.classifier.sgd.L1;
-
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -48,7 +46,8 @@ import com.google.common.io.Closeables;
  * 
  * - Modified version of LogisiticModelParameters:
  * 
- * http://svn.apache.org/repos/asf/mahout/trunk/examples/src/main/java/org/apache/mahout/classifier/sgd/LogisticModelParameters.java
+ * http://svn.apache.org/repos/asf/mahout/trunk/examples/src/main/java/org/
+ * apache/mahout/classifier/sgd/LogisticModelParameters.java
  * 
  */
 public class POLRModelParameters implements Writable {
@@ -58,32 +57,30 @@ public class POLRModelParameters implements Writable {
   private int numFeatures;
   private boolean useBias;
   private int maxTargetCategories;
-  private List<String> targetCategories; 
+  private List<String> targetCategories;
   private double lambda;
   private double learningRate;
-
   
   private ParallelOnlineLogisticRegression polr;
   
-  
   /**
    * Saves a model to an output stream.
-   * @throws Exception 
+   * 
+   * @throws Exception
    */
   public void saveTo(OutputStream out) throws Exception {
     if (polr != null) {
       polr.close();
     } else {
-      System.out.println( "Model Save >>> polr is null! [ERR]" );
+      System.out.println("Model Save >>> polr is null! [ERR]");
     }
-    if ( null == this.targetCategories) {
-      System.out.println( "targetCategories is null!" );
-      throw new Exception( "targetCategories is null!" );
+    if (null == this.targetCategories) {
+      System.out.println("targetCategories is null!");
+      throw new Exception("targetCategories is null!");
     }
-
     
     write(new DataOutputStream(out));
-
+    
   }
   
   /**
@@ -161,18 +158,17 @@ public class POLRModelParameters implements Writable {
     lambda = in.readDouble();
     learningRate = in.readDouble();
     System.out.println("read lambda: " + lambda);
-    //csv = null;
+    // csv = null;
     polr = new ParallelOnlineLogisticRegression();
     polr.readFields(in);
   }
   
-  
   /**
    * Sets the types of the predictors. This will later be used when reading CSV
-   * data. 
+   * data.
    * 
-   * If you don't use the CSV data and convert to vectors on your own, you
-   * don't need to call this.
+   * If you don't use the CSV data and convert to vectors on your own, you don't
+   * need to call this.
    * 
    * @param predictorList
    *          The list of variable names.
@@ -190,7 +186,7 @@ public class POLRModelParameters implements Writable {
       if (iTypes.hasNext()) {
         lastType = iTypes.next();
       }
-
+      
       typeMap.put(x.toString(), lastType);
     }
   }
@@ -273,10 +269,9 @@ public class POLRModelParameters implements Writable {
     this.learningRate = learningRate;
   }
   
-  public void setPOLR( ParallelOnlineLogisticRegression plr) {
+  public void setPOLR(ParallelOnlineLogisticRegression plr) {
     this.polr = plr;
   }
-  
   
   public ParallelOnlineLogisticRegression getPOLR() {
     this.polr.lambda(lambda);
@@ -284,32 +279,25 @@ public class POLRModelParameters implements Writable {
     return this.polr;
   }
   
-  
-  
   public void Debug() throws IOException {
     
-    System.out.println( "# POLRModelParams ------------ Debug ---------");
+    System.out.println("# POLRModelParams ------------ Debug ---------");
     
-    System.out.println( "> Num Categories: " + this.maxTargetCategories);
-    System.out.println( "> TypeMapSize: " + typeMap.size());
+    System.out.println("> Num Categories: " + this.maxTargetCategories);
+    System.out.println("> TypeMapSize: " + typeMap.size());
     for (Map.Entry<String,String> entry : typeMap.entrySet()) {
-      System.out.println( ">>\t Key: " + entry.getKey().toString());
-      System.out.println( ">>\t Val: " + entry.getValue().toString());
+      System.out.println(">>\t Key: " + entry.getKey().toString());
+      System.out.println(">>\t Val: " + entry.getValue().toString());
     }
-    System.out.println( "> numFeatures: " + numFeatures);
-    System.out.println( "> useBias: " + useBias);
-    System.out.println( "> maxTargetCategories: " + maxTargetCategories);
-    System.out.println( "> targetCategories.size(): " + targetCategories.size());
+    System.out.println("> numFeatures: " + numFeatures);
+    System.out.println("> useBias: " + useBias);
+    System.out.println("> maxTargetCategories: " + maxTargetCategories);
+    System.out.println("> targetCategories.size(): " + targetCategories.size());
     for (String category : targetCategories) {
-      System.out.println( ">>\t category: " + category);
+      System.out.println(">>\t category: " + category);
     }
-    System.out.println( "> lambda: " + lambda);
-    System.out.println( "> learningRate: " + learningRate);
-  }  
-  
-  
-  
-  
-  
+    System.out.println("> lambda: " + lambda);
+    System.out.println("> learningRate: " + learningRate);
+  }
   
 }

@@ -40,31 +40,29 @@ public class GlobalParameterVectorUpdateMessage {
   /**
    * message that is sent from the POLRMasterDriver to the POLRWorkerDrive
    * 
-   *  numCategories has to be 2 in the case of logistic regression
+   * numCategories has to be 2 in the case of logistic regression
    * 
    * @param response_dst_host
    * @param numCategories
    * @param numFeatures
    */
-  public GlobalParameterVectorUpdateMessage( String response_dst_host, int numCategories, int numFeatures ) {
+  public GlobalParameterVectorUpdateMessage(String response_dst_host,
+      int numCategories, int numFeatures) {
     
     this.dst_host = response_dst_host;
     
-    //  beta = new DenseMatrix(numCategories - 1, numFeatures);
+    // beta = new DenseMatrix(numCategories - 1, numFeatures);
     this.parameter_vector = new DenseMatrix(numCategories - 1, numFeatures);
     
   }
   
   public void Serialize(DataOutput d) throws IOException {
     
-    
     d.writeInt(GlobalPassCount);
-    //buf.write
+    // buf.write
     MatrixWritable.writeMatrix(d, this.parameter_vector);
-    //MatrixWritable.
+    // MatrixWritable.
     
   }
   
-
-
 }

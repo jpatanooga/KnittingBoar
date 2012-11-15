@@ -25,12 +25,12 @@ import org.apache.mahout.math.Matrix;
 import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.iterativereduce.Updateable;
 
-public class ParameterVectorGradientUpdatable implements Updateable<ParameterVectorGradient> {
-
+public class ParameterVectorGradientUpdatable implements
+    Updateable<ParameterVectorGradient> {
+  
   ParameterVectorGradient param_msg = null;
   
-  public ParameterVectorGradientUpdatable() {
-  }
+  public ParameterVectorGradientUpdatable() {}
   
   public ParameterVectorGradientUpdatable(ParameterVectorGradient g) {
     this.param_msg = g;
@@ -41,7 +41,8 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
     
     b.rewind();
     
-    //System.out.println( " > ParameterVectorGradient::fromBytes > b: " + b.array().length + ", remaining: " + b.remaining() );
+    // System.out.println( " > ParameterVectorGradient::fromBytes > b: " +
+    // b.array().length + ", remaining: " + b.remaining() );
     
     try {
       this.param_msg = new ParameterVectorGradient();
@@ -51,16 +52,19 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
       e.printStackTrace();
     }
   }
+  
   @Override
   public ParameterVectorGradient get() {
     // TODO Auto-generated method stub
     return this.param_msg;
   }
+  
   @Override
   public void set(ParameterVectorGradient t) {
     // TODO Auto-generated method stub
     this.param_msg = t;
   }
+  
   @Override
   public ByteBuffer toBytes() {
     // TODO Auto-generated method stub
@@ -72,18 +76,17 @@ public class ParameterVectorGradientUpdatable implements Updateable<ParameterVec
       e.printStackTrace();
     }
     
-    //ByteBuffer buf = ByteBuffer.allocate(bytes.length);
-    //buf.put(bytes);
+    // ByteBuffer buf = ByteBuffer.allocate(bytes.length);
+    // buf.put(bytes);
     ByteBuffer buf = ByteBuffer.wrap(bytes);
     
     return buf;
   }
-
+  
   @Override
   public void fromString(String s) {
-    // TODO Auto-generated method stub
-    
-  }
+  // TODO Auto-generated method stub
   
+  }
   
 }
