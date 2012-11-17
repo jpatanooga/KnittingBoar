@@ -210,14 +210,16 @@ public class TestRunPOLRMasterAndNWorkers extends TestCase {
         
       }
       
- 
-        // TODO: save model to HDFS
+      master.AveragePVec_GenerateGlobalUpdateVector(workers.size());
+      
+
+
       if (bContinuePass) {
         
-        
+/*        
         //master.GenerateGlobalUpdateVector();
         master.AveragePVec_GenerateGlobalUpdateVector(workers.size());
-        
+*/        
         GlobalParameterVectorUpdateMessage returned_msg = master.GetNextGlobalUpdateMsgFromQueue();
   
         // process global updates
