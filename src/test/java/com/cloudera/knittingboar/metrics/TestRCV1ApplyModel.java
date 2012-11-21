@@ -36,9 +36,6 @@ import junit.framework.TestCase;
 
 public class TestRCV1ApplyModel extends TestCase {
   
-  
-  
-  
   private static JobConf defaultConf = new JobConf();
   private static FileSystem localFs = null; 
   static {
@@ -107,19 +104,9 @@ public class TestRCV1ApplyModel extends TestCase {
     
   }    
   
-  
-  
-  
-  
-  
-
-  
   public void testApplyModel() throws Exception {
     
     POLRModelTester tester = new POLRModelTester();
-    
-    
-    
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
     tester.debug_setConf(this.generateDebugConfigurationObject());
@@ -144,14 +131,11 @@ public class TestRCV1ApplyModel extends TestCase {
     InputSplit[] splits = generateDebugSplits(fullRCV1TestFile, job);
     
     System.out.println( "split count: " + splits.length );
-        
-        
-      InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[0]);
+
+    InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[0]);
         // TODO: set this up to run through the conf pathways
-      tester.setupInputSplit(custom_reader_0);
-      
-      tester.RunThroughTestRecords();
-    
+    tester.setupInputSplit(custom_reader_0);
+    tester.RunThroughTestRecords();
     
   }
 

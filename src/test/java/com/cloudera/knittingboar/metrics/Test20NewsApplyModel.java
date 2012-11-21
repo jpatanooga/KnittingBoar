@@ -34,11 +34,6 @@ import junit.framework.TestCase;
 
 public class Test20NewsApplyModel extends TestCase {
 
-  
-  
-  
-  
-  
   private static JobConf defaultConf = new JobConf();
   private static FileSystem localFs = null; 
   static {
@@ -52,11 +47,10 @@ public class Test20NewsApplyModel extends TestCase {
   
   // "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model"
 //  private static Path model20News = new Path( "/tmp/TestRunPOLRMasterAndNWorkers.20news.model" );
-//    private static Path model20News = new Path( "/tmp/IR_Model_0.model" );
-  private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model" );
+    private static Path model20News = new Path( "/tmp/IR_Model_0.model" );
+//  private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model" );
   
   private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  
-  
   
   public Configuration generateDebugConfigurationObject() {
     
@@ -85,11 +79,8 @@ public class Test20NewsApplyModel extends TestCase {
     
     System.out.println("default block size: " + (block_size / 1024 / 1024) + "MB");
     
-    
-    
     // ---- set where we'll read the input files from -------------
     FileInputFormat.setInputPaths(job, input_path);
-
 
       // try splitting the file in a variety of sizes
       TextInputFormat format = new TextInputFormat();
@@ -105,25 +96,15 @@ public class Test20NewsApplyModel extends TestCase {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-       
       
       return splits;
     
-    
   }    
-  
-  
-  
-  
-  
-  
 
   
   public void testLoad20NewsModel() throws Exception {
     
     POLRModelTester tester = new POLRModelTester();
-    
-    
     
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
@@ -147,26 +128,15 @@ public class Test20NewsApplyModel extends TestCase {
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
 
-  
-    //fullRCV1Dir
     InputSplit[] splits = generateDebugSplits(testData20News, job);
     
     System.out.println( "split count: " + splits.length );
-
-        
         
       InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[0]);
       tester.setupInputSplit(custom_reader_0);
       
       tester.RunThroughTestRecords();
-     
-    
-    
     
   }
-  
-  
-  
-  
   
 }

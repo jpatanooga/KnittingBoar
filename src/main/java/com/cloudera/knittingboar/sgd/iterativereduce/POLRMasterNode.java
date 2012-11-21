@@ -67,6 +67,8 @@ public class POLRMasterNode extends POLRNodeBase implements
   
   private int GlobalMaxPassCount = 0;
   
+  private int Global_Min_IterationCount = 0;
+  
   // these are only used for saving the model
   public ParallelOnlineLogisticRegression polr = null;
   public POLRModelParameters polr_modelparams;
@@ -77,20 +79,38 @@ public class POLRMasterNode extends POLRNodeBase implements
       Collection<ParameterVectorGradientUpdatable> workerUpdates,
       Collection<ParameterVectorGradientUpdatable> masterUpdates) {
     
-    System.out.println("SuperStep: Worker Info ----- ");
+    System.out.println("\nMaster Compute: SuperStep - Worker Info ----- ");
     int x = 0;
+
+    // reset
+    //this.Global_Min_IterationCount = this.NumberPasses;
+    boolean iterationComplete = true;
+
     for (ParameterVectorGradientUpdatable i : workerUpdates) {
       
+      // not sure we still need this ---------------
       if (i.get().SrcWorkerPassCount > this.GlobalMaxPassCount) {
         
         this.GlobalMaxPassCount = i.get().SrcWorkerPassCount;
         
       }
       
-      System.out.println("Worker: " + x + " Trained Recs: "
+      // if any worker is not done with hte iteration, trip the flag
+      if (i.get().IterationComplete == 0 ) {
+        
+        //this.Global_Min_IterationCount = i.get().IterationCount;
+        iterationComplete = false;
+        
+      }      
+      
+      System.out.println("[Master] WorkerReport[" + x + "]: I: " + i.get().CurrentIteration + ", IC: " + i.get().IterationComplete + " Trained Recs: "
           + i.get().TrainedRecords + " AvgLogLikelihood: "
           + i.get().AvgLogLikelihood + " PercentCorrect: "
           + i.get().PercentCorrect);
+   
+      if ( i.get().IterationComplete == 1) {
+        System.out.println( "> worker " + x + " is done with current iteration" );
+      }
       x++;
       // accumulate gradient of parameter vectors
       this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
@@ -103,8 +123,19 @@ public class POLRMasterNode extends POLRNodeBase implements
     LOG.debug("Master node accumulating and averaging " + workerUpdates.size()
         + " worker updates.");
     
+    
+    
+    
     ParameterVectorGradient gradient_msg = new ParameterVectorGradient();
     gradient_msg.GlobalPassCount = this.GlobalMaxPassCount;
+    
+/*    if (iterationComplete) {
+      gradient_msg.IterationComplete = 1;
+      System.out.println( "> Master says: Iteration Complete" );
+    } else {
+      gradient_msg.IterationComplete = 0;
+    }
+    */
     gradient_msg.parameter_vector = this.global_parameter_vector.getMatrix()
         .clone();
     
@@ -113,6 +144,9 @@ public class POLRMasterNode extends POLRNodeBase implements
     
     // set the master copy!
     this.polr.SetBeta(this.global_parameter_vector.getMatrix().clone());
+    
+    // THIS NEEDS TO BE DONE, probably automated!
+    workerUpdates.clear();
     
     return return_msg;
   }
@@ -201,6 +235,12 @@ public class POLRMasterNode extends POLRNodeBase implements
       e.printStackTrace();
       System.out.println(">> Error loading conf!");
     }
+    
+    System.out.println( "-----------------------------------------" );
+    System.out.println( "# Master Conf #" );
+    System.out.println( "Number Iterations: " + this.NumberPasses );
+    System.out.println( "BatchSize: " + this.BatchSize );
+    System.out.println( "-----------------------------------------\n\n" );
     
     this.SetupPOLR();
     

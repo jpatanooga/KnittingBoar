@@ -41,8 +41,8 @@ public class POLRNodeBase {
   protected String ColumnHeaderNames = "";
   protected int NumberPasses = 1;
   
-  protected int LocalPassCount = 0;
-  protected int GlobalPassCount = 0;
+  protected int LocalBatchCountForIteration = 0;
+  protected int GlobalBatchCountForIteration = 0;
   
   protected String RecordFactoryClassname = "";
   

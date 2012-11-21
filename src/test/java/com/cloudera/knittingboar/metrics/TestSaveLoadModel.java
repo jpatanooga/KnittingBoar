@@ -37,7 +37,6 @@ import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
 import junit.framework.TestCase;
 
 public class TestSaveLoadModel extends TestCase {
-
   
   private static JobConf defaultConf = new JobConf();
   private static FileSystem localFs = null; 
@@ -51,7 +50,6 @@ public class TestSaveLoadModel extends TestCase {
   }
   
   private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/"));  
-    
   
   public Configuration generateDebugConfigurationObject() {
     
@@ -82,7 +80,6 @@ public class TestSaveLoadModel extends TestCase {
 
     FileInputFormat.setInputPaths(job, input_path);
 
-
       TextInputFormat format = new TextInputFormat();
       format.configure(job);
 
@@ -96,10 +93,8 @@ public class TestSaveLoadModel extends TestCase {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-       
       
       return splits;
-    
     
   }
   
@@ -107,9 +102,6 @@ public class TestSaveLoadModel extends TestCase {
   public void testRunMasterAndTwoWorkers() throws Exception {
 
     int num_passes = 15;
-    
-    
-    
     
     POLRMasterDriver master = new POLRMasterDriver();
     // ------------------    
@@ -136,8 +128,6 @@ public class TestSaveLoadModel extends TestCase {
     InputSplit[] splits = generateDebugSplits(workDir, job);
       
     System.out.println( "split count: " + splits.length );
-
-  
     
     ArrayList<POLRWorkerDriver> workers = new ArrayList<POLRWorkerDriver>();
     
@@ -147,7 +137,6 @@ public class TestSaveLoadModel extends TestCase {
       worker_model_builder.internalID = String.valueOf(x);
       // simulates the conf stuff
       worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
-        
         
       InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[x]);
         // TODO: set this up to run through the conf pathways
@@ -178,7 +167,6 @@ public class TestSaveLoadModel extends TestCase {
         
         // TODO: save model to HDFS
       if (x < num_passes - 1) {
-        
         
         master.GenerateGlobalUpdateVector();
         

@@ -28,6 +28,7 @@ import com.cloudera.iterativereduce.Updateable;
 public class ParameterVectorGradientUpdatable implements
     Updateable<ParameterVectorGradient> {
   
+  
   ParameterVectorGradient param_msg = null;
   
   public ParameterVectorGradientUpdatable() {}
@@ -87,6 +88,24 @@ public class ParameterVectorGradientUpdatable implements
   public void fromString(String s) {
   // TODO Auto-generated method stub
   
+  }
+
+  @Override
+  public int getGlobalBatchNumber() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getGlobalIterationNumber() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void setIterationState(int arg0, int arg1) {
+    // TODO Auto-generated method stub
+    
   }
   
 }

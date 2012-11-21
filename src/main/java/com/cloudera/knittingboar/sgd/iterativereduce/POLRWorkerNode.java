@@ -73,6 +73,9 @@ public class POLRWorkerNode extends POLRNodeBase implements
   
   private TextRecordParser lineParser = null;
   
+  private boolean IterationComplete = false;
+  private int CurrentIteration = 0;
+  
   // basic stats tracking
   POLRMetrics metrics = new POLRMetrics();
   
@@ -91,7 +94,15 @@ public class POLRWorkerNode extends POLRNodeBase implements
     
     ParameterVectorGradient gradient = new ParameterVectorGradient();
     gradient.parameter_vector = this.polr.getBeta().clone(); // this.polr.getGamma().getMatrix().clone();
-    gradient.SrcWorkerPassCount = this.LocalPassCount;
+    gradient.SrcWorkerPassCount = this.LocalBatchCountForIteration;
+    
+    if (this.lineParser.hasMoreRecords()) {
+      gradient.IterationComplete = 0;
+    } else {
+      gradient.IterationComplete = 1;
+    }
+    
+    gradient.CurrentIteration = this.CurrentIteration;
     
     gradient.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
         .floatValue();
@@ -115,79 +126,117 @@ public class POLRWorkerNode extends POLRNodeBase implements
     long batch_vec_factory_time = 0;
     
     boolean result = true;
+    //boolean processBatch = false;
     
-    for (int x = 0; x < this.BatchSize; x++) {
-      
-      try {
-        result = this.lineParser.next(value);
-      } catch (IOException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
-      
-      if (result) {
+/*    if (this.LocalPassCount > this.GlobalPassCount) {
+      // we need to sit this one out
+      System.out.println("Worker " + this.internalID
+          + " is ahead of global pass count [" + this.LocalPassCount + ":"
+          + this.GlobalPassCount + "] ");
+      processBatch = true;
+    }
+    
+    if (this.LocalPassCount >= this.NumberPasses) {
+      // learning is done, terminate
+      System.out.println("Worker " + this.internalID + " is done ["
+          + this.LocalPassCount + ":" + this.GlobalPassCount + "] ");
+      processBatch = false;
+    }    
+    
+    if (processBatch) {
+ */     
+  
+//    if (this.lineParser.hasMoreRecords()) {
+      //for (int x = 0; x < this.BatchSize; x++) {
+    while (this.lineParser.hasMoreRecords()) {
         
-        long startTime = System.currentTimeMillis();
-        
-        Vector v = new RandomAccessSparseVector(this.FeatureVectorSize);
-        int actual = -1;
         try {
-          
-          actual = this.VectorFactory.processLine(value.toString(), v);
-        } catch (Exception e) {
+          result = this.lineParser.next(value);
+        } catch (IOException e1) {
           // TODO Auto-generated catch block
-          e.printStackTrace();
+          e1.printStackTrace();
         }
         
-        long endTime = System.currentTimeMillis();
-        
-        batch_vec_factory_time += (endTime - startTime);
-        
-        // calc stats ---------
-        
-        double mu = Math.min(k + 1, 200);
-        double ll = this.polr.logLikelihood(actual, v);
-        
-        metrics.AvgLogLikelihood = metrics.AvgLogLikelihood
-            + (ll - metrics.AvgLogLikelihood) / mu;
-        
-        if (Double.isNaN(metrics.AvgLogLikelihood)) {
-          metrics.AvgLogLikelihood = 0;
-        }
-        
-        Vector p = new DenseVector(this.num_categories);
-        this.polr.classifyFull(p, v);
-        int estimated = p.maxValueIndex();
-        int correct = (estimated == actual ? 1 : 0);
-        metrics.AvgCorrect = metrics.AvgCorrect
-            + (correct - metrics.AvgCorrect) / mu;
-        this.polr.train(actual, v);
-        
-        k++;
-        metrics.TotalRecordsProcessed = k;
-        if (x == this.BatchSize - 1) {
+        if (result) {
           
-          System.err
-              .printf(
-                  "Worker %s:\t Trained Recs: %10d, loglikelihood: %10.3f, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
-                  this.internalID, k, ll, metrics.AvgLogLikelihood,
-                  metrics.AvgCorrect * 100, batch_vec_factory_time);
+          long startTime = System.currentTimeMillis();
           
-        }
+          Vector v = new RandomAccessSparseVector(this.FeatureVectorSize);
+          int actual = -1;
+          try {
+            
+            actual = this.VectorFactory.processLine(value.toString(), v);
+          } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          
+          long endTime = System.currentTimeMillis();
+          
+          batch_vec_factory_time += (endTime - startTime);
+          
+          // calc stats ---------
+          
+          double mu = Math.min(k + 1, 200);
+          double ll = this.polr.logLikelihood(actual, v);
+          
+          metrics.AvgLogLikelihood = metrics.AvgLogLikelihood
+              + (ll - metrics.AvgLogLikelihood) / mu;
+          
+          if (Double.isNaN(metrics.AvgLogLikelihood)) {
+            metrics.AvgLogLikelihood = 0;
+          }
+          
+          Vector p = new DenseVector(this.num_categories);
+          this.polr.classifyFull(p, v);
+          int estimated = p.maxValueIndex();
+          int correct = (estimated == actual ? 1 : 0);
+          metrics.AvgCorrect = metrics.AvgCorrect
+              + (correct - metrics.AvgCorrect) / mu;
+          this.polr.train(actual, v);
+          
+          k++;
+          metrics.TotalRecordsProcessed = k;
+//          if (x == this.BatchSize - 1) {
+            
+/*            System.err
+                .printf(
+                    "Worker %s:\t Iteration: %s, Trained Recs: %10d, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
+                    this.internalID, this.CurrentIteration, k, metrics.AvgLogLikelihood,
+                    metrics.AvgCorrect * 100, batch_vec_factory_time);
+  */          
+//          }
+          
+          this.polr.close();
+          
+        } else {
+          
+//          this.LocalBatchCountForIteration++;
+          // this.input_split.ResetToStartOfSplit();
+          // nothing else to process in split!
+//          break;
+          
+        } // if
         
-        this.polr.close();
-        
-      } else {
-        
-        this.LocalPassCount++;
-        // this.input_split.ResetToStartOfSplit();
-        // nothing else to process in split!
-        break;
-        
-      } // if
-      
-    } // for the batch size
+      } // for the batch size
     
+    System.err
+    .printf(
+        "Worker %s:\t Iteration: %s, Trained Recs: %10d, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
+        this.internalID, this.CurrentIteration, k, metrics.AvgLogLikelihood,
+        metrics.AvgCorrect * 100, batch_vec_factory_time);
+    
+    
+    
+/*    } else {
+      System.err
+      .printf(
+          "Worker %s:\t Trained Recs: %10d,  AvgLL: %10.3f, Percent Correct: %10.2f, [Done With Iteration]\n",
+          this.internalID, k, metrics.AvgLogLikelihood,
+          metrics.AvgCorrect * 100);
+      
+    } // if 
+  */  
     return new ParameterVectorGradientUpdatable(this.GenerateUpdate());
   }
   
@@ -210,11 +259,21 @@ public class POLRWorkerNode extends POLRNodeBase implements
     this.polr.SetBeta(global_update.parameter_vector);
     
     // update global count
-    this.GlobalPassCount = global_update.GlobalPassCount;
+    this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
     
     // flush the local gradient delta buffer ("gamma")
     this.polr.FlushGamma();
     
+/*    if (global_update.IterationComplete == 0) {
+      this.IterationComplete = false;
+    } else {
+      this.IterationComplete = true;
+
+      
+      // when this happens, it will trip the ApplicationWorkerService loop and iteration will increment
+      
+    }
+  */  
   }
   
   @Override
@@ -379,4 +438,45 @@ public class POLRWorkerNode extends POLRNodeBase implements
     
     ToolRunner.run(aw, args);
   }
+
+/*  @Override
+  public int getCurrentGlobalIteration() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+*/
+  
+  /**
+   * returns false if we're done with iterating over the data  
+   * 
+   * @return
+   */
+  @Override
+  public boolean IncrementIteration() {
+    
+    this.CurrentIteration++;
+    this.IterationComplete = false;
+    this.lineParser.reset();
+    
+    System.out.println( "IncIteration > " + this.CurrentIteration + ", " + this.NumberPasses );
+    
+    if (this.CurrentIteration >= this.NumberPasses) {
+      System.out.println("POLRWorkerNode: [ done with all iterations ]");
+      return false;
+    }
+    
+    return true;
+    
+  }
+
+/*  @Override
+  public boolean isStillWorkingOnCurrentIteration() {
+
+    
+    //return this.lineParser.hasMoreRecords();
+    
+    //return this.
+    return !this.IterationComplete;
+  }
+  */
 }

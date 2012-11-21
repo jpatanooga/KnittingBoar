@@ -37,8 +37,6 @@ import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
 import junit.framework.TestCase;
 
 public class Test20NewsNoSaveModel extends TestCase {
-
-  
   
   private static JobConf defaultConf = new JobConf();
   private static FileSystem localFs = null; 
@@ -72,20 +70,7 @@ public class Test20NewsNoSaveModel extends TestCase {
 
     // setup 20newsgroups
     c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
-    
-/*    // predictor label names
-    c.set( "com.cloudera.knittingboar.setup.PredictorLabelNames", "x,y" );
 
-    // predictor var types
-    c.set( "com.cloudera.knittingboar.setup.PredictorVariableTypes", "numeric,numeric" );
-    
-    // target variables
-    c.set( "com.cloudera.knittingboar.setup.TargetVariableName", "color" );
-
-    // column header names
-    c.set( "com.cloudera.knittingboar.setup.ColumnHeaderNames", "x,y,shape,color,k,k0,xx,xy,yy,a,b,c,bias" );
-    //c.set( "com.cloudera.knittingboar.setup.ColumnHeaderNames", "\"x\",\"y\",\"shape\",\"color\",\"k\",\"k0\",\"xx\",\"xy\",\"yy\",\"a\",\"b\",\"c\",\"bias\"\n" );
- */   
     return c;
     
   }  
@@ -97,7 +82,6 @@ public class Test20NewsNoSaveModel extends TestCase {
     System.out.println("default block size: " + (block_size / 1024 / 1024) + "MB");
 
     FileInputFormat.setInputPaths(job, input_path);
-
 
       // try splitting the file in a variety of sizes
       TextInputFormat format = new TextInputFormat();
@@ -113,20 +97,14 @@ public class Test20NewsNoSaveModel extends TestCase {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-       
       
       return splits;
     
-    
   }
-  
   
   public void testRunMasterAndTwoWorkers() throws Exception {
 
     int num_passes = 15;
-    
-    
-    
     
     POLRMasterDriver master = new POLRMasterDriver();
     // ------------------    
@@ -143,8 +121,6 @@ public class Test20NewsNoSaveModel extends TestCase {
     }
     // now construct any needed machine learning data structures based on config
     master.Setup();
-    // ------------------    
-    
  
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
@@ -153,8 +129,6 @@ public class Test20NewsNoSaveModel extends TestCase {
     InputSplit[] splits = generateDebugSplits(workDir, job);
       
     System.out.println( "split count: " + splits.length );
-
-  
     
     ArrayList<POLRWorkerDriver> workers = new ArrayList<POLRWorkerDriver>();
     
@@ -164,7 +138,6 @@ public class Test20NewsNoSaveModel extends TestCase {
       worker_model_builder.internalID = String.valueOf(x);
       // simulates the conf stuff
       worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
-        
         
       InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[x]);
         // TODO: set this up to run through the conf pathways
@@ -178,8 +151,6 @@ public class Test20NewsNoSaveModel extends TestCase {
       System.out.println( "> Setup Worker " + x );
       
     }
-
-
     
     for ( int x = 0; x < num_passes; x++) {
         
@@ -192,12 +163,9 @@ public class Test20NewsNoSaveModel extends TestCase {
         master.RecvGradientMessage(); // process msg
         
       }
-      
-      
         
         // TODO: save model to HDFS
       if (x < num_passes - 1) {
-        
         
         master.GenerateGlobalUpdateVector();
         
@@ -210,7 +178,6 @@ public class Test20NewsNoSaveModel extends TestCase {
 
         }
         
-        
         System.out.println( "---------- cycle " + x + " done ------------- " );
 
       } else {
@@ -221,16 +188,10 @@ public class Test20NewsNoSaveModel extends TestCase {
         master.SaveModelLocally("/tmp/TestRunPOLRMasterAndNWorkers.20news.model");
         
       } // if        
+
     } // for
     
-    
-    
-    
-    
-    
     POLRModelTester tester = new POLRModelTester();
-    
-    
     
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
@@ -246,52 +207,21 @@ public class Test20NewsNoSaveModel extends TestCase {
     }
     // now construct any needed machine learning data structures based on config
     tester.Setup();
-    //tester.Load( model20News.toString() );
-    
-    
-    //tester.SetCore(workers.get(0).polr, workers.get(0).polr_modelparams, workers.get(0).getRecordFactory());
-    
-    //tester.SetCore(master.polr, workers.get(0).polr_modelparams, workers.get(0).getRecordFactory());
     
     tester.SetCore(master.polr, master.polr_modelparams, workers.get(0).getRecordFactory());
     
-    //tester.Debug();
-    
-    // ------------------    
-    
-   
     //fullRCV1Dir
     InputSplit[] splits_test_data = generateDebugSplits(testData20News, job);
     
     System.out.println( "split count: " + splits_test_data.length );
 
-  
+    InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits_test_data[0]);
 
-    //ArrayList<POLRWorkerDriver> workers = new ArrayList<POLRWorkerDriver>();
+    // TODO: set this up to run through the conf pathways
+    tester.setupInputSplit(custom_reader_0);
     
-    //for ( int x = 0; x < splits.length; x++ ) {
-      
-      //POLRWorkerDriver worker_model_builder = new POLRWorkerDriver(); //workers.get(x);
-      //worker_model_builder.internalID = String.valueOf(x);
-      // simulates the conf stuff
-      //worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
-        
-        
-      //InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[0]);
-      InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits_test_data[0]);
-        // TODO: set this up to run through the conf pathways
-      tester.setupInputSplit(custom_reader_0);
-      
-      tester.RunThroughTestRecords();    
-    
-    
-    
-    
-    
-    
+    tester.RunThroughTestRecords();    
     
   }  
-  
-  
   
 }

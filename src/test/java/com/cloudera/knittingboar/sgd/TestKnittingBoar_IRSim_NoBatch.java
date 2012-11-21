@@ -14,19 +14,14 @@ import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextInputFormat;
 
-import com.cloudera.iterativereduce.ConfigFields;
 import com.cloudera.iterativereduce.io.TextRecordParser;
-import com.cloudera.knittingboar.io.InputRecordsSplit;
-import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 import com.cloudera.knittingboar.sgd.iterativereduce.POLRMasterNode;
 import com.cloudera.knittingboar.sgd.iterativereduce.POLRWorkerNode;
-import com.cloudera.knittingboar.utils.Utils;
 
 
-public class TestKnittingBoar_IRSim_NWorkers extends TestCase {
+public class TestKnittingBoar_IRSim_NoBatch  extends TestCase {
 
   
   private static JobConf defaultConf = new JobConf();
@@ -54,7 +49,7 @@ public class TestKnittingBoar_IRSim_NWorkers extends TestCase {
     
     c.setInt("com.cloudera.knittingboar.setup.BatchSize", 500);
     
-    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 4);
+    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 3);
     
     c.setInt("com.cloudera.knittingboar.setup.LearningRate", 5);
     
@@ -156,7 +151,8 @@ public class TestKnittingBoar_IRSim_NWorkers extends TestCase {
     boolean bContinuePass = true;
     int x = 0;
     
-    while (bContinuePass) {
+    //while (bContinuePass) {
+    for (int iteration = 0; iteration < 3; iteration++ ) {
         
       bContinuePass = true;
       for ( int worker_id = 0; worker_id < workers.size(); worker_id++ ) {
@@ -174,11 +170,13 @@ public class TestKnittingBoar_IRSim_NWorkers extends TestCase {
       for ( int worker_id = 0; worker_id < workers.size(); worker_id++ ) {
         
         workers.get(worker_id).update(master_result);
+        
+        workers.get(worker_id).IncrementIteration();
 
       }
         
       // if (iterationFinished) {
-      if (master_result.get().IterationComplete == 1) {
+/*      if (master_result.get().IterationComplete == 1) {
         
         System.out.println( " -------- end of pass ------- " );
 
@@ -192,15 +190,15 @@ public class TestKnittingBoar_IRSim_NWorkers extends TestCase {
         if (!bContinuePass) {
           System.out.println( " -------- end of all passes ------- " );
         } // if
-        
-      } // if
+*/        
+      //} // if
         
         
        
     } // while
   
        
-//        System.out.println( "> Saving Model... " );
+        System.out.println( "> Saving Model... " );
         
         Path out = new Path("/tmp/IR_Model_0.model");
         FileSystem fs = out.getFileSystem(defaultConf);

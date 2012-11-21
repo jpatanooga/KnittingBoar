@@ -40,6 +40,9 @@ public class ParameterVectorGradient {
   public Matrix parameter_vector = null;
   public int GlobalPassCount = 0; // what pass should the worker dealing with?
   
+  public int IterationComplete = 0; // 0 = no, 1 = yes
+  public int CurrentIteration = 0;
+  
   public int TrainedRecords = 0;
   public float AvgLogLikelihood = 0;
   public float PercentCorrect = 0;
@@ -54,6 +57,9 @@ public class ParameterVectorGradient {
     // d.writeUTF(src_host);
     d.writeInt(this.SrcWorkerPassCount);
     d.writeInt(this.GlobalPassCount);
+    
+    d.writeInt(this.IterationComplete);
+    d.writeInt(this.CurrentIteration);
     
     d.writeInt(this.TrainedRecords);
     d.writeFloat(this.AvgLogLikelihood);
@@ -74,6 +80,9 @@ public class ParameterVectorGradient {
     // this.src_host = in.readUTF();
     this.SrcWorkerPassCount = in.readInt();
     this.GlobalPassCount = in.readInt();
+    
+    this.IterationComplete = in.readInt();
+    this.CurrentIteration = in.readInt();
     
     this.TrainedRecords = in.readInt(); // d.writeInt(this.TrainedRecords);
     this.AvgLogLikelihood = in.readFloat(); // d.writeFloat(this.AvgLogLikelihood);
