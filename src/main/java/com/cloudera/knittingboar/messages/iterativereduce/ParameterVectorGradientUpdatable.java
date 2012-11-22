@@ -89,7 +89,7 @@ public class ParameterVectorGradientUpdatable implements
   // TODO Auto-generated method stub
   
   }
-
+/*
   @Override
   public int getGlobalBatchNumber() {
     // TODO Auto-generated method stub
@@ -107,5 +107,5 @@ public class ParameterVectorGradientUpdatable implements
     // TODO Auto-generated method stub
     
   }
-  
+*/  
 }
