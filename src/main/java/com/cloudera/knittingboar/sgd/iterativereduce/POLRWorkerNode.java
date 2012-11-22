@@ -296,8 +296,10 @@ public class POLRWorkerNode extends POLRNodeBase implements
       this.BatchSize = this.conf.getInt(
           "com.cloudera.knittingboar.setup.BatchSize", 200);
       
-      this.NumberPasses = this.conf.getInt(
-          "com.cloudera.knittingboar.setup.NumberPasses", 1);
+//      this.NumberPasses = this.conf.getInt(
+//          "com.cloudera.knittingboar.setup.NumberPasses", 1);
+      // app.iteration.count
+    this.NumberPasses = this.conf.getInt("app.iteration.count", 1);
       
       // protected double Lambda = 1.0e-4;
       this.Lambda = Double.parseDouble(this.conf.get(

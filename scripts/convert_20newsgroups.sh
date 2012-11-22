@@ -4,7 +4,7 @@ JAVA_HOME="/usr/lib/jvm/java-1.6.0"
 JAVA_OPTS=""
 JAR=" com.cloudera.knittingboar.conf.cmdline.DataConverterCmdLineDriver"
 
-execJAR="KnittingBoar-1.0-SNAPSHOT.jar"
+execJAR="../target/KnittingBoar-1.0-SNAPSHOT-jar-with-dependencies.jar"
 
 JAVA_CMD="/usr/bin/java"
 
