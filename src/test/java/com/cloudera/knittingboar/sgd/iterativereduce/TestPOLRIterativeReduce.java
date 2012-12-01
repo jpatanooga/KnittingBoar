@@ -19,6 +19,7 @@ package com.cloudera.knittingboar.sgd.iterativereduce;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -37,10 +38,12 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
+import com.cloudera.knittingboar.utils.TestingUtils;
 //import com.cloudera.knittingboar.yarn.AvroUtils;
 import com.cloudera.iterativereduce.Utils;
 import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMasterService;
@@ -52,7 +55,9 @@ import com.cloudera.iterativereduce.io.TextRecordParser;
 import com.cloudera.iterativereduce.yarn.avro.generated.FileSplit;
 import com.cloudera.iterativereduce.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.iterativereduce.yarn.avro.generated.WorkerId;
+import com.google.common.io.Files;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,6 +79,9 @@ public class TestPOLRIterativeReduce {
   
   private static JobConf defaultConf = new JobConf();
   private static FileSystem localFs = null; 
+  
+  private File baseDir;
+  
   static {
     
     //Logger.getRootLogger().setLevel(Level.TRACE);
@@ -131,6 +139,7 @@ public class TestPOLRIterativeReduce {
   public void setUp() throws Exception {
     masterAddress = new InetSocketAddress(9999);
     pool = Executors.newFixedThreadPool(4);
+    baseDir = Files.createTempDir();
 
     setUpMaster();
 
@@ -138,19 +147,10 @@ public class TestPOLRIterativeReduce {
     setUpWorker("worker2");
     setUpWorker("worker3");
   }
-
-  @Before
-  public void setUpFile() throws Exception {
-    Configuration conf = new Configuration();
-    FileSystem localFs = FileSystem.getLocal(conf);
-/* 
-    Path testDir = new Path("testData");
-    Path inputFile = new Path(testDir, "testWorkerService.txt");
-
-    Writer writer = new OutputStreamWriter(localFs.create(inputFile, true));
-    writer.write("10\n20\n30\n40\n50\n60\n70\n80\n90\n100");
-    writer.close();
-    */
+  
+  @After
+  public void teardown() throws Exception {
+   FileUtils.deleteDirectory(baseDir); 
   }
 
   /**
@@ -167,14 +167,10 @@ public class TestPOLRIterativeReduce {
     
     System.out.println( "start-ms:" + System.currentTimeMillis() );
     
-    // /Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt
-    
-//    FileSplit split = FileSplit.newBuilder()
-//        .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
-//        .build();
-
+    File inputFile = new File(baseDir, "kboar-shard-0.txt");
+    TestingUtils.copyDecompressed("kboar-shard-0.txt", inputFile);
     FileSplit split = FileSplit.newBuilder()
-    .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
+    .setPath(inputFile.getAbsolutePath()).setOffset(0).setLength(8348890)
     .build();    
     
     // hey MK, how do I set multiple splits or splits of multiple files?
