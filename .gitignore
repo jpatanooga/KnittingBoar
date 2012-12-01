@@ -2,6 +2,9 @@
 *.jpage
 .classpath
 .settings
+.project
+app.properties
+log4j.properties
 
 # Package Files #
 *.jar
