@@ -12,7 +12,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hadoop.version>2.0.0-cdh4.1.0</hadoop.version>
+    <hadoop.version>2.0.0-cdh4.1.2</hadoop.version>
     <mahout.version>0.6-cdh4.0.1</mahout.version>
   </properties>
 
@@ -173,8 +173,8 @@
       <version>${mahout.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>avro</artifactId>
           <groupId>org.apache.cassandra.deps</groupId>
+          <artifactId>avro</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -183,6 +183,12 @@
       <groupId>org.apache.mahout</groupId>
       <artifactId>mahout-math</artifactId>
       <version>${mahout.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
 
