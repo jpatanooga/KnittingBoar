@@ -130,7 +130,7 @@ public class TestRunPOLRMasterAndTwoWorkers extends TestCase {
     POLRMasterDriver master = new POLRMasterDriver();
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    master.debug_setConf(this.generateDebugConfigurationObject());
+    master.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       master.LoadConfigVarsLocally();
@@ -149,12 +149,12 @@ public class TestRunPOLRMasterAndTwoWorkers extends TestCase {
     POLRWorkerDriver worker_model_builder_0 = new POLRWorkerDriver();
     worker_model_builder_0.internalID = "0";
     // simulates the conf stuff
-    worker_model_builder_0.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder_0.setConf(this.generateDebugConfigurationObject());
     
     POLRWorkerDriver worker_model_builder_1 = new POLRWorkerDriver();
     worker_model_builder_1.internalID = "1";
     // simulates the conf stuff
-    worker_model_builder_1.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder_1.setConf(this.generateDebugConfigurationObject());
     
   
     // ---- this all needs to be done in 

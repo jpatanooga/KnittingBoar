@@ -50,7 +50,7 @@ import junit.framework.TestCase;
  * @author jpatterson
  *
  */
-public class TestBaseOLR_Test20Newsgroups extends TestCase {
+public class TestBaseOLRTest20Newsgroups extends TestCase {
 
   private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/kboar-shard-0.txt"));  
 

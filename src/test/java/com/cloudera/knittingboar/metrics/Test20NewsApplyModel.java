@@ -108,7 +108,7 @@ public class Test20NewsApplyModel extends TestCase {
     
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    tester.debug_setConf(this.generateDebugConfigurationObject());
+    tester.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       tester.LoadConfigVarsLocally();

@@ -128,7 +128,7 @@ public class TestPOLRModelParameters extends TestCase {
     POLRWorkerDriver olr_run = new POLRWorkerDriver();
     
     // generate the debug conf ---- normally setup by YARN stuff
-    olr_run.debug_setConf(this.generateDebugConfigurationObject());
+    olr_run.setConf(this.generateDebugConfigurationObject());
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);

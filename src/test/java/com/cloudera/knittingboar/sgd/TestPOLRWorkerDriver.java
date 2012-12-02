@@ -147,7 +147,7 @@ public class TestPOLRWorkerDriver extends TestCase {
 
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    worker.debug_setConf(this.generateDebugConfigurationObject());
+    worker.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       worker.LoadConfigVarsLocally();
@@ -200,7 +200,7 @@ public class TestPOLRWorkerDriver extends TestCase {
  
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       worker_model_builder.LoadConfigVarsLocally();
@@ -266,7 +266,7 @@ public class TestPOLRWorkerDriver extends TestCase {
  
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder.setConf(this.generateDebugConfigurationObject());
     
     System.out.println("split: " + splits[0].toString());
     InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[0]);
@@ -345,7 +345,7 @@ public class TestPOLRWorkerDriver extends TestCase {
     POLRWorkerDriver worker_model_builder = new POLRWorkerDriver();
     
     // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder.setConf(this.generateDebugConfigurationObject());
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);

@@ -120,7 +120,7 @@ public class TestRunPOLRWorkerSingleBatch extends TestCase {
     POLRWorkerDriver worker_model_builder_0 = new POLRWorkerDriver();
     
     // simulates the conf stuff
-    worker_model_builder_0.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder_0.setConf(this.generateDebugConfigurationObject());
   
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);

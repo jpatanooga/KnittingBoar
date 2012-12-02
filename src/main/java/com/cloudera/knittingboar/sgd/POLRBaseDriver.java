@@ -20,6 +20,7 @@ package com.cloudera.knittingboar.sgd;
 import org.apache.hadoop.conf.Configuration;
 
 import com.cloudera.knittingboar.records.RecordFactory;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Base class for both the master and the worker process for POLR
@@ -72,7 +73,8 @@ public abstract class POLRBaseDriver {
    * 
    * @param c
    */
-  public void debug_setConf(Configuration c) {
+  @VisibleForTesting
+  public void setConf(Configuration c) {
     
     this.conf = c;
     

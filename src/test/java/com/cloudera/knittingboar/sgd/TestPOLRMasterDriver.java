@@ -66,7 +66,7 @@ public class TestPOLRMasterDriver extends TestCase {
 
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    master.debug_setConf(this.generateDebugConfigurationObject());
+    master.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       master.LoadConfigVarsLocally();
@@ -106,7 +106,7 @@ public class TestPOLRMasterDriver extends TestCase {
 
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    master.debug_setConf(this.generateDebugConfigurationObject());
+    master.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       master.LoadConfigVarsLocally();
@@ -193,7 +193,7 @@ public class TestPOLRMasterDriver extends TestCase {
     //master.LoadConfig();
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    master.debug_setConf(this.generateDebugConfigurationObject());
+    master.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       master.LoadConfigVarsLocally();

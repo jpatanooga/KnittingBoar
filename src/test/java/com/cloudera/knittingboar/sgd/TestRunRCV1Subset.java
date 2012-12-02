@@ -171,7 +171,7 @@ public class TestRunRCV1Subset extends TestCase {
     POLRMasterDriver master = new POLRMasterDriver();
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    master.debug_setConf(this.generateDebugConfigurationObject());
+    master.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       master.LoadConfigVarsLocally();
@@ -198,7 +198,7 @@ public class TestRunRCV1Subset extends TestCase {
       POLRWorkerDriver worker_model_builder = new POLRWorkerDriver(); //workers.get(x);
       worker_model_builder.internalID = String.valueOf(x);
       // simulates the conf stuff
-      worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
+      worker_model_builder.setConf(this.generateDebugConfigurationObject());
         
         
       InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[x]);

@@ -169,7 +169,7 @@ public class TestWorkerAndMaster extends TestCase {
     //master.LoadConfig();
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    master.debug_setConf(this.generateDebugConfigurationObject());
+    master.setConf(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
     try {
       master.LoadConfigVarsLocally();
@@ -188,7 +188,7 @@ public class TestWorkerAndMaster extends TestCase {
     POLRWorkerDriver worker_model_builder = new POLRWorkerDriver();
     
     // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.debug_setConf(this.generateDebugConfigurationObject());
+    worker_model_builder.setConf(this.generateDebugConfigurationObject());
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
@@ -275,7 +275,7 @@ public class TestWorkerAndMaster extends TestCase {
     POLRWorkerDriver olr_run = new POLRWorkerDriver();
     
     // generate the debug conf ---- normally setup by YARN stuff
-    olr_run.debug_setConf(this.generateDebugConfigurationObject());
+    olr_run.setConf(this.generateDebugConfigurationObject());
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
