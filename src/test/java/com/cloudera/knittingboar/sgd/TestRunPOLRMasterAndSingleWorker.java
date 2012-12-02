@@ -18,7 +18,6 @@
 package com.cloudera.knittingboar.sgd;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -98,26 +97,9 @@ public class TestRunPOLRMasterAndSingleWorker {
     FileUtils.deleteQuietly(baseDir);
   }
 
-  public InputSplit[] generateDebugSplits(String input_file, JobConf job)
-      throws IOException {
-
-    long block_size = localFs.getDefaultBlockSize(workDir);
-
-    LOG.info("default block size: " + (block_size / 1024 / 1024) + "MB");
-
-    // ---- set where we'll read the input files from -------------
-    FileInputFormat.setInputPaths(job, workDir);
-
-    // try splitting the file in a variety of sizes
-    TextInputFormat format = new TextInputFormat();
-    format.configure(job);
-    return format.getSplits(job, 1);
-
-  }
-
   @Test
   public void testRunSingleWorkerSingleMaster() throws Exception {
-
+    // TODO a test with assertions is not a test
     POLRMasterDriver master = new POLRMasterDriver();
     // ------------------
     // generate the debug conf ---- normally setup by YARN stuff
@@ -136,7 +118,15 @@ public class TestRunPOLRMasterAndSingleWorker {
     // ---- this all needs to be done in
     JobConf job = new JobConf(defaultConf);
 
-    InputSplit[] splits = generateDebugSplits("kboar-shard-0.txt", job);
+    long block_size = localFs.getDefaultBlockSize(workDir);
+    LOG.info("default block size: " + (block_size / 1024 / 1024) + "MB");
+    // ---- set where we'll read the input files from -------------
+    FileInputFormat.setInputPaths(job, workDir);
+    // try splitting the file in a variety of sizes
+    TextInputFormat format = new TextInputFormat();
+    format.configure(job);
+
+    InputSplit[] splits = format.getSplits(job, 1);
 
     InputRecordsSplit custom_reader = new InputRecordsSplit(job, splits[0]);
 
