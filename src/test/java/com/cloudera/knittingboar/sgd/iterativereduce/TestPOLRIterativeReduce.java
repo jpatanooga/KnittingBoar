@@ -17,11 +17,7 @@
 
 package com.cloudera.knittingboar.sgd.iterativereduce;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,108 +25,59 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
-//import com.cloudera.knittingboar.yarn.AvroUtils;
-import com.cloudera.iterativereduce.Utils;
-import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMasterService;
 import com.cloudera.iterativereduce.ComputableMaster;
-import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorkerService;
 import com.cloudera.iterativereduce.ComputableWorker;
-import com.cloudera.iterativereduce.io.HDFSLineParser;
+import com.cloudera.iterativereduce.Utils;
 import com.cloudera.iterativereduce.io.TextRecordParser;
+import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMasterService;
+import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorkerService;
 import com.cloudera.iterativereduce.yarn.avro.generated.FileSplit;
 import com.cloudera.iterativereduce.yarn.avro.generated.StartupConfiguration;
 import com.cloudera.iterativereduce.yarn.avro.generated.WorkerId;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
+import com.cloudera.knittingboar.utils.TestingUtils;
+import com.google.common.io.Files;
+//import com.cloudera.knittingboar.yarn.AvroUtils;
 
 
 public class TestPOLRIterativeReduce {
 
-  InetSocketAddress masterAddress;
-  ExecutorService pool;
-
+  private InetSocketAddress masterAddress;
+  private ExecutorService pool;
   private ApplicationMasterService<ParameterVectorGradientUpdatable> masterService;
   private Future<Integer> master;
   private ComputableMaster<ParameterVectorGradientUpdatable> computableMaster;
-
-  private ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>> workerServices = new ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>>();
-  private ArrayList<Future<Integer>> workers = new ArrayList<Future<Integer>>();
-  private ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>> computableWorkers = new ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>>();
-
-  
-  
-  private static JobConf defaultConf = new JobConf();
-  private static FileSystem localFs = null; 
-  static {
-    
-    //Logger.getRootLogger().setLevel(Level.TRACE);
-    //LogFactory.getFactory()
-    //Logger foo = LogFactory
-     Logger logger = Logger.getLogger(ApplicationWorkerService.class);
-    logger.setLevel(Level.ERROR);
-    
-    logger = Logger.getLogger(ApplicationMasterService.class);
-    logger.setLevel(Level.ERROR);
-        
-    // org.apache.avro.ipc.NettyTransceiver
-    Logger.getLogger("org.apache.avro.ipc.NettyTransceiver").setLevel(Level.ERROR);
-    Logger.getLogger("org.apache.avro.ipc.NettyServer").setLevel(Level.ERROR);
-    //com.cloudera.knittingboar.yarn.appworker.HDFSLineParser
-    //Logger.getLogger("com.cloudera.knittingboar.yarn.appworker.HDFSLineParser").setLevel(Level.FATAL);
-   
-    try {
-      defaultConf.set("fs.defaultFS", "file:///");
-      localFs = FileSystem.getLocal(defaultConf);
-    } catch (IOException e) {
-      throw new RuntimeException("init failure", e);
-    }
-  }
-  
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train3/"));  
-      
-  
-  public Configuration generateDebugConfigurationObject() {
-    
-    
-    Configuration c = new Configuration();
-    
-    // feature vector size
-    c.setInt( "com.cloudera.knittingboar.setup.FeatureVectorSize", 10000 );
-
-    c.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);
-    
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
-    
-    c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 1);
-    
-    // local input split path
-    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
-
-    // setup 20newsgroups
-    c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
-    
-    return c;
-    
-  }    
+  private ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>> workerServices;
+  private ArrayList<Future<Integer>> workers;
+  private ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>> computableWorkers;
+  private File baseDir;
+  private Configuration configuration;
   
   
   @Before
   public void setUp() throws Exception {
     masterAddress = new InetSocketAddress(9999);
     pool = Executors.newFixedThreadPool(4);
+    baseDir = Files.createTempDir();
+    configuration =  new Configuration();
+    configuration.setInt( "com.cloudera.knittingboar.setup.FeatureVectorSize", 10000 );
+    configuration.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);    
+    configuration.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);    
+    configuration.setInt("com.cloudera.knittingboar.setup.NumberPasses", 1);    
+    // local input split path
+    configuration.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
+    // setup 20newsgroups
+    configuration.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
+    workerServices = new ArrayList<ApplicationWorkerService<ParameterVectorGradientUpdatable>>();
+    workers = new ArrayList<Future<Integer>>();
+    computableWorkers = new ArrayList<ComputableWorker<ParameterVectorGradientUpdatable>>();
 
     setUpMaster();
 
@@ -138,19 +85,10 @@ public class TestPOLRIterativeReduce {
     setUpWorker("worker2");
     setUpWorker("worker3");
   }
-
-  @Before
-  public void setUpFile() throws Exception {
-    Configuration conf = new Configuration();
-    FileSystem localFs = FileSystem.getLocal(conf);
-/* 
-    Path testDir = new Path("testData");
-    Path inputFile = new Path(testDir, "testWorkerService.txt");
-
-    Writer writer = new OutputStreamWriter(localFs.create(inputFile, true));
-    writer.write("10\n20\n30\n40\n50\n60\n70\n80\n90\n100");
-    writer.close();
-    */
+  
+  @After
+  public void teardown() throws Exception {
+   FileUtils.deleteDirectory(baseDir); 
   }
 
   /**
@@ -167,14 +105,10 @@ public class TestPOLRIterativeReduce {
     
     System.out.println( "start-ms:" + System.currentTimeMillis() );
     
-    // /Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt
-    
-//    FileSplit split = FileSplit.newBuilder()
-//        .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
-//        .build();
-
+    File inputFile = new File(baseDir, "kboar-shard-0.txt");
+    TestingUtils.copyDecompressed("kboar-shard-0.txt.gz", inputFile);
     FileSplit split = FileSplit.newBuilder()
-    .setPath("/Users/jpatterson/Downloads/datasets/20news-kboar/train3/kboar-shard-0.txt").setOffset(0).setLength(8348890)
+    .setPath(inputFile.getAbsolutePath()).setOffset(0).setLength(8348890)
     .build();    
     
     // hey MK, how do I set multiple splits or splits of multiple files?
@@ -187,10 +121,9 @@ public class TestPOLRIterativeReduce {
     workers.put(Utils.createWorkerId("worker2"), conf);
     workers.put(Utils.createWorkerId("worker3"), conf);
 
-    //computableMaster = new CompoundAdditionMaster();
     computableMaster = new POLRMasterNode();
     masterService = new ApplicationMasterService<ParameterVectorGradientUpdatable>(masterAddress,
-        workers, computableMaster, ParameterVectorGradientUpdatable.class, null, generateDebugConfigurationObject() );
+        workers, computableMaster, ParameterVectorGradientUpdatable.class, null, configuration );
 
     master = pool.submit(masterService);
   }
@@ -198,11 +131,11 @@ public class TestPOLRIterativeReduce {
   private void setUpWorker(String name) {
     //HDFSLineParser parser = new HDFSLineParser();
     
-    TextRecordParser parser = new TextRecordParser();
+    TextRecordParser<ParameterVectorGradientUpdatable> parser = new TextRecordParser<ParameterVectorGradientUpdatable>();
     
     ComputableWorker<ParameterVectorGradientUpdatable> computableWorker = new POLRWorkerNode();
     final ApplicationWorkerService<ParameterVectorGradientUpdatable> workerService = new ApplicationWorkerService<ParameterVectorGradientUpdatable>(
-        name, masterAddress, parser, computableWorker, ParameterVectorGradientUpdatable.class, generateDebugConfigurationObject() );
+        name, masterAddress, parser, computableWorker, ParameterVectorGradientUpdatable.class, configuration);
 
     Future<Integer> worker = pool.submit(new Callable<Integer>() {
       public Integer call() {
@@ -217,6 +150,7 @@ public class TestPOLRIterativeReduce {
 
   @Test
   public void testWorkerService() throws Exception {
+    // TODO tests without assertions are not tests
     workers.get(0).get();
     workers.get(1).get();
     workers.get(2).get();
