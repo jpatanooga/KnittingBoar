@@ -19,3 +19,4 @@ Knitting Boar is an experimental machine learning application which parallelizes
 * [Knitting Boar Internals] (https://github.com/jpatanooga/KnittingBoar/wiki/Knitting-Boar-Internals)
 * [Iterative Reduce] (https://github.com/jpatanooga/KnittingBoar/wiki/Iterative-Reduce)
 * [Outstanding Issues] (https://github.com/jpatanooga/KnittingBoar/wiki/Outstanding-Issues)
+* [Parallel SGD Resources] (https://github.com/jpatanooga/KnittingBoar/wiki/Parallel-SGD-Resources)
