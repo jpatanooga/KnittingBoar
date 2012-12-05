@@ -136,11 +136,10 @@ public class TestDataConverterDriver extends TestCase {
       //shard_file_0.delete();
       System.out.println( "Doesnt exist, downloading 20Newsgroups..." );
       Download20Newsgroups();
-    } else {
-      System.out.println( "20Newsgroups zip file already exists locally." );
-      UnTarExecVersion();
     }
     
+    System.out.println( "Unzipping 20newsgroups, bro." );
+    UnTarExecVersion();
     
     
     StringWriter sw = new StringWriter();
