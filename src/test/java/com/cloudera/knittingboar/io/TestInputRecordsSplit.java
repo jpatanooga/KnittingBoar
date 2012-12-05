@@ -147,6 +147,7 @@ public class TestInputRecordsSplit  extends TestCase {
       
   }
   
+  /*
   public void testRCV1Splits() throws IOException {
     
     String file_rcv1 = "/Users/jpatterson/Downloads/rcv1/rcv1.train.vw";
@@ -202,6 +203,7 @@ public class TestInputRecordsSplit  extends TestCase {
         
     
   }
+  */
   
   
   

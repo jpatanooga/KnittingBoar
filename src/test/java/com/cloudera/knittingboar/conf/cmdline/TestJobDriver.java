@@ -24,6 +24,11 @@ import org.apache.mahout.classifier.sgd.TrainLogistic;
 
 import junit.framework.TestCase;
 
+/**
+ * This is a test for the code where we planned on having a driver similar to MapReduce
+ * - hasnt materialized yet
+ *
+ */
 public class TestJobDriver extends TestCase {
 
   public void testBasics() throws Exception {
