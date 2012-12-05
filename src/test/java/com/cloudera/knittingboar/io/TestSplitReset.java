@@ -1,6 +1,8 @@
 package com.cloudera.knittingboar.io;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
@@ -33,10 +35,8 @@ public class TestSplitReset extends TestCase {
     }
   }
   
-//  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/"));  
 
-  // /Users/jpatterson/Downloads/datasets/20news-kboar/models
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/models/input/"));  
+  private static Path workDir = new Path(System.getProperty("test.build.data", "/tmp/TestSplitReset/"));  
   
   public Configuration generateDebugConfigurationObject() {
     
@@ -47,12 +47,8 @@ public class TestSplitReset extends TestCase {
 
     c.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);
     
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 500);
-    
     c.setInt("com.cloudera.knittingboar.setup.NumberPasses", 2);
     
-    // local input split path
-    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
 
     // setup 20newsgroups
     c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
@@ -100,26 +96,36 @@ public class TestSplitReset extends TestCase {
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
+    
+    
+    Path file = new Path(workDir, "testGetSplits.txt");
+
+    int tmp_file_size = 200000;
+    
+    long block_size = localFs.getDefaultBlockSize();
+    
+    System.out.println("default block size: " + (block_size / 1024 / 1024) + "MB");
+    
+    Writer writer = new OutputStreamWriter(localFs.create(file));
+    try {
+      for (int i = 0; i < tmp_file_size; i++) {
+        writer.write("a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 1, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 99");
+        writer.write("\n");
+      }
+    } finally {
+      writer.close();
+    }    
+    
+    System.out.println( "file write complete" );
+    
+    
 
     // TODO: work on this, splits are generating for everything in dir
     InputSplit[] splits = generateDebugSplits(workDir, job);
       
     System.out.println( "split count: " + splits.length );
 
-    //ArrayList<POLRWorkerNode> workers = new ArrayList<POLRWorkerNode>();
-  
-    //ArrayList<ParameterVectorGradientUpdatable> master_results = new ArrayList<ParameterVectorGradientUpdatable>();
-    
-    //for ( int x = 0; x < splits.length; x++ ) {
-      
-      //POLRWorkerNode worker_model_builder = new POLRWorkerNode(); //workers.get(x);
-      //worker_model_builder.internalID = String.valueOf(x);
-      // simulates the conf stuff
-      //worker_model_builder.setup(this.generateDebugConfigurationObject());
-        
-        
-      //InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[x]);
-      TextRecordParser txt_reader = new TextRecordParser();
+    TextRecordParser txt_reader = new TextRecordParser();
       
       long len = Integer.parseInt( splits[0].toString().split(":")[2].split("\\+")[1] );
 
