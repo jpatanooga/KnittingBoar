@@ -109,7 +109,9 @@ public class DatasetConverter {
       }
       
     } finally {
-      reader.close();
+      if(reader != null) {
+        reader.close();        
+      }
     }
     
     return out + "\n";
@@ -239,13 +241,11 @@ public class DatasetConverter {
         
       } // for
       
-    } catch (Exception e) {
-      
-      System.out.println(e);
-      
     } finally {
-      shard_writer.flush();
-      shard_writer.close();
+      if(shard_writer != null) {
+        shard_writer.flush();
+        shard_writer.close();        
+      }
     }
     
     for (int x = 0; x < current_shard_rec_count.size(); x++) {
