@@ -17,8 +17,13 @@
 
 package com.cloudera.knittingboar.metrics;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
+import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -29,6 +34,9 @@ import org.apache.hadoop.mapred.TextInputFormat;
 
 import com.cloudera.knittingboar.io.InputRecordsSplit;
 import com.cloudera.knittingboar.records.RecordFactory;
+import com.cloudera.knittingboar.utils.DataUtils;
+import com.cloudera.knittingboar.utils.DatasetConverter;
+import com.cloudera.knittingboar.utils.Utils;
 
 import junit.framework.TestCase;
 
@@ -45,12 +53,33 @@ public class Test20NewsApplyModel extends TestCase {
     }
   }
   
+  
+  //private static Path workDir = new Path(new Path(System.getProperty("test.build.data", "/tmp")), "Test20NewsApplyModel");  
+  
+  
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Dataset20Newsgroups");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  
+  private static File filesOutputDir = new File( workDir20NewsLocal + "/20news-converted");
+
+  // download 20newsgroups to tmp
+  private static String str20News_url = "http://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz";
+  private static String strSaveFileAs = workDir20NewsLocal.toString() + "/20news-bydate.tar.gz";
+  
+  private static String str20NewsTestDirInput = "" + unzipDir.toString() + "/20news-bydate-test/";
+//  private static String strTrainDirOutput = "" + filesOutputDir.toString() + "/20news-bydate-train/";
+  
+  private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
+  //private static String str20NewsTestDirOutput = "" + filesOutputDir.toString() + "/20news-bydate-train/";
+  
+  
+  
   // "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model"
 //  private static Path model20News = new Path( "/tmp/TestRunPOLRMasterAndNWorkers.20news.model" );
     private static Path model20News = new Path( "/tmp/IR_Model_0.model" );
 //  private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model" );
   
-  private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  
+  //private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  
   
   public Configuration generateDebugConfigurationObject() {
     
@@ -99,10 +128,84 @@ public class Test20NewsApplyModel extends TestCase {
       
       return splits;
     
-  }    
+  }   
+  
+  /**
+   * Check to see if a unit test has already and unzipped 20newsgroups.
+   * - if not: download and unzip 20newsgroups
+   * 
+   * @throws MalformedURLException
+   * @throws IOException
+   * @throws ArchiveException
+   */
+  private static void CheckFor20NewsgroupsLocally() throws MalformedURLException, IOException, ArchiveException {
+    
+    File download_dir = new File( workDir20NewsLocal.getName() );
+    
+    if (!download_dir.exists()) {
+      System.out.println( "Creating dir: " + workDir20NewsLocal.getName() );
+      download_dir.mkdir();
+    }
+    
+    if ( !unzipDir.exists() ) {
+      System.out.println( "Creating dir: " + unzipDir.getName() );
+      unzipDir.mkdir();
+    }
+    
+    System.out.println("Looking for: " + strSaveFileAs );
+    
+    File existing20NewsFile = new File(strSaveFileAs);
+    
+    if (!existing20NewsFile.exists()) {
+      //shard_file_0.delete();
+      System.out.println( "Doesnt exist, downloading 20Newsgroups..." );
+      Download20Newsgroups();
+    } else {
+      System.out.println( "Found 20Newsgroups locally. Using that Copy." );
+    }
+    
+    System.out.println( "Unzipping 20newsgroups, bro." );
+    //UnGzipAndTarFile( strSaveFileAs );
+
+    // now convert the input test data 
+    
+    // ------ convert ---------
+    
+    System.out.println( "> Converting files in " + str20NewsTestDirInput + " to KBoar input format in: " + strKBoarTestDirInput );
+    
+    // make a single file
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( str20NewsTestDirInput, strKBoarTestDirInput, 12000);
+    
+  }
+  
+  
+  
+  public static void Download20Newsgroups() throws MalformedURLException, IOException, ArchiveException {
+    
+    System.out.println( "Downloading: " + str20News_url );
+    org.apache.commons.io.FileUtils.copyURLToFile(new URL(str20News_url), new File(strSaveFileAs) );    
+        
+  }
+  
+  public static void UnGzipAndTarFile( String file ) throws FileNotFoundException, IOException, ArchiveException {
+    
+    System.out.println( "Untar-ing: " + file );
+    Utils.UnTarAndZipGZFile(new File(file ), unzipDir);
+    
+    
+  }
+  
 
   
   public void testLoad20NewsModel() throws Exception {
+    
+    //CheckFor20NewsgroupsLocally();
+    
+    File file20News = DataUtils.getTwentyNewsGroupDir();
+    
+
+    
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( "/tmp/knittingboar-20news/20news-bydate-test/", strKBoarTestDirInput, 12000);
     
     POLRModelTester tester = new POLRModelTester();
     
@@ -120,10 +223,11 @@ public class Test20NewsApplyModel extends TestCase {
     }
     // now construct any needed machine learning data structures based on config
     tester.Setup();
-    tester.Load( model20News.toString() );
+    tester.Load( "/tmp/olr-news-group.model" ); //  model20News.toString() );
     
     // ------------------    
     
+    Path testData20News = new Path(strKBoarTestDirInput);
  
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
@@ -138,5 +242,6 @@ public class Test20NewsApplyModel extends TestCase {
       tester.RunThroughTestRecords();
     
   }
-  
+
+    
 }

@@ -42,8 +42,17 @@ public class Utils {
       final File outputDir) throws FileNotFoundException, IOException,
       ArchiveException {
     
-    unTar(inputFile, outputDir);
-    unGzip(inputFile, outputDir);
+    System.out.println( "Path: " + inputFile.getParent() );
+    
+//    unGzip(inputFile, new File(inputFile.getParent()));
+
+    String new_path = inputFile.getPath().replaceFirst(".gz", "");
+    
+    System.out.println("Tar File: " + new_path);
+    
+    unTar(new File(new_path), outputDir);
+    
+    // now cleanup tmp .tar file
     
   }
   
