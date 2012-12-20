@@ -138,7 +138,7 @@ public class Test20NewsApplyModel extends TestCase {
    * @throws IOException
    * @throws ArchiveException
    */
-  private static void CheckFor20NewsgroupsLocally() throws MalformedURLException, IOException, ArchiveException {
+/*  private static void CheckFor20NewsgroupsLocally() throws MalformedURLException, IOException, ArchiveException {
     
     File download_dir = new File( workDir20NewsLocal.getName() );
     
@@ -177,9 +177,10 @@ public class Test20NewsApplyModel extends TestCase {
     DatasetConverter.ConvertNewsgroupsFromSingleFiles( str20NewsTestDirInput, strKBoarTestDirInput, 12000);
     
   }
+  */
   
   
-  
+/*  
   public static void Download20Newsgroups() throws MalformedURLException, IOException, ArchiveException {
     
     System.out.println( "Downloading: " + str20News_url );
@@ -194,7 +195,7 @@ public class Test20NewsApplyModel extends TestCase {
     
     
   }
-  
+  */
 
   
   public void testLoad20NewsModel() throws Exception {
@@ -223,7 +224,7 @@ public class Test20NewsApplyModel extends TestCase {
     }
     // now construct any needed machine learning data structures based on config
     tester.Setup();
-    tester.Load( "/tmp/olr-news-group.model" ); //  model20News.toString() );
+    tester.Load( "src/test/resources/KBoar_Sample.model" ); //"/tmp/TestRunPOLRMasterAndNWorkers.20news.model" ); //  model20News.toString() );
     
     // ------------------    
     
