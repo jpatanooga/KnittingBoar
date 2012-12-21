@@ -133,7 +133,7 @@ public class Test20NewsApplyModel extends TestCase {
     }
     // now construct any needed machine learning data structures based on config
     tester.Setup();
-    tester.Load( "src/test/resources/KBoar_Sample.model" ); //"/tmp/TestRunPOLRMasterAndNWorkers.20news.model" ); //  model20News.toString() );
+    tester.Load( "src/test/resources/KBoar_Sample.model" ); 
     
     // ------------------    
     

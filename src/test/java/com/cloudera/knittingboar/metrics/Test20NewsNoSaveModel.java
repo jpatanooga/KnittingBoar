@@ -17,6 +17,7 @@
 
 package com.cloudera.knittingboar.metrics;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -33,9 +34,18 @@ import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
 import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 import com.cloudera.knittingboar.sgd.POLRMasterDriver;
 import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
+import com.cloudera.knittingboar.utils.DataUtils;
+import com.cloudera.knittingboar.utils.DatasetConverter;
 
 import junit.framework.TestCase;
 
+/**
+ * Simulates the practice of constructing a model with 4 simulated workers and then testing this model
+ * locally on the held out test subset of the 20Newsgroup
+ * 
+ * @author jpatterson
+ *
+ */
 public class Test20NewsNoSaveModel extends TestCase {
   
   private static JobConf defaultConf = new JobConf();
@@ -49,9 +59,16 @@ public class Test20NewsNoSaveModel extends TestCase {
     }
   }
   
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/"));  
-    
-  private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Test20NewsNoSaveModel");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTrainDirInput = "" + unzipDir.toString() + "/KBoar-train/";
+  private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
+  
+
+  // location of N splits of KBoar converted data ---
+  private static Path workDir = new Path( strKBoarTrainDirInput ); //DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/" );
+  
+  private static Path testData20News = new Path( strKBoarTestDirInput ); //System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/"));  
   
   
   public Configuration generateDebugConfigurationObject() {
@@ -102,8 +119,28 @@ public class Test20NewsNoSaveModel extends TestCase {
     
   }
   
+  /**
+   * 1. get 20 newsgroups locally
+   * 
+   * 2. generate converted version w 4 splits
+   * 
+   * 3. run simulated parallel SGD w 4 workers
+   * 
+   * 4. run the generated model through the Tester
+   * 
+   * @throws Exception
+   */
   public void testRunMasterAndTwoWorkers() throws Exception {
 
+    DataUtils.getTwentyNewsGroupDir();   
+    
+    // convert the training data into 4 shards
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/", strKBoarTrainDirInput, 3000);
+    
+    // convert the test data into 1 shard
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-test/", strKBoarTestDirInput, 12000);
+    
+    
     int num_passes = 15;
     
     POLRMasterDriver master = new POLRMasterDriver();
@@ -210,7 +247,6 @@ public class Test20NewsNoSaveModel extends TestCase {
     
     tester.SetCore(master.polr, master.polr_modelparams, workers.get(0).getRecordFactory());
     
-    //fullRCV1Dir
     InputSplit[] splits_test_data = generateDebugSplits(testData20News, job);
     
     System.out.println( "split count: " + splits_test_data.length );
