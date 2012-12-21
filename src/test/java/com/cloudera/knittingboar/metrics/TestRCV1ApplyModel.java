@@ -34,8 +34,14 @@ import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
 
 import junit.framework.TestCase;
 
+/**
+ * This class will test applying the model against the RCV1 dataset [TODO]
+ * 
+ * @author jpatterson
+ *
+ */
 public class TestRCV1ApplyModel extends TestCase {
-  
+  /*
   private static JobConf defaultConf = new JobConf();
   private static FileSystem localFs = null; 
   static {
@@ -138,5 +144,5 @@ public class TestRCV1ApplyModel extends TestCase {
     tester.RunThroughTestRecords();
     
   }
-
+*/
 }

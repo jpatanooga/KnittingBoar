@@ -17,6 +17,7 @@
 
 package com.cloudera.knittingboar.metrics;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -33,9 +34,18 @@ import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
 import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 import com.cloudera.knittingboar.sgd.POLRMasterDriver;
 import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
+import com.cloudera.knittingboar.utils.DataUtils;
+import com.cloudera.knittingboar.utils.DatasetConverter;
 
 import junit.framework.TestCase;
 
+/**
+ * This unit test tests running a 4 worker simulated parallel SGD process, saving the model,
+ * loading the model, and then checking to see that the parameters of the model deserialized correctly
+ * 
+ * @author jpatterson
+ *
+ */
 public class TestSaveLoadModel extends TestCase {
   
   private static JobConf defaultConf = new JobConf();
@@ -49,7 +59,17 @@ public class TestSaveLoadModel extends TestCase {
     }
   }
   
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/"));  
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "TestSaveLoadModel");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTrainDirInput = "" + unzipDir.toString() + "/KBoar-train/";
+  //private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
+  
+
+  // location of N splits of KBoar converted data ---
+  private static Path workDir = new Path( strKBoarTrainDirInput ); //DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/" );
+  
+  
+  //private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/"));  
   
   public Configuration generateDebugConfigurationObject() {
     
@@ -62,9 +82,6 @@ public class TestSaveLoadModel extends TestCase {
     
     c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
     
-    // local input split path
-    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
-
     // setup 20newsgroups
     c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", "com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory");
 
@@ -99,8 +116,17 @@ public class TestSaveLoadModel extends TestCase {
   }
   
   
-  public void testRunMasterAndTwoWorkers() throws Exception {
+  public void testRunMasterAndFourWorkers() throws Exception {
 
+    DataUtils.getTwentyNewsGroupDir();   
+    
+    // convert the training data into 4 shards
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/", strKBoarTrainDirInput, 3000);
+    
+    // convert the test data into 1 shard
+//    DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-test/", strKBoarTestDirInput, 12000);
+    
+    
     int num_passes = 15;
     
     POLRMasterDriver master = new POLRMasterDriver();
