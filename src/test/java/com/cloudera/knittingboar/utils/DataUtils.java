@@ -31,6 +31,19 @@ public class DataUtils {
   private static final String TWENTY_NEWS_GROUP_TAR_URL = "http://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz";
   private static final String TWENTY_NEWS_GROUP_TAR_FILE_NAME = "20news-bydate.tar.gz";
   
+  public static String get20NewsgroupsLocalDataLocation() {
+
+    File tmpDir = new File("/tmp");
+    if(!tmpDir.isDirectory()) {
+      tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    }
+    File baseDir = new File(tmpDir, TWENTY_NEWS_GROUP_LOCAL_DIR);
+    
+    
+    return baseDir.toString();
+    
+  }
+  
   public static synchronized File getTwentyNewsGroupDir() throws IOException {
     if(twentyNewsGroups != null) {
       return twentyNewsGroups;
@@ -64,4 +77,7 @@ public class DataUtils {
     twentyNewsGroups = baseDir;
     return twentyNewsGroups;
   }
+  
+  
+  
 }
