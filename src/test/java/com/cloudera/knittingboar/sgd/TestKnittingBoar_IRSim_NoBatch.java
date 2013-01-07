@@ -15,6 +15,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextInputFormat;
 
 import com.cloudera.iterativereduce.io.TextRecordParser;
+import com.cloudera.iterativereduce.irunit.IRUnitDriver;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
 import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 import com.cloudera.knittingboar.sgd.iterativereduce.POLRMasterNode;
@@ -37,7 +38,7 @@ public class TestKnittingBoar_IRSim_NoBatch  extends TestCase {
   
   private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/"));  
     
-  
+/*  
   public Configuration generateDebugConfigurationObject() {
     
     Configuration c = new Configuration();
@@ -174,25 +175,7 @@ public class TestKnittingBoar_IRSim_NoBatch  extends TestCase {
         workers.get(worker_id).IncrementIteration();
 
       }
-        
-      // if (iterationFinished) {
-/*      if (master_result.get().IterationComplete == 1) {
-        
-        System.out.println( " -------- end of pass ------- " );
 
-      // simulates framework checking this and iterating
-        for ( int worker_id = 0; worker_id < workers.size(); worker_id++ ) {
-          
-          bContinuePass = workers.get(worker_id).IncrementIteration();
-
-        } // for
-        
-        if (!bContinuePass) {
-          System.out.println( " -------- end of all passes ------- " );
-        } // if
-*/        
-      //} // if
-        
         
        
     } // while
@@ -229,6 +212,27 @@ public class TestKnittingBoar_IRSim_NoBatch  extends TestCase {
     System.out.println( "total time in ms:" + ts_total );
     
     
+    
+  }
+  */
+  
+  public void testIRUnit_POLR() {
+    
+    System.out.println( "Starting: testIRUnit_POLR" );
+    
+    String[] props = {
+        "app.iteration.count",
+    "com.cloudera.knittingboar.setup.FeatureVectorSize",
+    "com.cloudera.knittingboar.setup.numCategories",
+    "com.cloudera.knittingboar.setup.RecordFactoryClassname"
+    };
+    
+    IRUnitDriver polr_driver = new IRUnitDriver("src/test/resources/app_unit_test.properties", props );
+    
+    polr_driver.Setup();
+    polr_driver.SimulateRun();
+    
+    System.out.println("\n\nComplete...");
     
   }
     
