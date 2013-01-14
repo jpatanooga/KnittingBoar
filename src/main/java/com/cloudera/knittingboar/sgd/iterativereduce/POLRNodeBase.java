@@ -30,7 +30,7 @@ public class POLRNodeBase {
   protected Configuration conf = null;
   protected int num_categories = 2;
   protected int FeatureVectorSize = -1;
-  protected int BatchSize = 200;
+//  protected int BatchSize = 200;
   protected double Lambda = 1.0e-4;
   protected double LearningRate = 10;
   
@@ -39,7 +39,7 @@ public class POLRNodeBase {
   String PredictorVariableTypes = "";
   protected String TargetVariableName = "";
   protected String ColumnHeaderNames = "";
-  protected int NumberPasses = 1;
+  protected int NumberIterations = 1;
   
   protected int LocalBatchCountForIteration = 0;
   protected int GlobalBatchCountForIteration = 0;
@@ -67,4 +67,9 @@ public class POLRNodeBase {
     }
     
   }
+  
+  public Configuration getConf() {
+    return this.conf;
+  }
+  
 }

@@ -17,6 +17,7 @@
 
 package com.cloudera.knittingboar.sgd.olr;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,6 +41,8 @@ import com.cloudera.knittingboar.metrics.POLRMetrics;
 import com.cloudera.knittingboar.metrics.POLRModelTester;
 import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
+import com.cloudera.knittingboar.utils.DataUtils;
+import com.cloudera.knittingboar.utils.DatasetConverter;
 
 import junit.framework.TestCase;
 
@@ -52,7 +55,7 @@ import junit.framework.TestCase;
  */
 public class TestBaseOLRTest20Newsgroups extends TestCase {
 
-  private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/kboar-shard-0.txt"));  
+  //private static Path testData20News = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/test/kboar-shard-0.txt"));  
 
   //private static Path model20News = new Path( "/Users/jpatterson/Downloads/datasets/20news-kboar/models/model_10_31pm.model" ); 
   private static Path model20News = new Path( "/tmp/olr-news-group.model" );
@@ -82,7 +85,9 @@ public class TestBaseOLRTest20Newsgroups extends TestCase {
   int[] bumps = new int[]{1, 2, 5};
   double lineCount = 0;
   
-  
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Dataset20Newsgroups");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
   
   public Configuration generateDebugConfigurationObject() {
     
@@ -93,11 +98,6 @@ public class TestBaseOLRTest20Newsgroups extends TestCase {
 
     c.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);
     
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 200);
-    
-    // local input split path
-    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
-
     // setup 20newsgroups
     c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY);
 
@@ -147,6 +147,14 @@ public class TestBaseOLRTest20Newsgroups extends TestCase {
   
   public void testResults() throws Exception {
     
+    File file20News = DataUtils.getTwentyNewsGroupDir();
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-test/", strKBoarTestDirInput, 6000);
+
+//    File base = new File( file20News + "/20news-bydate-train/" );
+    
+    System.out.println( "Testing on: " + strKBoarTestDirInput );
+    
+    
     OnlineLogisticRegression classifier = ModelSerializer.readBinary(new FileInputStream(model20News.toString()), OnlineLogisticRegression.class);
 
     
@@ -163,8 +171,10 @@ public class TestBaseOLRTest20Newsgroups extends TestCase {
     // TODO: work on this, splits are generating for everything in dir
 //    InputSplit[] splits = generateDebugSplits(inputDir, job);
   
+    Path strKBoarTestDirInputPath = new Path( strKBoarTestDirInput );
+    
     //fullRCV1Dir
-    InputSplit[] splits = generateDebugSplits(testData20News, job);
+    InputSplit[] splits = generateDebugSplits(strKBoarTestDirInputPath, job);
     
     System.out.println( "split count: " + splits.length );
 

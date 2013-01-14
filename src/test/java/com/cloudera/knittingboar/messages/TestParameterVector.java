@@ -31,11 +31,11 @@ import org.apache.mahout.math.Matrix;
 
 import junit.framework.TestCase;
 
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
-import com.cloudera.knittingboar.sgd.GradientBuffer;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVector;
 
 
-public class TestParameterVectorGradient extends TestCase {
+
+public class TestParameterVector extends TestCase {
 
   
   
@@ -71,7 +71,7 @@ public class TestParameterVectorGradient extends TestCase {
     System.out.println( "matrix created..." );
     
     
-    ParameterVectorGradient vec_gradient = new ParameterVectorGradient();
+    ParameterVector vec_gradient = new ParameterVector();
     vec_gradient.SrcWorkerPassCount = pass_count;
     vec_gradient.parameter_vector = m;
     vec_gradient.AvgLogLikelihood = -1.368f;
@@ -88,7 +88,7 @@ public class TestParameterVectorGradient extends TestCase {
     byte[] buf = vec_gradient.Serialize();
     
     
-    ParameterVectorGradient vec_gradient_deserialized = new ParameterVectorGradient();
+    ParameterVector vec_gradient_deserialized = new ParameterVector();
     vec_gradient_deserialized.Deserialize(buf);
     
     assertEquals( pass_count, vec_gradient_deserialized.SrcWorkerPassCount );

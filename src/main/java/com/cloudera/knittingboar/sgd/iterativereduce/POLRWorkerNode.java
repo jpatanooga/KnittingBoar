@@ -32,14 +32,15 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVector;
+
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorUpdatable;
 import com.cloudera.knittingboar.metrics.POLRMetrics;
 import com.cloudera.knittingboar.records.CSVBasedDatasetRecordFactory;
 import com.cloudera.knittingboar.records.RCV1RecordFactory;
 import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
-import com.cloudera.knittingboar.sgd.GradientBuffer;
+
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression; //import com.cloudera.knittingboar.yarn.CompoundAdditionWorker;
 
@@ -59,7 +60,7 @@ import com.google.common.collect.Lists;
  * 
  */
 public class POLRWorkerNode extends POLRNodeBase implements
-    ComputableWorker<ParameterVectorGradientUpdatable> {
+    ComputableWorker<ParameterVectorUpdatable> {
   
   private static final Log LOG = LogFactory.getLog(POLRWorkerNode.class);
   
@@ -90,9 +91,9 @@ public class POLRWorkerNode extends POLRNodeBase implements
    * vectors to the master - this method plugs the local parameter vector into
    * the message
    */
-  public ParameterVectorGradient GenerateUpdate() {
+  public ParameterVector GenerateUpdate() {
     
-    ParameterVectorGradient gradient = new ParameterVectorGradient();
+    ParameterVector gradient = new ParameterVector();
     gradient.parameter_vector = this.polr.getBeta().clone(); // this.polr.getGamma().getMatrix().clone();
     gradient.SrcWorkerPassCount = this.LocalBatchCountForIteration;
     
@@ -120,7 +121,7 @@ public class POLRWorkerNode extends POLRNodeBase implements
    * SGD
    */
   @Override
-  public ParameterVectorGradientUpdatable compute() {
+  public ParameterVectorUpdatable compute() {
     
     Text value = new Text();
     long batch_vec_factory_time = 0;
@@ -237,11 +238,11 @@ public class POLRWorkerNode extends POLRNodeBase implements
       
     } // if 
   */  
-    return new ParameterVectorGradientUpdatable(this.GenerateUpdate());
+    return new ParameterVectorUpdatable(this.GenerateUpdate());
   }
   
-  public ParameterVectorGradientUpdatable getResults() {
-    return new ParameterVectorGradientUpdatable(GenerateUpdate());
+  public ParameterVectorUpdatable getResults() {
+    return new ParameterVectorUpdatable(GenerateUpdate());
   }
   
   /**
@@ -251,9 +252,9 @@ public class POLRWorkerNode extends POLRNodeBase implements
    * 
    */
   @Override
-  public void update(ParameterVectorGradientUpdatable t) {
+  public void update(ParameterVectorUpdatable t) {
     // masterTotal = t.get();
-    ParameterVectorGradient global_update = t.get();
+    ParameterVector global_update = t.get();
     
     // set the local parameter vector to the global aggregate ("beta")
     this.polr.SetBeta(global_update.parameter_vector);
@@ -262,7 +263,7 @@ public class POLRWorkerNode extends POLRNodeBase implements
     this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
     
     // flush the local gradient delta buffer ("gamma")
-    this.polr.FlushGamma();
+//    this.polr.FlushGamma();
     
 /*    if (global_update.IterationComplete == 0) {
       this.IterationComplete = false;
@@ -293,13 +294,13 @@ public class POLRWorkerNode extends POLRNodeBase implements
           "Error loading config: could not load feature vector size");
       
       // feature vector size
-      this.BatchSize = this.conf.getInt(
-          "com.cloudera.knittingboar.setup.BatchSize", 200);
+//      this.BatchSize = this.conf.getInt(
+//          "com.cloudera.knittingboar.setup.BatchSize", 200);
       
 //      this.NumberPasses = this.conf.getInt(
 //          "com.cloudera.knittingboar.setup.NumberPasses", 1);
       // app.iteration.count
-    this.NumberPasses = this.conf.getInt("app.iteration.count", 1);
+    this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
       
       // protected double Lambda = 1.0e-4;
       this.Lambda = Double.parseDouble(this.conf.get(
@@ -426,8 +427,8 @@ public class POLRWorkerNode extends POLRNodeBase implements
    * implement this. - this is currently a legacy artifact
    */
   @Override
-  public ParameterVectorGradientUpdatable compute(
-      List<ParameterVectorGradientUpdatable> records) {
+  public ParameterVectorUpdatable compute(
+      List<ParameterVectorUpdatable> records) {
     // TODO Auto-generated method stub
     return compute();
   }
@@ -435,8 +436,8 @@ public class POLRWorkerNode extends POLRNodeBase implements
   public static void main(String[] args) throws Exception {
     TextRecordParser parser = new TextRecordParser();
     POLRWorkerNode pwn = new POLRWorkerNode();
-    ApplicationWorker<ParameterVectorGradientUpdatable> aw = new ApplicationWorker<ParameterVectorGradientUpdatable>(
-        parser, pwn, ParameterVectorGradientUpdatable.class);
+    ApplicationWorker<ParameterVectorUpdatable> aw = new ApplicationWorker<ParameterVectorUpdatable>(
+        parser, pwn, ParameterVectorUpdatable.class);
     
     ToolRunner.run(aw, args);
   }
@@ -460,9 +461,9 @@ public class POLRWorkerNode extends POLRNodeBase implements
     this.IterationComplete = false;
     this.lineParser.reset();
     
-    System.out.println( "IncIteration > " + this.CurrentIteration + ", " + this.NumberPasses );
+    System.out.println( "IncIteration > " + this.CurrentIteration + ", " + this.NumberIterations );
     
-    if (this.CurrentIteration >= this.NumberPasses) {
+    if (this.CurrentIteration >= this.NumberIterations) {
       System.out.println("POLRWorkerNode: [ done with all iterations ]");
       return false;
     }

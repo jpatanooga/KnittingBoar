@@ -15,7 +15,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextInputFormat;
 
 import com.cloudera.iterativereduce.io.TextRecordParser;
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorUpdatable;
 import com.cloudera.knittingboar.sgd.iterativereduce.POLRWorkerNode;
 
 import junit.framework.TestCase;

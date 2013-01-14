@@ -45,6 +45,8 @@ import org.apache.mahout.math.Vector;
 
 import com.cloudera.knittingboar.io.InputRecordsSplit;
 import com.cloudera.knittingboar.io.TestInputRecordsSplit;
+import com.cloudera.knittingboar.utils.DataUtils;
+import com.cloudera.knittingboar.utils.DatasetConverter;
 import com.cloudera.knittingboar.utils.Utils;
 import com.google.common.collect.ConcurrentHashMultiset;
 import com.google.common.collect.Iterables;
@@ -73,7 +75,10 @@ public class TestTwentyNewsgroupsRecordFactory extends TestCase {
     }
   }
   
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train2/"));
+  //private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Downloads/datasets/20news-kboar/train2/"));
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "TestSaveLoadModel");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTrainDirInput = "" + unzipDir.toString() + "/KBoar-train/";
   
   public void testLineParse() {
     
@@ -165,10 +170,14 @@ public class TestTwentyNewsgroupsRecordFactory extends TestCase {
     TwentyNewsgroupsRecordFactory rec_factory = new TwentyNewsgroupsRecordFactory("\t");
     //rec_factory.setClassSplitString("\t");
     
+    DataUtils.getTwentyNewsGroupDir();   
+    
+    // convert the training data into 4 shards
+    DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/", strKBoarTrainDirInput, 3000);
     
     
     JobConf job = new JobConf(defaultConf);
-    Path file = new Path(workDir, "20news-part-0.txt");
+    //Path file = new Path(workDir, "20news-part-0.txt");
 
     int tmp_file_size = 200000;
     
@@ -179,7 +188,9 @@ public class TestTwentyNewsgroupsRecordFactory extends TestCase {
     // A reporter that does nothing
     Reporter reporter = Reporter.NULL;
  
-    FileInputFormat.setInputPaths(job, workDir);
+    Path workPath = new Path(strKBoarTrainDirInput);
+    
+    FileInputFormat.setInputPaths(job, workPath);
 
 
       // try splitting the file in a variety of sizes

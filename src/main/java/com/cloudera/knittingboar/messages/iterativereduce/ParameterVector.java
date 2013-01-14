@@ -30,9 +30,9 @@ import java.io.OutputStream;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
 
-import com.cloudera.knittingboar.sgd.GradientBuffer;
 
-public class ParameterVectorGradient {
+
+public class ParameterVector {
   
   // worker stuff to send out
   public int SrcWorkerPassCount = 0;
@@ -99,5 +99,83 @@ public class ParameterVectorGradient {
   public int numCategories() {
     return this.parameter_vector.numRows();
   }
+  
+  
+  
+  
+  
+  
+  /**
+   * TODO: fix loop
+   * 
+   * @param other_gamma
+   */
+  public void AccumulateParameterVector(Matrix other_gamma) {
+    
+//    this.gamma.plus(arg0)
+    
+    for (int row = 0; row < this.parameter_vector.rowSize(); row++) {
+      
+      for (int col = 0; col < this.parameter_vector.columnSize(); col++) {
+        
+        double old_this_val = this.parameter_vector.get(row, col);
+        double other_val = other_gamma.get(row, col);
+        
+        // System.out.println( "Accumulate: " + old_this_val + ", " + other_val
+        // );
+        
+        this.parameter_vector.set(row, col, old_this_val + other_val);
+        
+        // System.out.println( "new value: " + this.gamma.get(row, col) );
+        
+      }
+      
+    }
+    
+//    this.AccumulatedGradientsCount++;
+    
+  }
+/*  
+  public void Accumulate(GradientBuffer other_gamma) {
+    
+    for (int row = 0; row < this.gamma.rowSize(); row++) {
+      
+      for (int col = 0; col < this.gamma.columnSize(); col++) {
+        
+        double old_this_val = this.gamma.get(row, col);
+        double other_val = other_gamma.getCell(row, col);
+        
+        this.gamma.set(row, col, old_this_val + other_val);
+        
+      }
+      
+    }
+    
+    this.AccumulatedGradientsCount++;
+    
+  }
+  */
+  
+  /**
+   * TODO: Need to take a look at built in matrix ops here 
+   * 
+   */
+  public void AverageParameterVectors(int denominator) {
+    
+    for (int row = 0; row < this.parameter_vector.rowSize(); row++) {
+      
+      for (int col = 0; col < this.parameter_vector.columnSize(); col++) {
+        
+        double old_this_val = this.parameter_vector.get(row, col);
+        // double other_val = other_gamma.getCell(row, col);
+        this.parameter_vector.set(row, col, old_this_val / denominator);
+        
+      }
+      
+    }
+    
+  }  
+  
+  
   
 }

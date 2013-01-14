@@ -30,7 +30,7 @@ import org.apache.hadoop.mapred.TextInputFormat;
 
 import com.cloudera.knittingboar.io.InputRecordsSplit;
 import com.cloudera.knittingboar.records.RecordFactory;
-import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
+//import com.cloudera.knittingboar.sgd.POLRWorkerDriver;
 
 import junit.framework.TestCase;
 

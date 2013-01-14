@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.mahout.classifier.sgd.L1;
 import org.apache.mahout.classifier.sgd.ModelDissector;
@@ -34,13 +35,19 @@ import com.cloudera.knittingboar.records.CSVBasedDatasetRecordFactory;
 import com.cloudera.knittingboar.records.RCV1RecordFactory;
 import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
-import com.cloudera.knittingboar.sgd.POLRBaseDriver;
+//import com.cloudera.knittingboar.sgd.POLRBaseDriver;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 
-public class POLRModelTester extends POLRBaseDriver {
+public class POLRModelTester {
+  
+  boolean bConfLoaded = false;
+  boolean bSetup = false;
+  boolean bRunning = false;
+  
+  private Configuration conf = null;  
   
   public ParallelOnlineLogisticRegression polr = null; // lmp.createRegression();
   
@@ -68,6 +75,160 @@ public class POLRModelTester extends POLRBaseDriver {
   int[] bumps = new int[] {1, 2, 5};
   double lineCount = 0;
   
+  protected int num_categories = 2;
+  protected int FeatureVectorSize = -1;
+//  protected int BatchSize = 200;
+  protected double Lambda = 1.0e-4;
+  protected double LearningRate = 10;
+  
+  String LocalInputSplitPath = "";
+  String PredictorLabelNames = "";
+  String PredictorVariableTypes = "";
+  protected String TargetVariableName = "";
+  protected String ColumnHeaderNames = "";
+  protected int NumberPasses = 1;
+  
+//  protected int LocalPassCount = 0;
+//  protected int GlobalPassCount = 0;
+  
+  protected String RecordFactoryClassname = "";
+    
+  
+  
+  /**
+   * used with unit tests to pre-set a Configuration
+   * 
+   * 
+   * @param c
+   */
+  public void setConf(Configuration c) {
+    
+    this.conf = c;
+    
+  }
+  
+  public Configuration getConf() {
+    
+    return this.conf;
+    
+  }
+  
+  /**
+   * Loads the config from [HDFS / JobConf]
+   * 
+   * 
+   * NOTES - the mechanics of Configuration may be different in this context -
+   * where does Configuration typically get its info from onload?
+   * 
+   * @throws Exception
+   * 
+   */
+  public void LoadConfigVarsLocally() throws Exception {
+    
+    // figure out how many features we need
+    
+    this.bConfLoaded = false;
+    
+    // this is hard set with LR to 2 classes
+    this.num_categories = this.conf.getInt(
+        "com.cloudera.knittingboar.setup.numCategories", 2);
+    
+    // feature vector size
+    this.FeatureVectorSize = LoadIntConfVarOrException(
+        "com.cloudera.knittingboar.setup.FeatureVectorSize",
+        "Error loading config: could not load feature vector size");
+    
+    // feature vector size
+//    this.BatchSize = this.conf.getInt(
+//        "com.cloudera.knittingboar.setup.BatchSize", 200);
+    
+    this.NumberPasses = this.conf.getInt(
+        "com.cloudera.knittingboar.setup.NumberPasses", 1);
+    
+    // protected double Lambda = 1.0e-4;
+    this.Lambda = Double.parseDouble(this.conf.get(
+        "com.cloudera.knittingboar.setup.Lambda", "1.0e-4"));
+    
+    // protected double LearningRate = 50;
+    this.LearningRate = Double.parseDouble(this.conf.get(
+        "com.cloudera.knittingboar.setup.LearningRate", "10"));
+    
+    // local input split path
+//    this.LocalInputSplitPath = LoadStringConfVarOrException(
+//        "com.cloudera.knittingboar.setup.LocalInputSplitPath",
+//        "Error loading config: could not load local input split path");
+    
+    // System.out.println("LoadConfig()");
+    
+    // maps to either CSV, 20newsgroups, or RCV1
+    this.RecordFactoryClassname = LoadStringConfVarOrException(
+        "com.cloudera.knittingboar.setup.RecordFactoryClassname",
+        "Error loading config: could not load RecordFactory classname");
+    
+    if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
+      
+      // so load the CSV specific stuff ----------
+      
+      // predictor label names
+      this.PredictorLabelNames = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.PredictorLabelNames",
+          "Error loading config: could not load predictor label names");
+      
+      // predictor var types
+      this.PredictorVariableTypes = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.PredictorVariableTypes",
+          "Error loading config: could not load predictor variable types");
+      
+      // target variables
+      this.TargetVariableName = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.TargetVariableName",
+          "Error loading config: Target Variable Name");
+      
+      // column header names
+      this.ColumnHeaderNames = LoadStringConfVarOrException(
+          "com.cloudera.knittingboar.setup.ColumnHeaderNames",
+          "Error loading config: Column Header Names");
+      
+      // System.out.println("LoadConfig(): " + this.ColumnHeaderNames);
+      
+    }
+    
+    this.bConfLoaded = true;
+    
+  }
+/*  
+  public int GetCurrentLocalPassCount() {
+    return this.LocalPassCount;
+  }
+  
+  public void IncGlobalPassCount() {
+    this.GlobalPassCount++;
+  }
+*/  
+  private String LoadStringConfVarOrException(String ConfVarName,
+      String ExcepMsg) throws Exception {
+    
+    if (null == this.conf.get(ConfVarName)) {
+      throw new Exception(ExcepMsg);
+    } else {
+      return this.conf.get(ConfVarName);
+    }
+    
+  }
+  
+  private int LoadIntConfVarOrException(String ConfVarName, String ExcepMsg)
+      throws Exception {
+    
+    if (null == this.conf.get(ConfVarName)) {
+      throw new Exception(ExcepMsg);
+    } else {
+      return this.conf.getInt(ConfVarName, 0);
+    }
+    
+  }
+    
+  
+  
   public void SetCore(ParallelOnlineLogisticRegression plr,
       POLRModelParameters params, RecordFactory fac) {
     
@@ -79,7 +240,7 @@ public class POLRModelTester extends POLRBaseDriver {
     this.num_categories = this.polr_modelparams.getMaxTargetCategories();
     this.FeatureVectorSize = this.polr_modelparams.getNumFeatures();
     
-    this.BatchSize = 10000;
+    //this.BatchSize = 10000;
   }
   
   public void Setup() {
@@ -89,7 +250,7 @@ public class POLRModelTester extends POLRBaseDriver {
     this.num_categories = -1; // polr_modelparams.getMaxTargetCategories();
     this.FeatureVectorSize = -1; // polr_modelparams.getNumFeatures();
     
-    this.BatchSize = 10000;
+//    this.BatchSize = 10000;
     
     // setup record factory stuff here ---------
     
@@ -137,7 +298,8 @@ public class POLRModelTester extends POLRBaseDriver {
     k = 0;
     int num_correct = 0;
     
-    for (int x = 0; x < this.BatchSize; x++) {
+//    for (int x = 0; x < this.BatchSize; x++) {
+    while (true) {
       
       if (this.input_split.next(value)) {
         

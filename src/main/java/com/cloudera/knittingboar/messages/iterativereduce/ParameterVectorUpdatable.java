@@ -22,18 +22,18 @@ import java.nio.ByteBuffer;
 
 import org.apache.mahout.math.Matrix;
 
-import com.cloudera.knittingboar.sgd.GradientBuffer;
+//import com.cloudera.knittingboar.sgd.GradientBuffer;
 import com.cloudera.iterativereduce.Updateable;
 
-public class ParameterVectorGradientUpdatable implements
-    Updateable<ParameterVectorGradient> {
+public class ParameterVectorUpdatable implements
+    Updateable<ParameterVector> {
   
   
-  ParameterVectorGradient param_msg = null;
+  ParameterVector param_msg = null;
   
-  public ParameterVectorGradientUpdatable() {}
+  public ParameterVectorUpdatable() {}
   
-  public ParameterVectorGradientUpdatable(ParameterVectorGradient g) {
+  public ParameterVectorUpdatable(ParameterVector g) {
     this.param_msg = g;
   }
   
@@ -46,7 +46,7 @@ public class ParameterVectorGradientUpdatable implements
     // b.array().length + ", remaining: " + b.remaining() );
     
     try {
-      this.param_msg = new ParameterVectorGradient();
+      this.param_msg = new ParameterVector();
       this.param_msg.Deserialize(b.array());
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -55,13 +55,13 @@ public class ParameterVectorGradientUpdatable implements
   }
   
   @Override
-  public ParameterVectorGradient get() {
+  public ParameterVector get() {
     // TODO Auto-generated method stub
     return this.param_msg;
   }
   
   @Override
-  public void set(ParameterVectorGradient t) {
+  public void set(ParameterVector t) {
     // TODO Auto-generated method stub
     this.param_msg = t;
   }

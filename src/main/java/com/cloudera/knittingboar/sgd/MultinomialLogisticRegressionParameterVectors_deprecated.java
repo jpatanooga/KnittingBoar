@@ -25,16 +25,14 @@ import org.apache.mahout.math.Matrix;
 import com.cloudera.knittingboar.utils.Utils;
 
 /**
- * Gradient accumulation buffer for parallel sgd
+ * An array of parameter vectors in the form of a Matrix object
  * 
- * basically a wrapper around another Matrix object to hold the intermediate
- * updates per batch which are sent to the master node for accumulation into the
- * global parameter vector
+ * A wrapper around another Matrix object to hold the worker's parameter vectors
  * 
  * @author jpatterson
  * 
  */
-public class GradientBuffer {
+public class MultinomialLogisticRegressionParameterVectors_deprecated {
   
   protected Matrix gamma; // this is the saved updated gradient we merge at the
                           // super step
@@ -42,7 +40,7 @@ public class GradientBuffer {
   private int AccumulatedGradientsCount = 0;
   private int numCategories = 2; // default
   
-  public GradientBuffer(int numCategories, int numFeatures) {
+  public MultinomialLogisticRegressionParameterVectors_deprecated(int numCategories, int numFeatures) {
     
     this.numCategories = numCategories;
     this.gamma = new DenseMatrix(numCategories - 1, numFeatures);
@@ -89,7 +87,14 @@ public class GradientBuffer {
     
   }
   
-  public void AccumulateGradient(Matrix other_gamma) {
+  /**
+   * TODO: fix loop
+   * 
+   * @param other_gamma
+   */
+  public void AccumulateParameterVector(Matrix other_gamma) {
+    
+//    this.gamma.plus(arg0)
     
     for (int row = 0; row < this.gamma.rowSize(); row++) {
       
@@ -112,7 +117,7 @@ public class GradientBuffer {
     this.AccumulatedGradientsCount++;
     
   }
-  
+/*  
   public void Accumulate(GradientBuffer other_gamma) {
     
     for (int row = 0; row < this.gamma.rowSize(); row++) {
@@ -131,8 +136,13 @@ public class GradientBuffer {
     this.AccumulatedGradientsCount++;
     
   }
+  */
   
-  public void AverageAccumulations(int denominator) {
+  /**
+   * TODO: Need to take a look at built in matrix ops here 
+   * 
+   */
+  public void AverageParameterVectors(int denominator) {
     
     for (int row = 0; row < this.gamma.rowSize(); row++) {
       
@@ -153,7 +163,7 @@ public class GradientBuffer {
    * 
    * @param other
    */
-  public void Copy(GradientBuffer other) {
+/*  public void Copy(MultinomialLogisticRegressionParameterVectors other) {
     
     this.Accumulate(other);
     
@@ -179,7 +189,7 @@ public class GradientBuffer {
     return merged;
     
   }
-  
+*/  
   /**
    * Clears all values in matrix back to 0s
    */

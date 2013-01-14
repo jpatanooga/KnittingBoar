@@ -15,22 +15,36 @@
  * limitations under the License.
  */
 
-package com.cloudera.knittingboar.messages;
+package com.cloudera.knittingboar.io;
+
+import java.util.ArrayList;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 import junit.framework.TestCase;
 
-public class TestGlobalParameterVectorUpdateMessage extends TestCase {
+/**
+ * This explodes if you also have the google-collections jar in the classpath.
+ * 
+ * fix: remove google-collections
+ * 
+ * @author jpatterson
+ *
+ */
+public class TestCsvRecordParsing extends TestCase {
 
   
-  public void testCtor() {
+  public void testParse() {
     
-    GlobalParameterVectorUpdateMessage msg = new GlobalParameterVectorUpdateMessage("127.0.0.1", 2, 5);
+    String line = "\"a\", \"b\", \"c\"\n";
     
-    assertEquals( 5, msg.parameter_vector.numCols() );
+    Splitter COMMA = Splitter.on(',').trimResults(CharMatcher.is('"'));
+    ArrayList<String> variableNames = Lists.newArrayList(COMMA.split(line));
+
     
-    assertEquals( 1, msg.parameter_vector.rowSize() );
-    
-    System.out.println( "Test Complete for Ctor()" );
+    System.out.println( variableNames );
     
   }
   

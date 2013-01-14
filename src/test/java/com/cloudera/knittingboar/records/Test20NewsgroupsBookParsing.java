@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -42,6 +43,7 @@ import org.apache.mahout.vectorizer.encoders.Dictionary;
 import org.apache.mahout.vectorizer.encoders.FeatureVectorEncoder;
 import org.apache.mahout.vectorizer.encoders.StaticWordValueEncoder;
 
+import com.cloudera.knittingboar.utils.DataUtils;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ConcurrentHashMultiset;
 import com.google.common.collect.HashMultiset;
@@ -51,6 +53,14 @@ import com.google.common.collect.Multiset;
 import junit.framework.TestCase;
 
 public class Test20NewsgroupsBookParsing extends TestCase {
+
+  
+  
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Dataset20Newsgroups");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
+    
+  
   
   private static final int FEATURES = 10000;
   private static Multiset<String> overallCounts;
@@ -67,7 +77,7 @@ public class Test20NewsgroupsBookParsing extends TestCase {
    */
   private static void countWords(Analyzer analyzer, Collection<String> words, Reader in) throws IOException {
     
-    System.out.println( "> ----- countWords ------" );
+    //System.out.println( "> ----- countWords ------" );
     
     // use the provided analyzer to tokenize the input stream
     TokenStream ts = analyzer.tokenStream("text", in);
@@ -76,11 +86,11 @@ public class Test20NewsgroupsBookParsing extends TestCase {
     // for each word in the stream, minus non-word stuff, add word to collection
     while (ts.incrementToken()) {
       String s = ts.getAttribute(CharTermAttribute.class).toString();
-      System.out.print( " " + s );
+      //System.out.print( " " + s );
       words.add(s);
     }
     
-    System.out.println( "\n<" );
+    //System.out.println( "\n<" );
     
     /*overallCounts.addAll(words);*/
   }  
@@ -102,8 +112,11 @@ public class Test20NewsgroupsBookParsing extends TestCase {
     // last line on p.269
     Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_31);
     
-
-    File base = new File("/Users/jpatterson/Downloads/datasets/20news-bydate/20-debug/");
+    File file20News = DataUtils.getTwentyNewsGroupDir();
+    
+System.out.println( "written to: " + DataUtils.get20NewsgroupsLocalDataLocation() );
+    
+    File base = new File(DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train");
     overallCounts = HashMultiset.create();
 
     

@@ -120,9 +120,9 @@ public class TestParallelOnlineLogisticRegression extends TestCase {
     Utils.PrintVectorNonZero(plr_agent_0.getBeta().viewRow(0));
     
     
-    System.out.println( "\nGamma: " );
+//    System.out.println( "\nGamma: " );
     //Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().getRow(0));
-    Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().viewRow(0));
+//    Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().viewRow(0));
   
     plr_agent_0.train(0, trainingSet_0.get(0) );
         
@@ -131,9 +131,9 @@ public class TestParallelOnlineLogisticRegression extends TestCase {
     Utils.PrintVectorNonZero(plr_agent_0.noReallyGetBeta().viewRow(0));
     
     
-    System.out.println( "\nGamma: " );
+//    System.out.println( "\nGamma: " );
     //Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().getRow(0));
-    Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().viewRow(0));
+//    Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().viewRow(0));
     
   }
   
@@ -172,12 +172,12 @@ public class TestParallelOnlineLogisticRegression extends TestCase {
   
     plr_agent_0.train(0, trainingSet_0.get(0) );
     
-    System.out.println( "\nGamma: " );
-    Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().viewRow(0));
+//    System.out.println( "\nGamma: " );
+//    Utils.PrintVectorNonZero(plr_agent_0.gamma.getMatrix().viewRow(0));
         
     
-    plr_agent_0.FlushGamma();
-
+//    plr_agent_0.FlushGamma();
+/*
     System.out.println( "Flushing Gamma ...... " );
     
     System.out.println( "\nGamma: " );
@@ -188,7 +188,7 @@ public class TestParallelOnlineLogisticRegression extends TestCase {
       assertEquals( plr_agent_0.gamma.getMatrix().get(0, x), 0.0 );
       
     }
-    
+*/    
   }
 
   

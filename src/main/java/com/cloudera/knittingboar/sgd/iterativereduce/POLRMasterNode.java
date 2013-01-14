@@ -29,16 +29,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.L1;
 import org.apache.mahout.classifier.sgd.UniformPrior;
+import org.apache.mahout.math.DenseMatrix;
 
-import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.knittingboar.messages.GradientUpdateMessage;
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
-import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
+//import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
+//import com.cloudera.knittingboar.messages.GradientUpdateMessage;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVector;
+import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorUpdatable;
 import com.cloudera.knittingboar.records.CSVBasedDatasetRecordFactory;
 import com.cloudera.knittingboar.records.RCV1RecordFactory;
 import com.cloudera.knittingboar.records.RecordFactory;
 import com.cloudera.knittingboar.records.TwentyNewsgroupsRecordFactory;
-import com.cloudera.knittingboar.sgd.GradientBuffer;
+//import com.cloudera.knittingboar.sgd.MultinomialLogisticRegressionParameterVectors;
 import com.cloudera.knittingboar.sgd.POLRModelParameters;
 import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression; //import com.cloudera.knittingboar.yarn.appmaster.ApplicationMaster;
 //import com.cloudera.knittingboar.yarn.appmaster.ComputableMaster;
@@ -59,11 +60,11 @@ import com.google.common.collect.Lists;
  * 
  */
 public class POLRMasterNode extends POLRNodeBase implements
-    ComputableMaster<ParameterVectorGradientUpdatable> {
+    ComputableMaster<ParameterVectorUpdatable> {
   
   private static final Log LOG = LogFactory.getLog(POLRMasterNode.class);
   
-  GradientBuffer global_parameter_vector = null;
+  ParameterVector global_parameter_vector = null;
   
   private int GlobalMaxPassCount = 0;
   
@@ -75,9 +76,9 @@ public class POLRMasterNode extends POLRNodeBase implements
   private RecordFactory VectorFactory = null;
   
   @Override
-  public ParameterVectorGradientUpdatable compute(
-      Collection<ParameterVectorGradientUpdatable> workerUpdates,
-      Collection<ParameterVectorGradientUpdatable> masterUpdates) {
+  public ParameterVectorUpdatable compute(
+      Collection<ParameterVectorUpdatable> workerUpdates,
+      Collection<ParameterVectorUpdatable> masterUpdates) {
     
     System.out.println("\nMaster Compute: SuperStep - Worker Info ----- ");
     int x = 0;
@@ -85,8 +86,9 @@ public class POLRMasterNode extends POLRNodeBase implements
     // reset
     //this.Global_Min_IterationCount = this.NumberPasses;
     boolean iterationComplete = true;
+    this.global_parameter_vector.parameter_vector = new DenseMatrix(this.num_categories - 1, this.FeatureVectorSize);
 
-    for (ParameterVectorGradientUpdatable i : workerUpdates) {
+    for (ParameterVectorUpdatable i : workerUpdates) {
       
       // not sure we still need this ---------------
       if (i.get().SrcWorkerPassCount > this.GlobalMaxPassCount) {
@@ -113,12 +115,14 @@ public class POLRMasterNode extends POLRNodeBase implements
       }
       x++;
       // accumulate gradient of parameter vectors
-      this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
+      //this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
+      this.global_parameter_vector.AccumulateParameterVector(i.get().parameter_vector);
       
     }
     
     // now average the parameter vectors together
-    this.global_parameter_vector.AverageAccumulations(workerUpdates.size());
+    //this.global_parameter_vector.AverageAccumulations(workerUpdates.size());
+    this.global_parameter_vector.AverageParameterVectors(workerUpdates.size());
     
     LOG.debug("Master node accumulating and averaging " + workerUpdates.size()
         + " worker updates.");
@@ -126,7 +130,7 @@ public class POLRMasterNode extends POLRNodeBase implements
     
     
     
-    ParameterVectorGradient gradient_msg = new ParameterVectorGradient();
+    ParameterVector gradient_msg = new ParameterVector();
     gradient_msg.GlobalPassCount = this.GlobalMaxPassCount;
     
 /*    if (iterationComplete) {
@@ -136,14 +140,15 @@ public class POLRMasterNode extends POLRNodeBase implements
       gradient_msg.IterationComplete = 0;
     }
     */
-    gradient_msg.parameter_vector = this.global_parameter_vector.getMatrix()
-        .clone();
+    gradient_msg.parameter_vector = this.global_parameter_vector.parameter_vector.clone();
     
-    ParameterVectorGradientUpdatable return_msg = new ParameterVectorGradientUpdatable();
+    
+    
+    ParameterVectorUpdatable return_msg = new ParameterVectorUpdatable();
     return_msg.set(gradient_msg);
     
     // set the master copy!
-    this.polr.SetBeta(this.global_parameter_vector.getMatrix().clone());
+    this.polr.SetBeta(this.global_parameter_vector.parameter_vector.clone());
     
     // THIS NEEDS TO BE DONE, probably automated!
     workerUpdates.clear();
@@ -152,7 +157,7 @@ public class POLRMasterNode extends POLRNodeBase implements
   }
   
   @Override
-  public ParameterVectorGradientUpdatable getResults() {
+  public ParameterVectorUpdatable getResults() {
     System.out.println(">>> getResults() - null!!!");
     return null;
   }
@@ -175,12 +180,12 @@ public class POLRMasterNode extends POLRNodeBase implements
           "Error loading config: could not load feature vector size");
       
       // feature vector size
-      this.BatchSize = this.conf.getInt(
-          "com.cloudera.knittingboar.setup.BatchSize", 200);
+//      this.BatchSize = this.conf.getInt(
+//          "com.cloudera.knittingboar.setup.BatchSize", 200);
       
 //      this.NumberPasses = this.conf.getInt(
 //          "com.cloudera.knittingboar.setup.NumberPasses", 1);
-      this.NumberPasses = this.conf.getInt("app.iteration.count", 1);
+      this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
       
       // protected double Lambda = 1.0e-4;
       this.Lambda = Double.parseDouble(this.conf.get(
@@ -239,7 +244,7 @@ public class POLRMasterNode extends POLRNodeBase implements
     
     System.out.println( "-----------------------------------------" );
     System.out.println( "# Master Conf #" );
-    System.out.println( "Number Iterations: " + this.NumberPasses );
+    System.out.println( "Number Iterations: " + this.NumberIterations );
     System.out.println( "-----------------------------------------\n\n" );
     
     this.SetupPOLR();
@@ -253,8 +258,8 @@ public class POLRMasterNode extends POLRNodeBase implements
     LOG.debug("SetupOLR: " + this.num_categories + ", "
         + this.FeatureVectorSize);
     
-    this.global_parameter_vector = new GradientBuffer(this.num_categories,
-        this.FeatureVectorSize);
+    this.global_parameter_vector = new ParameterVector(); //this.num_categories,
+        //this.FeatureVectorSize);
     
     String[] predictor_label_names = this.PredictorLabelNames.split(",");
     
@@ -337,9 +342,10 @@ public class POLRMasterNode extends POLRNodeBase implements
   
   public static void main(String[] args) throws Exception {
     POLRMasterNode pmn = new POLRMasterNode();
-    ApplicationMaster<ParameterVectorGradientUpdatable> am = new ApplicationMaster<ParameterVectorGradientUpdatable>(
-        pmn, ParameterVectorGradientUpdatable.class);
+    ApplicationMaster<ParameterVectorUpdatable> am = new ApplicationMaster<ParameterVectorUpdatable>(
+        pmn, ParameterVectorUpdatable.class);
     
     ToolRunner.run(am, args);
   }
+  
 }

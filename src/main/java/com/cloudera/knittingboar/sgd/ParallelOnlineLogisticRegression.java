@@ -72,11 +72,12 @@ public class ParallelOnlineLogisticRegression extends
   
   // ####### This is NEW ######################
   // that is (numCategories-1) x numFeatures
-  protected GradientBuffer gamma; // this is the saved updated gradient we merge
+  //protected MultinomialLogisticRegressionParameterVectors gamma; // this is the saved updated gradient we merge
                                   // at the super step
   
   public ParallelOnlineLogisticRegression() {
   // private constructor available for serialization, but not normal use
+    
   }
   
   /**
@@ -98,7 +99,7 @@ public class ParallelOnlineLogisticRegression extends
     beta = new DenseMatrix(numCategories - 1, numFeatures);
     
     // brand new factor for parallelization
-    this.gamma = new GradientBuffer(numCategories, numFeatures);
+//    this.gamma = new MultinomialLogisticRegressionParameterVectors(numCategories, numFeatures);
   }
   
   /**
@@ -261,7 +262,7 @@ public class ParallelOnlineLogisticRegression extends
         beta.setQuick(i, j, newValue);
         
         // now update gamma --- we only want the gradient since the last time
-        
+/*        
         double old_gamma = gamma.getCell(i, j);
         double new_gamma = old_gamma + gradient_to_add; // gradientBase *
                                                         // learningRate *
@@ -269,7 +270,7 @@ public class ParallelOnlineLogisticRegression extends
                                                         // * instance.get(j);
         
         gamma.setCell(i, j, new_gamma);
-        
+  */      
       }
     }
     
@@ -318,14 +319,14 @@ public class ParallelOnlineLogisticRegression extends
    * Reset all values in Gamma (gradient buffer) back to zero
    * 
    */
-  public void FlushGamma() {
+/*  public void FlushGamma() {
     
     this.gamma.Reset();
     
   }
   
-  public GradientBuffer getGamma() {
+  public MultinomialLogisticRegressionParameterVectors getGamma() {
     return this.gamma;
   }
-  
+*/  
 }

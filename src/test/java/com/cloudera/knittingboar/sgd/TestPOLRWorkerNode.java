@@ -32,13 +32,15 @@ import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
+import org.apache.mahout.math.DenseMatrix;
+import org.apache.mahout.math.Matrix;
 
 import junit.framework.TestCase;
 
+import com.cloudera.iterativereduce.io.TextRecordParser;
 import com.cloudera.knittingboar.io.InputRecordsSplit;
-import com.cloudera.knittingboar.messages.GlobalParameterVectorUpdateMessage;
-import com.cloudera.knittingboar.messages.GradientUpdateMessage;
 import com.cloudera.knittingboar.records.RecordFactory;
+import com.cloudera.knittingboar.sgd.iterativereduce.POLRWorkerNode;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
@@ -51,7 +53,7 @@ import com.google.common.io.Resources;
  * @author jpatterson
  *
  */
-public class TestPOLRWorkerDriver extends TestCase {
+public class TestPOLRWorkerNode extends TestCase {
 
   
   
@@ -66,7 +68,13 @@ public class TestPOLRWorkerDriver extends TestCase {
     }
   }
   
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Documents/workspace/WovenWabbit/data/donut_no_header.csv"));  
+  private static int feature_vector_size = 10;
+  private static Path workDir = new Path( "src/test/resources/donut_no_header.csv" );  
+  /*
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Dataset20Newsgroups");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
+*/    
 
   
   public Configuration generateDebugConfigurationObject() {
@@ -78,15 +86,13 @@ public class TestPOLRWorkerDriver extends TestCase {
 
     c.setInt( "com.cloudera.knittingboar.setup.numCategories", 2);
     
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 10);
-    
     
     
     c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", RecordFactory.CSV_RECORDFACTORY);
     
     
     // local input split path
-    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
+//    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
     
     // predictor label names
     c.set( "com.cloudera.knittingboar.setup.PredictorLabelNames", "x,y" );
@@ -143,29 +149,17 @@ public class TestPOLRWorkerDriver extends TestCase {
   
   public void testConfiguration() {
     
-    POLRWorkerDriver worker = new POLRWorkerDriver();
+    POLRWorkerNode worker = new POLRWorkerNode();
 
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    worker.setConf(this.generateDebugConfigurationObject());
+    worker.setup(this.generateDebugConfigurationObject());
     // now load the conf stuff into locally used vars
-    try {
-      worker.LoadConfigVarsLocally();
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      System.out.println( "Conf load fail: shutting down." );
-      assertEquals( 0, 1 );
-    }
-    // now construct any needed machine learning data structures based on config
-    worker.Setup();
-    //worker.DebugPrintConfig();
-    // ------------------
 
     // test the base conf stuff ------------
     
     assertEquals( worker.getConf().getInt("com.cloudera.knittingboar.setup.FeatureVectorSize", 0), 10 );
-    assertEquals( worker.getConf().get("com.cloudera.knittingboar.setup.LocalInputSplitPath"), "hdfs://127.0.0.1/input/0" );
+//    assertEquals( worker.getConf().get("com.cloudera.knittingboar.setup.LocalInputSplitPath"), "hdfs://127.0.0.1/input/0" );
     assertEquals( worker.getConf().get("com.cloudera.knittingboar.setup.PredictorLabelNames"), "x,y" );
     assertEquals( worker.getConf().get("com.cloudera.knittingboar.setup.PredictorVariableTypes"), "numeric,numeric" );
     assertEquals( worker.getConf().get("com.cloudera.knittingboar.setup.TargetVariableName"), "color" );
@@ -180,68 +174,6 @@ public class TestPOLRWorkerDriver extends TestCase {
   
   
   
-  /**
-   * 1. Generate some gradient
-   * 
-   * 2. Construct a gradient update message
-   * 
-   * 3. simulate generation of a PVec update message
-   * 
-   * 4. update the local POLR driver w the PVec message
-   * 
-   * 5. check the local gradient and pvec matrices
-   * 
-   */
-  public void testRecievePVectorUpdateMessage() {
-    
-    System.out.println( "\n------ testRecievePVectorUpdateMessage --------- ");
-    POLRWorkerDriver worker_model_builder = new POLRWorkerDriver();
-    
- 
-    // ------------------    
-    // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.setConf(this.generateDebugConfigurationObject());
-    // now load the conf stuff into locally used vars
-    try {
-      worker_model_builder.LoadConfigVarsLocally();
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      System.out.println( "Conf load fail: shutting down." );
-      assertEquals( 0, 1 );
-    }
-    // now construct any needed machine learning data structures based on config
-    worker_model_builder.Setup();
-    
-    double val1 = -1.0;
-    
-     GradientBuffer g0 = new GradientBuffer( 2, worker_model_builder.FeatureVectorSize );
-     
-     for ( int x = 0; x < worker_model_builder.FeatureVectorSize; x++ ) {
-       
-       g0.setCell(0, x, val1);
-       
-     }
-
-     GlobalParameterVectorUpdateMessage pvec_msg = new GlobalParameterVectorUpdateMessage("127.0.0.1", 2, worker_model_builder.FeatureVectorSize);
-     pvec_msg.parameter_vector = g0.gamma.clone();
-     
-     worker_model_builder.ProcessIncomingParameterVectorMessage(pvec_msg);
-     
-     System.out.println( "Updated worker node's pvec via msg" );
-     
-     worker_model_builder.polr.Debug_PrintGamma();
-  
-     for ( int x = 0; x < worker_model_builder.FeatureVectorSize; x++ ) {
-     
-       assertEquals( worker_model_builder.polr.noReallyGetBeta().get(0, x), val1 );
-       
-     }
-     
-     System.out.println( "--------------------------------\n" );
-         
-    
-  }
   
   
   /**
@@ -261,62 +193,53 @@ public class TestPOLRWorkerDriver extends TestCase {
     
     System.out.println( "split count: " + splits.length );
     
-    POLRWorkerDriver worker_model_builder = new POLRWorkerDriver();
+    POLRWorkerNode worker_model_builder = new POLRWorkerNode();
     
  
     // ------------------    
     // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.setConf(this.generateDebugConfigurationObject());
+    worker_model_builder.setup(this.generateDebugConfigurationObject());
     
     System.out.println("split: " + splits[0].toString());
-    InputRecordsSplit custom_reader_0 = new InputRecordsSplit(job, splits[0]);
-      // TODO: set this up to run through the conf pathways
-    worker_model_builder.setupInputSplit(custom_reader_0);
+     
+    TextRecordParser txt_reader = new TextRecordParser();
+
+    long len = Integer.parseInt(splits[0].toString().split(":")[2]
+        .split("\\+")[1]);
+
+    txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);
+
+    worker_model_builder.setRecordParser(txt_reader);
+
     
-    // now load the conf stuff into locally used vars
-    try {
-      worker_model_builder.LoadConfigVarsLocally();
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      System.out.println( "Conf load fail: shutting down." );
-      assertEquals( 0, 1 );
-    }
-    // now construct any needed machine learning data structures based on config
-    worker_model_builder.Setup();
-    // ------------------
+   
     
+//      worker_model_builder.RunNextTrainingBatch();
+    worker_model_builder.compute();
     
-      worker_model_builder.RunNextTrainingBatch();
+//    worker_model_builder.polr.Set
     
     // ------------------- now replace beta ------------
     
     double val1 = -1.0;
     
-     GradientBuffer g0 = new GradientBuffer( 2, worker_model_builder.FeatureVectorSize );
+    // GradientBuffer g0 = new GradientBuffer( 2, worker_model_builder.FeatureVectorSize );
+    Matrix m = new DenseMatrix( 2, feature_vector_size );
 
-     for ( int x = 0; x < worker_model_builder.FeatureVectorSize; x++ ) {
+     for ( int x = 0; x < feature_vector_size; x++ ) {
        
-       g0.setCell(0, x, val1);
+       m.set(0, x, val1);
        
      }
-     
-
-     GlobalParameterVectorUpdateMessage pvec_msg = new GlobalParameterVectorUpdateMessage("127.0.0.1", 2, worker_model_builder.FeatureVectorSize);
-     pvec_msg.parameter_vector = g0.gamma.clone();
-     
-     worker_model_builder.ProcessIncomingParameterVectorMessage(pvec_msg);
-     
-     System.out.println( "Updated worker node's pvec via msg" );
-     
-     worker_model_builder.polr.Debug_PrintGamma();
   
-     for ( int x = 0; x < worker_model_builder.FeatureVectorSize; x++ ) {
+     worker_model_builder.polr.SetBeta(m);
+     
+     for ( int x = 0; x < feature_vector_size; x++ ) {
      
        assertEquals( worker_model_builder.polr.noReallyGetBeta().get(0, x), val1 );
        
      }
-     
+ 
      System.out.println( "--------------------------------\n" );
    
   }
@@ -342,33 +265,44 @@ public class TestPOLRWorkerDriver extends TestCase {
    */
   public void testPOLROnFullDatasetRun() throws Exception {
     
-    POLRWorkerDriver worker_model_builder = new POLRWorkerDriver();
+    POLRWorkerNode worker_model_builder = new POLRWorkerNode();
     
     // generate the debug conf ---- normally setup by YARN stuff
-    worker_model_builder.setConf(this.generateDebugConfigurationObject());
+    worker_model_builder.setup(this.generateDebugConfigurationObject());
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
 
     InputSplit[] splits = generateDebugSplits(workDir, job);
 
-    InputRecordsSplit custom_reader = new InputRecordsSplit(job, splits[0]);
+//    InputRecordsSplit custom_reader = new InputRecordsSplit(job, splits[0]);
       
       // TODO: set this up to run through the conf pathways
-    worker_model_builder.setupInputSplit(custom_reader);
-    
+//    worker_model_builder.setupInputSplit(custom_reader);
+/*    
     worker_model_builder.LoadConfigVarsLocally();
 
     worker_model_builder.Setup();    
-    
-    
-    for ( int x = 0; x < 25; x++) {
-      
-      worker_model_builder.RunNextTrainingBatch();
-      
-      System.out.println( "---------- cycle " + x + " done ------------- " );
+  */  
 
-  } // for    
+    
+    TextRecordParser txt_reader = new TextRecordParser();
+
+    long len = Integer.parseInt(splits[0].toString().split(":")[2]
+        .split("\\+")[1]);
+
+    txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);
+
+    worker_model_builder.setRecordParser(txt_reader);
+    
+    
+    //for ( int x = 0; x < 5; x++) {
+      
+      worker_model_builder.compute();
+      
+      //System.out.println( "---------- cycle " + x + " done ------------- " );
+
+  //} // for    
     
     
     // ------ move this loop into the POLR Worker Driver --------
@@ -376,7 +310,7 @@ public class TestPOLRWorkerDriver extends TestCase {
         
     
     
-    worker_model_builder.PrintModelStats();
+   // worker_model_builder.PrintModelStats();
     
     assertEquals(1.0e-4, worker_model_builder.polr_modelparams.getLambda(), 1.0e-9);
     assertEquals(10, worker_model_builder.polr_modelparams.getNumFeatures());

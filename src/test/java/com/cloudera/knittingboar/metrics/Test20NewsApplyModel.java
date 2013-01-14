@@ -63,6 +63,8 @@ public class Test20NewsApplyModel extends TestCase {
   private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
   private static String strKBoarTestDirInput = "" + unzipDir.toString() + "/KBoar-test/";
     
+  
+  
   public Configuration generateDebugConfigurationObject() {
     
     Configuration c = new Configuration();
@@ -72,7 +74,7 @@ public class Test20NewsApplyModel extends TestCase {
 
     c.setInt( "com.cloudera.knittingboar.setup.numCategories", 20);
     
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 500);
+//    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 500);
     
     // setup 20newsgroups
     c.set( "com.cloudera.knittingboar.setup.RecordFactoryClassname", RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY);

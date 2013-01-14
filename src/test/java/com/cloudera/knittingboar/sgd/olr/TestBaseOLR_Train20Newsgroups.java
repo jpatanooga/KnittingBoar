@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -54,6 +55,7 @@ import org.apache.mahout.vectorizer.encoders.FeatureVectorEncoder;
 import org.apache.mahout.vectorizer.encoders.StaticWordValueEncoder;
 import org.apache.mahout.vectorizer.encoders.Dictionary;
 
+import com.cloudera.knittingboar.utils.DataUtils;
 import com.cloudera.knittingboar.utils.Utils;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ConcurrentHashMultiset;
@@ -80,6 +82,9 @@ public class TestBaseOLR_Train20Newsgroups extends TestCase {
   private static final int FEATURES = 10000;
   private static Multiset<String> overallCounts;
 
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Dataset20Newsgroups");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  
   
   /**
    * 
@@ -116,8 +121,10 @@ public class TestBaseOLR_Train20Newsgroups extends TestCase {
   
   public void testTrainNewsGroups() throws IOException {
     
+    File file20News = DataUtils.getTwentyNewsGroupDir();
 
-    File base = new File("/Users/jpatterson/Downloads/datasets/20news-bydate/20news-bydate-train/");
+    File base = new File( file20News + "/20news-bydate-train/" );
+        //"/Users/jpatterson/Downloads/datasets/20news-bydate/20news-bydate-train/");
     overallCounts = HashMultiset.create();
 
     long startTime = System.currentTimeMillis();

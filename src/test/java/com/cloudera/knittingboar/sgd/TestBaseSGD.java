@@ -34,8 +34,10 @@ import org.apache.hadoop.mapred.TextInputFormat;
 
 import junit.framework.TestCase;
 
+import com.cloudera.iterativereduce.io.TextRecordParser;
 import com.cloudera.knittingboar.io.InputRecordsSplit;
 import com.cloudera.knittingboar.records.RecordFactory;
+import com.cloudera.knittingboar.sgd.iterativereduce.POLRWorkerNode;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
@@ -56,7 +58,7 @@ public class TestBaseSGD extends TestCase {
   }
   
   //private static Path workDir = new Path(System.getProperty("/Users/jpatterson/Documents/workspace/WovenWabbit/data/donut_no_header.csv"));
-  private static Path workDir = new Path(System.getProperty("test.build.data", "/Users/jpatterson/Documents/workspace/WovenWabbit/data/donut_no_header.csv"));  
+  private static Path workDir = new Path(System.getProperty("test.build.data", "src/test/resources/donut_no_header.csv"));  
 
   
   public Configuration generateDebugConfigurationObject() {
@@ -68,7 +70,7 @@ public class TestBaseSGD extends TestCase {
 
     c.setInt( "com.cloudera.knittingboar.setup.numCategories", 2);
     
-    c.setInt("com.cloudera.knittingboar.setup.BatchSize", 10);
+    //c.setInt("com.cloudera.knittingboar.setup.BatchSize", 10);
     
     
     
@@ -76,7 +78,7 @@ public class TestBaseSGD extends TestCase {
     
     
     // local input split path
-    c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
+    //c.set( "com.cloudera.knittingboar.setup.LocalInputSplitPath", "hdfs://127.0.0.1/input/0" );
     
     // predictor label names
     c.set( "com.cloudera.knittingboar.setup.PredictorLabelNames", "x,y" );
@@ -155,10 +157,13 @@ public class TestBaseSGD extends TestCase {
   public void testTrainer() throws Exception {
     
     
-    POLRWorkerDriver olr_run = new POLRWorkerDriver();
+    //POLRWorkerDriver olr_run = new POLRWorkerDriver();
+    
+    POLRWorkerNode olr_run = new POLRWorkerNode();
+    olr_run.setup(this.generateDebugConfigurationObject());
     
     // generate the debug conf ---- normally setup by YARN stuff
-    olr_run.setConf(this.generateDebugConfigurationObject());
+    //olr_run.setConf(this.generateDebugConfigurationObject());
     
     // ---- this all needs to be done in 
     JobConf job = new JobConf(defaultConf);
@@ -168,17 +173,27 @@ public class TestBaseSGD extends TestCase {
     InputRecordsSplit custom_reader = new InputRecordsSplit(job, splits[0]);
       
       // TODO: set this up to run through the conf pathways
-    olr_run.setupInputSplit(custom_reader);
-    
-    olr_run.LoadConfigVarsLocally();
+    //olr_run.setupInputSplit(custom_reader);
+    TextRecordParser txt_reader = new TextRecordParser();
 
-    olr_run.Setup();    
+    long len = Integer.parseInt(splits[0].toString().split(":")[2]
+        .split("\\+")[1]);
+
+    txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);
+
+    olr_run.setRecordParser(txt_reader);
+
+    //olr_run.s
+    
+    //olr_run.LoadConfigVarsLocally();
+
+    //olr_run.Setup();    
     
     
-    for ( int x = 0; x < 25; x++) {
+    for ( int x = 0; x < 5; x++) {
       
-      olr_run.RunNextTrainingBatch();
-      
+      olr_run.compute();
+      olr_run.IncrementIteration();
       System.out.println( "---------- cycle " + x + " done ------------- " );
 
   } // for    
