@@ -17,20 +17,33 @@
 
 package com.cloudera.knittingboar.utils;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import org.apache.hadoop.fs.Path;
 
 import junit.framework.TestCase;
 
 public class TestDatasetConverter extends TestCase {
 
-  public void test20NewsgroupsFormatConverterForNWorkers() throws IOException {
+  private static Path workDir20NewsLocal = new Path(new Path("/tmp"), "Dataset20Newsgroups");
+  private static File unzipDir = new File( workDir20NewsLocal + "/20news-bydate");
+  private static String strKBoarTrainDirInput = "" + unzipDir.toString() + "/KBoar-train4/";
+  private static String strKBoarSVMLightTrainDirInput = "" + unzipDir.toString() + "/KBoar-SVMLight/";  
+  
+  public void test20NewsgroupsFormatConverterForNWorkers() throws Exception {
     
     //DatasetConverter.ConvertNewsgroupsFromNaiveBayesFormat("/Users/jpatterson/Downloads/datasets/20news-processed/train/", "/Users/jpatterson/Downloads/datasets/20news-kboar/train2/");
     
     //int count = DatasetConverter.ConvertNewsgroupsFromSingleFiles("/Users/jpatterson/Downloads/datasets/20news-bydate/20news-bydate-train/", "/Users/jpatterson/Downloads/datasets/20news-kboar/train3/", 5657);
     
-    int count = DatasetConverter.ConvertNewsgroupsFromSingleFiles("/Users/jpatterson/Downloads/datasets/20news-bydate/20news-bydate-train/", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/", 2850);
+//    int count = DatasetConverter.ConvertNewsgroupsFromSingleFiles("/Users/jpatterson/Downloads/datasets/20news-bydate/20news-bydate-train/", "/Users/jpatterson/Downloads/datasets/20news-kboar/train4/", 2850);
+    File file20News = DataUtils.getTwentyNewsGroupDir();
+    
+//    int count = DatasetConverter.ConvertNewsgroupsFromSingleFiles( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/", strKBoarTrainDirInput, 2850);
+    
+    int count = DatasetConverter.ConvertNewsgroupsFromSingleFilesToSVMLightFormat( DataUtils.get20NewsgroupsLocalDataLocation() + "/20news-bydate-train/", strKBoarSVMLightTrainDirInput, 2850);
     
     assertEquals( 11314, count );
     
